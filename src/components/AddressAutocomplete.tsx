@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, MapPin } from 'lucide-react';
-import { searchAddress, type GeocodingResult } from '../lib/geocoding';
+import { searchAddress, getPlaceDetails, type AddressPrediction } from '../lib/geocoding';
 
 interface AddressAutocompleteProps {
     onSelect: (location: { latitude: number; longitude: number; address: string; name: string }) => void;
@@ -10,15 +10,16 @@ interface AddressAutocompleteProps {
 
 export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", className = "" }: AddressAutocompleteProps) {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<GeocodingResult[]>([]);
+    const [results, setResults] = useState<AddressPrediction[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
     // Debounce search
     useEffect(() => {
         const timeoutId = setTimeout(async () => {
-            if (query.length > 2) {
+            if (query.trim().length >= 2) {
                 setIsSearching(true);
                 const searchResults = await searchAddress(query);
                 setResults(searchResults);
@@ -28,7 +29,7 @@ export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", 
                 setResults([]);
                 setIsOpen(false);
             }
-        }, 500); // 500ms debounce
+        }, 400);
 
         return () => clearTimeout(timeoutId);
     }, [query]);
@@ -46,16 +47,23 @@ export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", 
         };
     }, []);
 
-    const handleSelect = (result: GeocodingResult) => {
-        const location = {
-            latitude: parseFloat(result.lat),
-            longitude: parseFloat(result.lon),
-            address: result.display_name,
-            name: result.name || result.display_name.split(',')[0]
-        };
-        onSelect(location);
-        setQuery('');
-        setIsOpen(false);
+    const handleSelect = async (prediction: AddressPrediction) => {
+        setIsFetchingDetails(true);
+        try {
+            const details = await getPlaceDetails(prediction.place_id);
+            if (details) {
+                onSelect({
+                    latitude: parseFloat(details.lat),
+                    longitude: parseFloat(details.lon),
+                    address: details.display_name,
+                    name: details.name || details.display_name.split(',')[0]
+                });
+            }
+            setQuery('');
+            setIsOpen(false);
+        } finally {
+            setIsFetchingDetails(false);
+        }
     };
 
     return (
@@ -72,38 +80,37 @@ export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", 
                 {isSearching && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                 )}
+                {isFetchingDetails && !isSearching && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                )}
             </div>
 
             {isOpen && results.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
-                    {results.map((result, i) => {
-                        const mainText = result.name || result.display_name.split(',')[0];
-                        const subText = result.display_name;
-
-                        return (
-                            <button
-                                key={i}
-                                onClick={() => handleSelect(result)}
-                                className="w-full text-left p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-800 last:border-0 transition-colors group"
-                            >
-                                <div className="flex items-start gap-3">
-                                    <MapPin className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 mt-0.5 flex-shrink-0" />
-                                    <div className="min-w-0 flex-1">
-                                        <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">
-                                            {mainText}
-                                        </div>
-                                        <div className="text-[10px] text-zinc-400 line-clamp-2 leading-tight">
-                                            {subText}
-                                        </div>
+                    {results.map((result, i) => (
+                        <button
+                            key={result.place_id || i}
+                            onClick={() => handleSelect(result)}
+                            disabled={isFetchingDetails}
+                            className="w-full text-left p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-800 last:border-0 transition-colors group disabled:opacity-50"
+                        >
+                            <div className="flex items-start gap-3">
+                                <MapPin className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 mt-0.5 flex-shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                    <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">
+                                        {result.main_text || result.description.split(',')[0]}
+                                    </div>
+                                    <div className="text-[10px] text-zinc-400 line-clamp-2 leading-tight">
+                                        {result.description}
                                     </div>
                                 </div>
-                            </button>
-                        )
-                    })}
+                            </div>
+                        </button>
+                    ))}
                 </div>
             )}
 
-            {isOpen && query.length > 2 && !isSearching && results.length === 0 && (
+            {isOpen && query.trim().length >= 2 && !isSearching && results.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 p-3 text-center">
                     <p className="text-[10px] text-zinc-400 italic">Inga adresser hittades</p>
                 </div>

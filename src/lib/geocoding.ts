@@ -14,6 +14,14 @@ export interface GeocodingResult {
     };
 }
 
+/** Prediction from Autocomplete (address suggestions); lat/lon from getPlaceDetails. */
+export interface AddressPrediction {
+    place_id: string;
+    description: string;
+    main_text?: string;
+    secondary_text?: string;
+}
+
 let googleMapsLoaded = false;
 let googleMapsLoadingPromise: Promise<void> | null = null;
 
@@ -52,49 +60,84 @@ async function loadGoogleMaps(): Promise<void> {
     return googleMapsLoadingPromise;
 }
 
-export async function searchAddress(query: string): Promise<GeocodingResult[]> {
-    if (!query || query.length < 3) return [];
+export async function searchAddress(query: string): Promise<AddressPrediction[]> {
+    if (!query || query.trim().length < 2) return [];
 
     try {
         await loadGoogleMaps();
 
-        if (!(window as any).google || !(window as any).google.maps || !(window as any).google.maps.places) return [];
+        const g = (window as any).google;
+        if (!g?.maps?.places?.AutocompleteService) return [];
 
-        // Use PlacesService instead of Geocoder for better POI results (malls, buildings, etc)
-        const dummyDiv = document.createElement('div');
-        const service = new (window as any).google.maps.places.PlacesService(dummyDiv);
+        const service = new g.maps.places.AutocompleteService();
 
         return new Promise((resolve) => {
-            service.textSearch({ query: query }, (results: any[], status: string) => {
-                if (status === 'OK' && results) {
-                    const mappedResults = results.map(result => {
-                        return {
-                            lat: result.geometry.location.lat().toString(),
-                            lon: result.geometry.location.lng().toString(),
-                            display_name: result.formatted_address,
-                            name: result.name, // The actual name of the place (e.g. "Kista Galleria")
-                            address: {
-                                // For textSearch, we don't get granular address components easily
-                                // unless we call getDetails, but formatted_address is usually enough.
-                                road: '',
-                                house_number: '',
-                                city: '',
-                                town: '',
-                                postcode: '',
-                                country: ''
-                            }
-                        };
-                    });
-                    resolve(mappedResults);
-                } else {
-                    console.log('Places search failed or no results:', status);
-                    resolve([]);
+            service.getPlacePredictions(
+                {
+                    input: query.trim(),
+                    types: ['address'],
+                    language: 'sv',
+                    componentRestrictions: { country: 'se' }
+                },
+                (predictions: any[] | null, status: string) => {
+                    if (status === 'OK' && predictions && predictions.length > 0) {
+                        resolve(predictions.map((p: any) => ({
+                            place_id: p.place_id,
+                            description: p.description,
+                            main_text: p.structured_formatting?.main_text,
+                            secondary_text: p.structured_formatting?.secondary_text
+                        })));
+                    } else {
+                        if (status !== 'ZERO_RESULTS') console.log('Places Autocomplete:', status);
+                        resolve([]);
+                    }
                 }
-            });
+            );
         });
     } catch (error) {
-        console.error('Error searching address with Google Places:', error);
+        console.error('Error in address autocomplete:', error);
         return [];
+    }
+}
+
+/** Get lat/lon and address for a place_id (call when user selects a prediction). */
+export async function getPlaceDetails(placeId: string): Promise<GeocodingResult | null> {
+    if (!placeId) return null;
+
+    try {
+        await loadGoogleMaps();
+
+        const g = (window as any).google;
+        if (!g?.maps?.places?.PlacesService) return null;
+
+        const dummyDiv = document.createElement('div');
+        const service = new g.maps.places.PlacesService(dummyDiv);
+
+        return new Promise((resolve) => {
+            service.getDetails(
+                { placeId, fields: ['geometry', 'formatted_address', 'name', 'address_components'] },
+                (place: any, status: string) => {
+                    if (status === 'OK' && place?.geometry?.location) {
+                        const lat = place.geometry.location.lat();
+                        const lng = place.geometry.location.lng();
+                        const display_name = place.formatted_address || `${lat}, ${lng}`;
+                        const name = place.name || place.formatted_address?.split(',')[0]?.trim();
+                        resolve({
+                            lat: String(lat),
+                            lon: String(lng),
+                            display_name,
+                            name,
+                            address: {}
+                        });
+                    } else {
+                        resolve(null);
+                    }
+                }
+            );
+        });
+    } catch (error) {
+        console.error('Error getting place details:', error);
+        return null;
     }
 }
 
