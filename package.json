@@ -12,7 +12,6 @@
   "dependencies": {
     "@capacitor/browser": "^6.0.0",
     "@capacitor/geolocation": "^6.0.0",
-    "@capacitor/local-notifications": "^6.0.0",
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
     "@tailwindcss/vite": "^4.1.18",
     "canvas-confetti": "^1.9.4",

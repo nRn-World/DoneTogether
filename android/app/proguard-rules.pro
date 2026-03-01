@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Capacitor Geolocation plugin rules
+-keep class com.getcapacitor.geolocation.** { *; }
+-keep class com.getcapacitor.** { *; }
+-dontoptimize
