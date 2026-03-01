@@ -63,17 +63,22 @@ Follow these steps to run the project locally.
     npm install
     ```
 
-3.  **Configure Firebase**
+3.  **Configure Environment**
+    *   Copy `.env.example` to `.env`: `cp .env.example .env`
+    *   Add your Google Maps API key to `.env` file
+    *   Get API key from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+
+4.  **Configure Firebase**
     *   Create a project in [Firebase Console](https://console.firebase.google.com).
     *   Copy your config into `src/lib/firebase.ts`.
     *   Enable Google Auth and Firestore Database.
 
-4.  **Start the dev server**
+5.  **Start the dev server**
     ```bash
     npm run dev
     ```
 
-5.  **Build for Android (optional)**
+6.  **Build for Android (optional)**
     ```bash
     npm run build
     npx cap sync
