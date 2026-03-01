@@ -101,3 +101,7 @@ If you like this project, consider:
 ⭐ Starring the project on GitHub  
 ☕ Buying me a coffee  
 📢 Sharing with your friends
+
+---
+
+*Last updated: March 2026*
