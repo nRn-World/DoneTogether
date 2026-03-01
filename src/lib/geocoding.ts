@@ -29,7 +29,7 @@ async function loadGoogleMaps(): Promise<void> {
     if (googleMapsLoaded) return;
     if (googleMapsLoadingPromise) return googleMapsLoadingPromise;
 
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyCqyQBJ5NkThxyguGymmHSEOIfVDitD7vY";
     if (!apiKey) {
         console.error("Google Maps API Key is missing!");
         return;
