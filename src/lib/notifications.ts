@@ -33,7 +33,6 @@ export async function sendAppNotification(
             status: 'pending',
             createdAt: Timestamp.now()
         });
-        console.log(`Notification queued for ${to}: ${title}`);
     } catch (error) {
         console.error('Error queuing notification:', error);
     }

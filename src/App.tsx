@@ -16,8 +16,7 @@ import {
   deletePlan,
   updatePlan,
   addMemberToPlan,
-  toggleReaction,
-  cleanupExpiredPlans
+  toggleReaction
 } from './hooks/useFirestore';
 import { useFriendRequests } from './hooks/useFriends';
 import { getInviteByCode, incrementInviteUse } from './hooks/useInvites';
@@ -52,7 +51,7 @@ function App() {
     }
   }, [theme]);
   const { user, userProfile, loading: authLoading, error: authError, signInWithGoogle, signOut, isAuthenticated } = useAuth();
-  const { plans, loading: _plansLoading } = usePlans(user?.uid);
+  const { plans } = usePlans(user?.uid);
 
   // Initialize location tracking
   const { permissionStatus, isTracking, getCurrentLocation } = useLocation(user?.uid);
@@ -120,13 +119,6 @@ function App() {
     }
   }, []);
 
-  // Auto-cleanup expired completed plans (30 days)
-  useEffect(() => {
-    if (isAuthenticated && user?.uid) {
-      cleanupExpiredPlans(user.uid).catch(console.error);
-    }
-  }, [isAuthenticated, user?.uid]);
-
   // Handle joining plan when authenticated
   useEffect(() => {
     const handleJoin = async () => {
@@ -169,7 +161,7 @@ function App() {
     };
 
     handleJoin();
-  }, [pendingInviteCode, user, userProfile]);
+  }, [pendingInviteCode, user, userProfile, joiningPlan, t]);
 
   // Show auth modal on load if not authenticated
   useEffect(() => {
@@ -202,7 +194,6 @@ function App() {
       });
 
       if (oldPlans.length > 0) {
-        console.log(`Auto-cleaning ${oldPlans.length} old plans...`);
         oldPlans.forEach(plan => {
           deletePlan(plan.id);
         });
@@ -219,7 +210,7 @@ function App() {
     if (!user || !userProfile) return;
     try {
       await toggleReaction(planId, itemId, user.uid, userProfile.displayName, emoji);
-    } catch (err: any) {
+    } catch {
       showToast(t('plans.update_error'));
     }
   };
@@ -729,8 +720,7 @@ function App() {
                                 <button
                                   type="button"
                                   onClick={async () => {
-                                    console.log('GPS button clicked, permission status:', permissionStatus);
-                                    const location = await getCurrentLocation();
+                                     const location = await getCurrentLocation();
                                     if (location && location.coords) {
                                       setSelectedAddLocation({
                                         latitude: location.coords.latitude,
@@ -1031,7 +1021,15 @@ function App() {
                           <div key={place.id} className="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                <div className={`p-2 bg-${place.color}-50 dark:bg-${place.color}-900/20 text-${place.color}-500 rounded-lg`}>
+                                   <div className={`p-2 rounded-lg ${
+                                     place.color === 'indigo'
+                                       ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500'
+                                       : place.color === 'amber'
+                                         ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500'
+                                         : place.color === 'emerald'
+                                           ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500'
+                                           : 'bg-rose-50 dark:bg-rose-900/20 text-rose-500'
+                                   }`}>
                                   <MapPin className="w-4 h-4" />
                                 </div>
                                 <div className="text-left">

@@ -15,17 +15,23 @@ export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", 
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const searchRequestIdRef = useRef(0);
 
     // Debounce search
     useEffect(() => {
         const timeoutId = setTimeout(async () => {
             if (query.trim().length >= 2) {
+                const requestId = ++searchRequestIdRef.current;
                 setIsSearching(true);
                 const searchResults = await searchAddress(query);
+                if (requestId !== searchRequestIdRef.current) {
+                    return;
+                }
                 setResults(searchResults);
                 setIsSearching(false);
                 setIsOpen(true);
             } else {
+                searchRequestIdRef.current++;
                 setResults([]);
                 setIsOpen(false);
             }

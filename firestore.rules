@@ -1,10 +1,69 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // TEMPORARY: Allow all authenticated users to read/write EVERYTHING
-    // This solves the immediate permission error.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isPlanMember(planData) {
+      return isSignedIn() && planData.members[request.auth.uid] != null;
+    }
+
+    function canCreatePlan() {
+      return isSignedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.members[request.auth.uid] != null;
+    }
+
+    function canSelfJoinPlan() {
+      return isSignedIn()
+        && resource.data.members[request.auth.uid] == null
+        && request.resource.data.members[request.auth.uid] != null
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
+        && request.resource.data.members.diff(resource.data.members).addedKeys().hasOnly([request.auth.uid]);
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isOwner(userId);
+    }
+
+    match /plans/{planId} {
+      allow read: if isPlanMember(resource.data);
+      allow create: if canCreatePlan();
+      allow update: if isPlanMember(resource.data) || canSelfJoinPlan();
+      allow delete: if isPlanMember(resource.data)
+        && (resource.data.ownerId == request.auth.uid || resource.data.completed == true);
+    }
+
+    match /friendRequests/{requestId} {
+      allow create: if isSignedIn() && request.resource.data.from == request.auth.uid;
+      allow read: if isSignedIn()
+        && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow update: if isSignedIn() && resource.data.to == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /notifications/{notificationId} {
+      allow create: if isSignedIn();
+      allow read, update: if isSignedIn() && resource.data.to == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /planInvites/{inviteCode} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && exists(/databases/$(database)/documents/plans/$(request.resource.data.planId))
+        && get(/databases/$(database)/documents/plans/$(request.resource.data.planId)).data.members[request.auth.uid] != null;
+      allow update: if isSignedIn()
+        && exists(/databases/$(database)/documents/plans/$(resource.data.planId))
+        && get(/databases/$(database)/documents/plans/$(resource.data.planId)).data.members[request.auth.uid] != null;
+      allow delete: if false;
     }
   }
 }

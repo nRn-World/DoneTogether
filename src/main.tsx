@@ -1,4 +1,4 @@
-import { StrictMode, Component } from 'react'
+import { StrictMode, Component, type ErrorInfo } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './i18n'
@@ -24,7 +24,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('CRITICAL APP ERROR:', error);
     console.error('Component Stack:', errorInfo.componentStack);
   }
@@ -112,10 +112,23 @@ try {
   )
 } catch (error) {
   console.error('CRITICAL STARTUP ERROR:', error);
-  document.body.innerHTML = `
-    <div style="background:#09090b;color:#fff;min-height:100vh;padding:20px;font-family:monospace;">
-      <h1 style="color:#ef4444;">Startup Error</h1>
-      <pre>${error instanceof Error ? error.stack : String(error)}</pre>
-    </div>
-  `;
+  document.body.textContent = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.style.background = '#09090b';
+  wrapper.style.color = '#fff';
+  wrapper.style.minHeight = '100vh';
+  wrapper.style.padding = '20px';
+  wrapper.style.fontFamily = 'monospace';
+
+  const title = document.createElement('h1');
+  title.style.color = '#ef4444';
+  title.textContent = 'Startup Error';
+
+  const pre = document.createElement('pre');
+  pre.textContent = error instanceof Error ? (error.stack || error.message) : String(error);
+
+  wrapper.appendChild(title);
+  wrapper.appendChild(pre);
+  document.body.appendChild(wrapper);
 }

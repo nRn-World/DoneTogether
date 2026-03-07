@@ -37,7 +37,7 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
             } else {
                 setSearchResult(user);
             }
-        } catch (error: any) {
+        } catch {
             setSearchError(t('friends.search_error'));
         } finally {
             setSearching(false);

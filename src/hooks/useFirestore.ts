@@ -6,6 +6,7 @@ import {
     onSnapshot,
     doc,
     getDoc,
+    getDocs,
     updateDoc,
     Timestamp,
     arrayUnion,
@@ -398,22 +399,17 @@ export async function cleanupExpiredPlans(userId: string): Promise<void> {
         where('completed', '==', true)
     );
 
-    onSnapshot(q, async (snapshot) => {
-        const now = Date.now();
-        const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+    const snapshot = await getDocs(q);
+    const now = Date.now();
+    const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
 
-        for (const doc of snapshot.docs) {
-            const plan = doc.data() as Plan;
-            if (plan.completedAt) {
-                const completedTime = plan.completedAt.toMillis();
-                if (now - completedTime > thirtyDaysInMs) {
-                    await deleteDoc(doc.ref);
-                    console.log(`Deleted expired plan: ${plan.name}`);
-                }
+    for (const planDoc of snapshot.docs) {
+        const plan = planDoc.data() as Plan;
+        if (plan.completedAt) {
+            const completedTime = plan.completedAt.toMillis();
+            if (now - completedTime > thirtyDaysInMs) {
+                await deleteDoc(planDoc.ref);
             }
         }
-    });
-
-    // We only want to run this once, so we'll just let it run and not worry about unsubscribing 
-    // since it's used at app level usually. 
+    }
 }

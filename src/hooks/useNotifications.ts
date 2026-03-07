@@ -52,12 +52,14 @@ export function useNotifications(userId: string | undefined) {
                     if ('Notification' in window && Notification.permission === 'granted') {
                         new Notification(data.title || 'DoneTogether', {
                             body: data.body,
-                            icon: '/DoneTogether/pwa-icon.png'
+                            icon: '/pwa-icon.png'
                         });
                     }
 
                     // Mark as sent in DB so we don't notify twice
-                    updateDoc(change.doc.ref, { status: 'sent' });
+                    updateDoc(change.doc.ref, { status: 'sent' }).catch((error) => {
+                        console.error('Error updating notification status:', error);
+                    });
                 }
             });
         });
@@ -65,7 +67,7 @@ export function useNotifications(userId: string | undefined) {
         // 3. Handle FCM foreground messages
         if (messaging) {
             const unsubscribeFCM = onMessage(messaging, (payload) => {
-                if (payload.notification) {
+                if (payload.notification && 'Notification' in window && Notification.permission === 'granted') {
                     new Notification(payload.notification.title || 'DoneTogether', {
                         body: payload.notification.body,
                         icon: '/pwa-icon.png'

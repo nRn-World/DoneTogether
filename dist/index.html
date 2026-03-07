@@ -13,37 +13,68 @@
   <meta name="description"
     content="Skapa och dela planer i realtid med vänner och team. Samarbeta och slutför tillsammans." />
   <title>DoneTogether</title>
-  <script type="module" crossorigin src="./assets/index-BvG8mHk_.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CfZxYbHI.css">
+  <script type="module" crossorigin src="./assets/index-BFtUo5rZ.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-niTZTN0d.css">
 </head>
 
 <body>
   <div id="root"></div>
   <script>
+    function renderStartupError(title, details, trace) {
+      document.body.textContent = '';
+
+      const root = document.createElement('div');
+      root.style.background = '#09090b';
+      root.style.color = '#fff';
+      root.style.minHeight = '100vh';
+      root.style.padding = '20px';
+      root.style.fontFamily = 'monospace';
+      root.style.fontSize = '14px';
+
+      const heading = document.createElement('h1');
+      heading.style.color = '#ef4444';
+      heading.style.marginBottom = '20px';
+      heading.textContent = title;
+
+      const card = document.createElement('div');
+      card.style.background = '#18181b';
+      card.style.padding = '20px';
+      card.style.border = '1px solid #27272a';
+      card.style.borderRadius = '12px';
+      card.style.overflow = 'auto';
+
+      const detailsEl = document.createElement('div');
+      detailsEl.style.color = '#f87171';
+      detailsEl.style.marginBottom = '10px';
+      detailsEl.textContent = details;
+
+      card.appendChild(detailsEl);
+
+      if (trace) {
+        const traceEl = document.createElement('pre');
+        traceEl.style.marginTop = '15px';
+        traceEl.style.color = '#a1a1aa';
+        traceEl.style.whiteSpace = 'pre-wrap';
+        traceEl.textContent = trace;
+        card.appendChild(traceEl);
+      }
+
+      root.appendChild(heading);
+      root.appendChild(card);
+      document.body.appendChild(root);
+    }
+
     window.onerror = function (message, source, lineno, colno, error) {
-      document.body.innerHTML = `
-          <div style="background:#09090b;color:#fff;min-height:100vh;padding:20px;font-family:monospace;font-size:14px;">
-            <h1 style="color:#ef4444;margin-bottom:20px;">CRITICAL ERROR (Pre-React)</h1>
-            <div style="background:#18181b;padding:20px;border:1px solid #27272a;border-radius:12px;overflow:auto;">
-              <div style="color:#f87171;margin-bottom:10px;">${message}</div>
-              <div style="color:#71717a;">${source}:${lineno}:${colno}</div>
-              <pre style="margin-top:15px;color:#a1a1aa;white-space:pre-wrap;">${error ? error.stack : 'No stack trace'}</pre>
-            </div>
-          </div>
-        `;
+      const details = `${String(message)} (${String(source)}:${String(lineno)}:${String(colno)})`;
+      const trace = error && error.stack ? error.stack : 'No stack trace';
+      renderStartupError('CRITICAL ERROR (Pre-React)', details, trace);
     };
     // Catch unhandled promise rejections
     window.onunhandledrejection = function (event) {
-      document.body.innerHTML = `
-         <div style="background:#09090b;color:#fff;min-height:100vh;padding:20px;font-family:monospace;font-size:14px;">
-            <h1 style="color:#ef4444;margin-bottom:20px;">UNHANDLED PROMISE REJECTION</h1>
-            <div style="background:#18181b;padding:20px;border:1px solid #27272a;border-radius:12px;overflow:auto;">
-              <div style="color:#f87171;margin-bottom:10px;">Reason: ${event.reason}</div>
-            </div>
-          </div>
-        `;
+      const reason = event && event.reason != null ? String(event.reason) : 'Unknown reason';
+      renderStartupError('UNHANDLED PROMISE REJECTION', `Reason: ${reason}`);
     };
-  </script>
+  </script>
 </body>
 
 </html>

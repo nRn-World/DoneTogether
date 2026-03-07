@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Geolocation, type Position } from '@capacitor/geolocation';
 
 // Check if we're in a web browser
-const isWeb = typeof window !== 'undefined' && !(window as any).Capacitor;
+const isWeb = typeof window !== 'undefined' && !('Capacitor' in window);
 
 export function useLocation(userId: string | undefined) {
     const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
@@ -16,8 +16,7 @@ export function useLocation(userId: string | undefined) {
             try {
                 if (isWeb) {
                     // Web browser geolocation
-                    console.log('Checking web browser location permissions...');
-                    
+
                     if (!navigator.geolocation) {
                         console.error('Geolocation is not supported by this browser');
                         setPermissionStatus('denied');
@@ -27,15 +26,13 @@ export function useLocation(userId: string | undefined) {
                     // Check permission status (may not exist in all browsers, e.g. Safari)
                     try {
                         const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
-                        console.log('Web geolocation permission:', permission.state);
                         setPermissionStatus(permission.state);
                         if (permission.state === 'denied') {
-                            console.log('Geolocation permission denied');
                             return;
                         }
                         // Listen for permission changes
                         permission.onchange = () => setPermissionStatus(permission.state);
-                    } catch (_) {
+                    } catch {
                         // permissions.query not supported (e.g. Safari) – assume prompt, let getCurrentPosition trigger dialog
                         setPermissionStatus('prompt');
                     }
@@ -71,24 +68,19 @@ export function useLocation(userId: string | undefined) {
                     setIsTracking(true);
                 } else {
                     // Capacitor native geolocation
-                    console.log('Checking location permissions...');
                     let permission = await Geolocation.checkPermissions();
 
                     if (permission.location !== 'granted') {
-                        console.log('Requesting location permissions...');
                         permission = await Geolocation.requestPermissions();
                     }
 
-                    console.log('Location permission result:', permission.location);
                     setPermissionStatus(permission.location);
 
                     if (permission.location !== 'granted') {
-                        console.log('Location permission not granted, skipping tracking.');
                         setIsTracking(false);
                         return;
                     }
 
-                    console.log('Permissions check complete, starting tracking.');
                     setIsTracking(true);
 
                     // Clear any existing watch

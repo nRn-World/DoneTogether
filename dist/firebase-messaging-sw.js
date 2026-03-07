@@ -6,12 +6,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-comp
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
 firebase.initializeApp({
-    apiKey: "AIzaSyDBQyniBEySpW0ZUWbTZwwO2huU5GtygRA",
-    authDomain: "donetogether-official.firebaseapp.com",
-    projectId: "donetogether-official",
-    storageBucket: "donetogether-official.firebasestorage.app",
-    messagingSenderId: "226200528766",
-    appId: "1:226200528766:android:d38c55a71186b84470b52f",
+    apiKey: "AIzaSyDsGmC9FOrwuJQMqFKhmCuxiJIP0vxoTBU",
+    authDomain: "donetogether-v1.firebaseapp.com",
+    projectId: "donetogether-v1",
+    storageBucket: "donetogether-v1.firebasestorage.app",
+    messagingSenderId: "677287957451",
+    appId: "1:677287957451:web:812a897c8f906a63b8dc4e",
     measurementId: "G-XXXXXXXXXX"
 });
 
@@ -20,12 +20,12 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // Customize notification here
-    const notificationTitle = payload.notification.title;
+    const notification = payload && payload.notification ? payload.notification : {};
+    const notificationTitle = notification.title || 'DoneTogether';
     const notificationOptions = {
-        body: payload.notification.body,
-        icon: '/DoneTogether/pwa-icon.png'
+        body: notification.body || '',
+        icon: '/pwa-icon.png'
     };
 
     self.registration.showNotification(notificationTitle,

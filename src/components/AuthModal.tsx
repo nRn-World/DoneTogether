@@ -88,14 +88,12 @@ export function AuthModal({ onSignIn, onClose, error }: AuthModalProps) {
                 </div>
 
                 <button
-                    onClick={() => {
-                        // TODO: Implement email login
-                        console.log('Email login not implemented yet');
-                    }}
-                    className="w-full h-14 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white font-black italic uppercase tracking-widest flex items-center justify-center gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all"
+                    type="button"
+                    disabled
+                    className="w-full h-14 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 font-black italic uppercase tracking-widest flex items-center justify-center gap-4 opacity-60 cursor-not-allowed"
                 >
                     <LogIn className="w-5 h-5" />
-                    {t('auth.login_email')}
+                    {t('auth.login_email')} (snart)
                 </button>
             </motion.div>
         </div>
