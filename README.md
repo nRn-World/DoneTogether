@@ -101,5 +101,5 @@ If you like this project, consider:
 * ⭐ Star the project on GitHub  
 * ☕ [Buy me a coffee](https://buymeacoffee.com/nrnworld)  
 * 📢 Share with your friends  
-☕ Buying me a coffee  
-📢 Sharing with your friends
+* ☕ Buying me a coffee  
+* 📢 Sharing with your friends
