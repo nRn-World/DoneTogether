@@ -92,12 +92,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 👨‍💻 **Author**  
 Created 2026 by © nRn World
-
 📧 bynrnworld@gmail.com
 
-🙏 **Support**  
+## 🙏 Support
+
 If you like this project, consider:
 
-⭐ Starring the project on GitHub  
+* ⭐ Star the project on GitHub  
+* ☕ [Buy me a coffee](https://buymeacoffee.com/nrnworld)  
+* 📢 Share with your friends  
 ☕ Buying me a coffee  
 📢 Sharing with your friends
