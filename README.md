@@ -92,6 +92,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 👨‍💻 **Author**  
 Created 2026 by © nRn World
+
 📧 bynrnworld@gmail.com
 
 ## 🙏 Support
