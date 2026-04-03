@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, ArrowRight, Loader, Link as LinkIcon } from 'lucide-react';
-import { getInviteByCode, incrementInviteUse } from '../hooks/useInvites';
+import { validateAndIncrementInvite } from '../hooks/useInvites';
 import { addMemberToPlan } from '../hooks/useFirestore';
 import type { UserProfile } from '../types';
 
@@ -13,6 +14,7 @@ interface JoinModalProps {
 }
 
 export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps) {
+    const { t } = useTranslation();
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -30,10 +32,10 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                 code = code.split('/join/')[1];
             }
 
-            const invite = await getInviteByCode(code);
+            const invite = await validateAndIncrementInvite(code);
 
             if (!invite) {
-                setError('Ogiltig eller utgången inbjudningskod');
+                setError(t('plans.join_invalid'));
                 setLoading(false);
                 return;
             }
@@ -46,13 +48,11 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                 userProfile.photoURL
             );
 
-            await incrementInviteUse(code);
-
             onJoin(invite.planId);
             onClose();
         } catch (err: any) {
             console.error('Error joining plan:', err);
-            setError('Kunde inte gå med i planen. Försök igen.');
+            setError(t('plans.join_error_text'));
         } finally {
             setLoading(false);
         }
@@ -78,7 +78,7 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                     </div>
                     <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-zinc-900 dark:text-white">DoneTogether</h2>
                     <p className="text-zinc-500 dark:text-zinc-400 font-medium italic">
-                        Klistra in en inbjudningslänk eller kod för att gå med i en plan.
+                        {t('plans.join_plan_subtitle')}
                     </p>
                 </div>
 
@@ -88,7 +88,7 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="T.ex. https://.../join/ABC123"
+                            placeholder={t('plans.join_placeholder')}
                             className="w-full h-16 px-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none font-bold italic text-lg text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700 shadow-inner"
                             autoFocus
                         />
@@ -108,11 +108,11 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                         {loading ? (
                             <>
                                 <Loader className="w-5 h-5 animate-spin" />
-                                Går med...
+                                {t('plans.joining')}
                             </>
                         ) : (
                             <>
-                                Gå med nu
+                                {t('plans.join_now')}
                                 <ArrowRight className="w-5 h-5 stroke-[3px]" />
                             </>
                         )}

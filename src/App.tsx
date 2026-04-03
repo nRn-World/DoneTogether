@@ -19,7 +19,7 @@ import {
   toggleReaction
 } from './hooks/useFirestore';
 import { useFriendRequests } from './hooks/useFriends';
-import { getInviteByCode, incrementInviteUse } from './hooks/useInvites';
+import { validateAndIncrementInvite } from './hooks/useInvites';
 import { useNotifications } from './hooks/useNotifications';
 import { JoinModal } from './components/JoinModal';
 import { AuthModal } from './components/AuthModal';
@@ -69,7 +69,7 @@ function App() {
     if (hasActiveGeoFences && !isTracking) {
       // Debounce toast
       const timer = setTimeout(() => {
-        showToast('⚠️ GPS krävs för dina påminnelser!');
+        showToast(t('plans.gps_required_toast'));
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -100,6 +100,7 @@ function App() {
   const [tempLabel, setTempLabel] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [itemFile, setItemFile] = useState<File | null>(null);
+  const [itemFilePreview, setItemFilePreview] = useState<string | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [activeReactionPicker, setActiveReactionPicker] = useState<string | null>(null);
 
@@ -126,7 +127,7 @@ function App() {
 
       setJoiningPlan(true);
       try {
-        const invite = await getInviteByCode(pendingInviteCode);
+        const invite = await validateAndIncrementInvite(pendingInviteCode);
 
         if (!invite) {
           showToast(t('plans.join_invalid'));
@@ -143,9 +144,7 @@ function App() {
           userProfile.photoURL
         );
 
-        await incrementInviteUse(pendingInviteCode);
-
-        showToast(`Gick med i ${invite.planName}!`);
+        showToast(t('plans.join_success', { name: invite.planName }));
         setCurrentPlanId(invite.planId);
         setActiveTab('plans');
 
@@ -173,6 +172,16 @@ function App() {
       }
     }
   }, [authLoading, isAuthenticated]);
+
+  useEffect(() => {
+    if (itemFile) {
+      const url = URL.createObjectURL(itemFile);
+      setItemFilePreview(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setItemFilePreview(null);
+    }
+  }, [itemFile]);
 
   // Trigger confetti when plan is completed
   useEffect(() => {
@@ -567,7 +576,7 @@ function App() {
                           </div>
                           <div>
                             <div className="font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white uppercase italic tracking-tight transition-colors">{plan.name}</div>
-                            <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">{plan.items?.filter(i => i.checked).length || 0}/{plan.items?.length || 0} TAGNA</div>
+                            <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">{plan.items?.filter(i => i.checked).length || 0}/{plan.items?.length || 0} {t('plans.completed_label')}</div>
                           </div>
                         </div>
                         {plan.ownerId === user?.uid && (
@@ -583,7 +592,7 @@ function App() {
                         )}
                       </div>
                     )) : (
-                      <p className="text-zinc-400 dark:text-zinc-600 text-sm italic px-2">Inga aktiva planer.</p>
+                      <p className="text-zinc-400 dark:text-zinc-600 text-sm italic px-2">{t('plans.no_active_plans_text')}</p>
                     )}
                   </div>
                 </div>
@@ -671,8 +680,8 @@ function App() {
                             }} />
                           </label>
                           {itemFile && (
-                            <div className="relative ml-1">
-                              <img src={URL.createObjectURL(itemFile)} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
+                             <div className="relative ml-1">
+                               <img src={itemFilePreview!} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
                               <button type="button" onClick={() => setItemFile(null)} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
                                 <X className="w-2.5 h-2.5" />
                               </button>
@@ -1196,9 +1205,6 @@ function App() {
                     <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
                       Created 2026 by © nRn World
                     </p>
-                    <p className="text-[9px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide mt-1">
-                      bynrnworld@gmail.com
-                    </p>
                   </div>
                 </div>
               </div>
@@ -1241,11 +1247,11 @@ function App() {
                           <div>
                             <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic uppercase tracking-tight">{plan.name}</h4>
                             <div className="flex flex-col gap-0.5 mt-1">
-                              <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-black uppercase tracking-widest">
-                                {plan.completedAt ? `KLAR ${plan.completedAt.toDate().toLocaleDateString('sv-SE')}` : 'AVKLARAD'}
+                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-black uppercase tracking-widest">
+                                {plan.completedAt ? `${t('plans.clear_done')} ${plan.completedAt.toDate().toLocaleDateString('sv-SE')}` : t('plans.completed_label')}
                               </p>
                               <p className="text-[9px] font-bold text-red-500/80 uppercase tracking-tight">
-                                Raderas automatiskt om {daysLeft} {daysLeft === 1 ? 'dag' : 'dagar'}
+                                {t('plans.auto_delete', { days: daysLeft })}
                               </p>
                             </div>
                           </div>
@@ -1256,9 +1262,9 @@ function App() {
                       </div>
 
                       <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.1em] text-zinc-400 dark:text-zinc-500 relative z-10 border-t border-zinc-100 dark:border-zinc-800/50 pt-5">
-                        <span>{plan.items?.length || 0} PUNKTER AVKLARADE</span>
+                        <span>{plan.items?.length || 0} {t('plans.items_completed_label')}</span>
                         <button onClick={() => handleReopenPlan(plan.id)} className="text-emerald-600 dark:text-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
-                          ÅTERUPPTA
+                          {t('plans.resume_btn')}
                         </button>
                       </div>
                     </div>
@@ -1266,7 +1272,7 @@ function App() {
                 }) : (
                   <div className="text-center py-20 bg-white dark:bg-zinc-950/20 rounded-[40px] border-2 border-dashed border-zinc-200 dark:border-zinc-900">
                     <History className="w-16 h-16 text-zinc-200 dark:text-zinc-900 mx-auto mb-6" />
-                    <p className="text-zinc-400 dark:text-zinc-600 font-black italic uppercase tracking-widest text-xs">Inga slutförda planer än.</p>
+                    <p className="text-zinc-400 dark:text-zinc-600 font-black italic uppercase tracking-widest text-xs">{t('plans.no_completed_plans_text')}</p>
                   </div>
                 )}
               </div>
@@ -1283,7 +1289,7 @@ function App() {
             className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'home' ? 'text-emerald-500 scale-110' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500 dark:hover:text-zinc-400'}`}
           >
             <Home className="w-6 h-6 stroke-[2.5px]" />
-            <span className="text-[9px] font-black uppercase tracking-widest">{t('common.home') || 'Home'}</span>
+            <span className="text-[9px] font-black uppercase tracking-widest">{t('common.home')}</span>
           </button>
 
           <button
@@ -1348,19 +1354,19 @@ function App() {
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">Vad ska planen heta?</label>
+                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">{t('plans.plan_name_label')}</label>
                   <input
                     type="text"
                     value={newPlanName}
                     onChange={(e) => setNewPlanName(e.target.value)}
-                    placeholder="T.ex. Sommarstugan 2024"
+                    placeholder={t('plans.plan_name_placeholder')}
                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-5 px-6 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic text-lg text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700 shadow-inner"
                     autoFocus
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">Omslagsbild (Snyggt!)</label>
+                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">{t('plans.cover_image_label')}</label>
                   <div className="relative group overflow-hidden rounded-[24px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/40 transition-all aspect-video flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 cursor-pointer">
                     {imagePreview ? (
                       <>
@@ -1372,7 +1378,7 @@ function App() {
                     ) : (
                       <div className="flex flex-col items-center">
                         <Camera className="w-10 h-10 text-zinc-200 dark:text-zinc-800 group-hover:text-emerald-500 transition-colors mb-4" />
-                        <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-600 group-hover:text-emerald-500 transition-colors tracking-widest uppercase">Klicka för att välja bild</span>
+                        <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-600 group-hover:text-emerald-500 transition-colors tracking-widest uppercase">{t('plans.cover_image_placeholder')}</span>
                       </div>
                     )}
                     <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
@@ -1431,8 +1437,8 @@ function App() {
                         }} />
                       </label>
                       {itemFile ? (
-                        <div className="relative ml-1">
-                          <img src={URL.createObjectURL(itemFile)} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
+                         <div className="relative ml-1">
+                           <img src={itemFilePreview!} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
                           <button type="button" onClick={() => setItemFile(null)} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
                             <X className="w-2.5 h-2.5" />
                           </button>
@@ -1514,7 +1520,7 @@ function App() {
                             type="button"
                             onClick={async () => {
                               if (permissionStatus === 'denied') {
-                                showToast('GPS nekad. Öppna inställningar och tillåt plats för appen.');
+                                showToast(t('plans.gps_denied_toast'));
                                 return;
                               }
                               const location = await getCurrentLocation();

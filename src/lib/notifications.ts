@@ -3,18 +3,16 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 export interface AppNotification {
     id: string;
-    to: string; // recipient userId
+    to: string;
+    from: string;
     title: string;
     body: string;
     type: 'friend_request' | 'plan_update' | 'plan_complete';
-    relatedId?: string; // planId or requestId
+    relatedId?: string;
     status: 'pending' | 'sent' | 'failed';
     createdAt: Timestamp;
 }
 
-/**
- * Queues a notification in Firestore to be sent via Cloud Functions (or handled by an observer)
- */
 export async function sendAppNotification(
     to: string,
     title: string,
@@ -26,6 +24,7 @@ export async function sendAppNotification(
         const notificationsRef = collection(db, 'notifications');
         await addDoc(notificationsRef, {
             to,
+            from: db.app.auth?.currentUser?.uid || 'system',
             title,
             body,
             type,
@@ -33,7 +32,6 @@ export async function sendAppNotification(
             status: 'pending',
             createdAt: Timestamp.now()
         });
-    } catch (error) {
-        console.error('Error queuing notification:', error);
+    } catch {
     }
 }

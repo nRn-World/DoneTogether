@@ -35,3 +35,8 @@ dist-ssr
 
 # Firebase private documentation
 FireBase/
+
+# Android google-services.json (contains project config - be careful sharing)
+# android/app/google-services.json
+"DoneTogether.zip"  
+"DoneTogether3.code-workspace" 

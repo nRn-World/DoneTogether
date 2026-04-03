@@ -5,13 +5,13 @@ import { getMessaging } from 'firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDsGmC9FOrwuJQMqFKhmCuxiJIP0vxoTBU",
-    authDomain: "donetogether-v1.firebaseapp.com",
-    projectId: "donetogether-v1",
-    storageBucket: "donetogether-v1.firebasestorage.app",
-    messagingSenderId: "677287957451",
-    appId: "1:677287957451:web:812a897c8f906a63b8dc4e",
-    measurementId: "G-XXXXXXXXXX"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
@@ -29,7 +29,7 @@ try {
     messagingInstance = getMessaging(app);
   }
 } catch (error) {
-  console.error('Firebase Messaging initialization failed:', error);
+  console.error('Firebase Messaging initialization failed');
 }
 export const messaging = messagingInstance;
 

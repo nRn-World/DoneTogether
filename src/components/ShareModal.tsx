@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { X, Link as LinkIcon, Copy, Check, Users as UsersIcon } from 'lucide-react';
 import { getOrCreatePlanInvite, generateInviteLink } from '../hooks/useInvites';
@@ -14,6 +15,7 @@ interface ShareModalProps {
 }
 
 export function ShareModal({ plan, currentUserId, currentUserName, onClose }: ShareModalProps) {
+    const { t } = useTranslation();
     const [inviteLink, setInviteLink] = useState('');
     const [copied, setCopied] = useState(false);
     const [generating, setGenerating] = useState(false);
@@ -27,8 +29,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
             const code = await getOrCreatePlanInvite(plan.id, plan.name, currentUserId, currentUserName);
             const link = generateInviteLink(code);
             setInviteLink(link);
-        } catch (error: any) {
-            console.error('Error generating invite:', error);
+        } catch {
         } finally {
             setGenerating(false);
         }
@@ -43,10 +44,9 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
     const handleShareWithFriend = async (friendUid: string, friendEmail: string, friendName: string, friendPhoto?: string) => {
         try {
             await addMemberToPlan(plan.id, friendUid, friendEmail, friendName, friendPhoto);
-            setShareMessage(`${friendName} har lagts till i planen!`);
+            setShareMessage(`${friendName} ${t('plans.item_added')}`);
             setTimeout(() => setShareMessage(''), 2000);
-        } catch (error: any) {
-            console.error('Error sharing with friend:', error);
+        } catch {
         }
     };
 
@@ -62,7 +62,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                 {/* Header */}
                 <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                     <div>
-                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">Dela planen</h2>
+                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">{t('plans.share_title')}</h2>
                         <p className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mt-1 italic">{plan.name}</p>
                     </div>
                     <button onClick={onClose} className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
@@ -85,7 +85,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                     {/* Generate Link */}
                     <div className="space-y-4">
                         <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
-                            Bjud in med länk
+                            {t('plans.share_invite_link')}
                         </h3>
                         {!inviteLink ? (
                             <button
@@ -94,7 +94,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                 className="w-full h-14 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-black font-black italic uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-black/10"
                             >
                                 <LinkIcon className="w-5 h-5 stroke-[2.5px]" />
-                                {generating ? 'Genererar...' : 'Generera inbjudan'}
+                                {generating ? t('plans.generating') : t('plans.generate_invite')}
                             </button>
                         ) : (
                             <div className="space-y-3">
@@ -110,7 +110,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                         className="px-6 h-14 rounded-2xl bg-emerald-500 text-black font-black italic uppercase tracking-widest hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
                                     >
                                         {copied ? <Check className="w-5 h-5 stroke-[3px]" /> : <Copy className="w-5 h-5 stroke-[2.5px]" />}
-                                        {copied ? 'Klar!' : 'Kopiera'}
+                                        {copied ? t('plans.copied') : t('plans.copy')}
                                     </button>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                     {friends.length > 0 && (
                         <div className="space-y-4">
                             <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
-                                Dela med dina vänner
+                                {t('plans.share_with_friends')}
                             </h3>
                             <div className="space-y-2">
                                 {friends.map((friend) => (
@@ -144,13 +144,13 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                         </div>
 
                                         {isMember(friend.uid) ? (
-                                            <div className="text-[10px] font-black uppercase text-zinc-300 dark:text-zinc-600 tracking-widest">Medlem</div>
+                                            <div className="text-[10px] font-black uppercase text-zinc-300 dark:text-zinc-600 tracking-widest">{t('plans.member')}</div>
                                         ) : (
                                             <button
                                                 onClick={() => handleShareWithFriend(friend.uid, friend.email, friend.displayName, friend.photoURL)}
                                                 className="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
                                             >
-                                                Bjud in
+                                                {t('plans.invite')}
                                             </button>
                                         )}
                                     </div>
@@ -163,7 +163,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                     <div className="space-y-4">
                         <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                             <UsersIcon className="w-4 h-4" />
-                            Medlemmar ({Object.keys(plan.members).length})
+                            {t('plans.members', { count: Object.keys(plan.members).length })}
                         </h3>
                         <div className="grid grid-cols-1 gap-2">
                             {Object.values(plan.members).map((member) => (
@@ -185,7 +185,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                         </div>
                                     </div>
                                     <div className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-lg tracking-widest ${member.role === 'owner' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-500' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500'}`}>
-                                        {member.role === 'owner' ? 'Ägare' : 'Medhjälpare'}
+                                        {member.role === 'owner' ? t('plans.owner') : t('plans.helper')}
                                     </div>
                                 </div>
                             ))}

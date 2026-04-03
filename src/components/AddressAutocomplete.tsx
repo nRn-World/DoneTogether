@@ -8,7 +8,7 @@ interface AddressAutocompleteProps {
     className?: string;
 }
 
-export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", className = "" }: AddressAutocompleteProps) {
+export function AddressAutocomplete({ onSelect, placeholder = "Search address...", className = "" }: AddressAutocompleteProps) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<AddressPrediction[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -118,7 +118,7 @@ export function AddressAutocomplete({ onSelect, placeholder = "Sök adress...", 
 
             {isOpen && query.trim().length >= 2 && !isSearching && results.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 p-3 text-center">
-                    <p className="text-[10px] text-zinc-400 italic">Inga adresser hittades</p>
+                    <p className="text-[10px] text-zinc-400 italic">No addresses found</p>
                 </div>
             )}
         </div>

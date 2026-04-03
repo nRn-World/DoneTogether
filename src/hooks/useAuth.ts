@@ -15,21 +15,22 @@ export function useAuth() {
     const { i18n } = useTranslation();
 
     useEffect(() => {
-        let profileUnsubscribe: () => void;
+        let profileUnsubscribe: (() => void) | null = null;
+        let cancelled = false;
 
         const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+            if (cancelled) return;
             try {
                 setUser(firebaseUser);
                 if (firebaseUser) {
                     const userRef = doc(db, 'users', firebaseUser.uid);
 
-                    // Listen for real-time updates to the user profile
                     profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
+                        if (cancelled) return;
                         if (docSnap.exists()) {
                             const profile = docSnap.data() as UserProfile;
                             setUserProfile(profile);
 
-                            // Sync language from profile if it exists and is different
                             if (profile.language && profile.language !== i18n.language) {
                                 i18n.changeLanguage(profile.language);
                             }
@@ -47,26 +48,30 @@ export function useAuth() {
                             setUserProfile(newProfile);
                         }
                         setLoading(false);
-                    }, (err) => {
-                        console.error('Profile snapshot error:', err);
-                        setLoading(false);
+                    }, () => {
+                        if (!cancelled) setLoading(false);
                     });
                 } else {
                     setUserProfile(null);
-                    if (profileUnsubscribe) profileUnsubscribe();
+                    if (profileUnsubscribe) {
+                        profileUnsubscribe();
+                        profileUnsubscribe = null;
+                    }
                     setLoading(false);
                 }
-            } catch (err) {
-                console.error('Auth state change error:', err);
-                setLoading(false);
+            } catch {
+                if (!cancelled) setLoading(false);
             }
         });
 
         return () => {
+            cancelled = true;
             unsubscribe();
-            if (profileUnsubscribe) profileUnsubscribe();
+            if (profileUnsubscribe) {
+                profileUnsubscribe();
+                profileUnsubscribe = null;
+            }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const signInWithGoogle = async () => {

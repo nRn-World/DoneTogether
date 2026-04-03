@@ -17,12 +17,20 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
     const [searching, setSearching] = useState(false);
     const [searchError, setSearchError] = useState('');
     const [actionMessage, setActionMessage] = useState('');
+    const [lastSearchTime, setLastSearchTime] = useState(0);
 
     const { friends, loading: friendsLoading } = useFriends(currentUser.uid);
     const { incomingRequests, outgoingRequests } = useFriendRequests(currentUser.uid);
 
     const handleSearch = async () => {
         if (!searchEmail.trim()) return;
+
+        const now = Date.now();
+        if (now - lastSearchTime < 2000) {
+            setSearchError(t('friends.search_error'));
+            return;
+        }
+        setLastSearchTime(now);
 
         setSearching(true);
         setSearchError('');

@@ -12,6 +12,7 @@ import {
     arrayUnion,
     addDoc,
     deleteDoc,
+    deleteField,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { Plan, PlanMember, Item } from '../types';
@@ -149,7 +150,7 @@ export async function updatePlan(planId: string, updates: Partial<Plan>) {
     // If we are reopening a plan, clear the completedAt timestamp
     const finalUpdates = { ...updates };
     if (updates.completed === false) {
-        (finalUpdates as any).completedAt = null;
+        finalUpdates.completedAt = deleteField();
     }
 
     await updateDoc(planRef, {
@@ -166,7 +167,7 @@ export async function deletePlan(planId: string) {
 export async function addItemToPlan(planId: string, text: string, userId: string, userName: string, imageUrl?: string, location?: Item['location']): Promise<void> {
     const planRef = doc(db, 'plans', planId);
     const newItem: Item = {
-        id: Math.random().toString(36).substring(2, 11),
+        id: crypto.randomUUID(),
         text,
         checked: false,
         imageUrl,
@@ -389,27 +390,4 @@ export async function toggleReaction(
         items: updatedItems,
         lastModified: Timestamp.now()
     });
-}
-
-export async function cleanupExpiredPlans(userId: string): Promise<void> {
-    const plansRef = collection(db, 'plans');
-    const q = query(
-        plansRef,
-        where(`members.${userId}`, '!=', null),
-        where('completed', '==', true)
-    );
-
-    const snapshot = await getDocs(q);
-    const now = Date.now();
-    const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-
-    for (const planDoc of snapshot.docs) {
-        const plan = planDoc.data() as Plan;
-        if (plan.completedAt) {
-            const completedTime = plan.completedAt.toMillis();
-            if (now - completedTime > thirtyDaysInMs) {
-                await deleteDoc(planDoc.ref);
-            }
-        }
-    }
 }

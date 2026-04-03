@@ -9,6 +9,7 @@ import {
     Timestamp,
     query,
     where,
+    runTransaction,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { PlanInvite } from '../types';
@@ -110,6 +111,38 @@ export async function incrementInviteUse(code: string): Promise<void> {
     await updateDoc(inviteRef, {
         useCount: increment(1),
     });
+}
+
+export async function validateAndIncrementInvite(code: string): Promise<PlanInvite | null> {
+    const inviteRef = doc(db, 'planInvites', code);
+
+    try {
+        const invite = await runTransaction(db, async (transaction) => {
+            const inviteSnap = await transaction.get(inviteRef);
+
+            if (!inviteSnap.exists()) return null;
+
+            const inviteData = inviteSnap.data() as PlanInvite;
+
+            if (inviteData.expiresAt && inviteData.expiresAt.toMillis() < Date.now()) {
+                return null;
+            }
+
+            if (inviteData.maxUses && inviteData.useCount >= inviteData.maxUses) {
+                return null;
+            }
+
+            transaction.update(inviteRef, {
+                useCount: increment(1),
+            });
+
+            return { id: inviteSnap.id, ...inviteData } as PlanInvite;
+        });
+
+        return invite;
+    } catch {
+        return null;
+    }
 }
 
 export function generateInviteLink(code: string): string {

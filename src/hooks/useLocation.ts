@@ -167,7 +167,7 @@ export function useLocation(userId: string | undefined) {
         } catch (error) {
             console.error('Error getting current position:', error);
             if (isWeb) {
-                alert('Kunde inte hämta din position. Kontrollera att du har tillåtit GPS i din webbläsare.');
+                alert('Could not fetch your location. Please make sure location is enabled in your browser settings.');
             }
             return null;
         }

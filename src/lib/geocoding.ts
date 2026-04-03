@@ -76,8 +76,8 @@ export async function searchAddress(query: string): Promise<AddressPrediction[]>
                 {
                     input: query.trim(),
                     types: ['address'],
-                    language: 'sv',
-                    componentRestrictions: { country: 'se' }
+                    language: navigator.language || 'en',
+                    componentRestrictions: { country: navigator.language?.slice(-2).toLowerCase() || 'us' }
                 },
                 (predictions: any[] | null, status: string) => {
                     if (status === 'OK' && predictions && predictions.length > 0) {
