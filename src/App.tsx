@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Plus, Share2, Trash2, Pencil, Check, Users, User, ArrowLeft, Home, Camera, History, X, Smile, Sun, Moon, MapPin } from 'lucide-react';
+import { Plus, Share2, Trash2, Pencil, Check, Users, User, ArrowLeft, Home, Camera, History, X, Smile, Sun, Moon, MapPin, Copy } from 'lucide-react';
 import { compressAndToBase64 } from './lib/utils';
 import { useAuth } from './hooks/useAuth';
 import {
@@ -1202,9 +1202,24 @@ function App() {
 
                   {/* Copyright Footer */}
                   <div className="w-full text-center py-6 mt-4">
-                    <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
-                      Created 2026 by © nRn World
-                    </p>
+                    <div className="flex items-center justify-center gap-2">
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
+                        Created 2026 by © nRn World
+                      </p>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText('bynrnworld@gmail.com');
+                          showToast('Email kopierad!');
+                        }}
+                        className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        title="Copy email"
+                      >
+                        <Copy className="w-3 h-3 text-zinc-400 dark:text-zinc-600" />
+                      </button>
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium">
+                        bynrnworld@gmail.com
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
