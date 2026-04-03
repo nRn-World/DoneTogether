@@ -27,7 +27,7 @@ let googleMapsLoadingPromise: Promise<void> | null = null;
 async function loadGoogleMaps(): Promise<boolean> {
     if (googleMapsLoaded) return true;
 
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyCqyQBJ5NkThxyguGymmHSEOIfVDitD7vY';
     if (!apiKey) return false;
 
     if (googleMapsLoadingPromise) return googleMapsLoadingPromise.then(() => true);
