@@ -5,15 +5,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-comp
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
-firebase.initializeApp({
-    apiKey: "AIzaSyDsGmC9FOrwuJQMqFKhmCuxiJIP0vxoTBU",
-    authDomain: "donetogether-v1.firebaseapp.com",
-    projectId: "donetogether-v1",
-    storageBucket: "donetogether-v1.firebasestorage.app",
-    messagingSenderId: "677287957451",
-    appId: "1:677287957451:web:812a897c8f906a63b8dc4e",
-    measurementId: "G-XXXXXXXXXX"
-});
+// Firebase config is injected via index.html into self.__firebaseConfig
+// This avoids hardcoding credentials in the service worker
+if (!self.__firebaseConfig) {
+    console.error('Firebase config not injected. See .env.example for setup.');
+} else {
+    firebase.initializeApp(self.__firebaseConfig);
+}
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
