@@ -1,4 +1,4 @@
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 export interface AppNotification {
@@ -24,7 +24,7 @@ export async function sendAppNotification(
         const notificationsRef = collection(db, 'notifications');
         await addDoc(notificationsRef, {
             to,
-            from: db.app.auth?.currentUser?.uid || 'system',
+            from: auth.currentUser?.uid || 'system',
             title,
             body,
             type,

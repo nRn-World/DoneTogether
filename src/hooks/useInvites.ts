@@ -136,7 +136,7 @@ export async function validateAndIncrementInvite(code: string): Promise<PlanInvi
                 useCount: increment(1),
             });
 
-            return { id: inviteSnap.id, ...inviteData } as PlanInvite;
+            return { ...inviteData, id: inviteSnap.id } as PlanInvite;
         });
 
         return invite;

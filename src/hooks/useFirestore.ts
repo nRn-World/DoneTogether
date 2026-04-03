@@ -6,7 +6,6 @@ import {
     onSnapshot,
     doc,
     getDoc,
-    getDocs,
     updateDoc,
     Timestamp,
     arrayUnion,
@@ -148,7 +147,7 @@ export async function updatePlan(planId: string, updates: Partial<Plan>) {
     const planRef = doc(db, 'plans', planId);
 
     // If we are reopening a plan, clear the completedAt timestamp
-    const finalUpdates = { ...updates };
+    const finalUpdates: Record<string, unknown> = { ...updates };
     if (updates.completed === false) {
         finalUpdates.completedAt = deleteField();
     }
