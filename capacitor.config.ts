@@ -9,7 +9,8 @@ const config: CapacitorConfig = {
       scopes: ['profile', 'email'],
       serverClientId: process.env.VITE_GOOGLE_SERVER_CLIENT_ID || '677287957451-6vja60qu97qvobgr61li4b3dlrj1pslq.apps.googleusercontent.com',
       forceCodeForRefreshToken: true
-    }
+    },
+    GeofencePlugin: {}
   },
   android: {
     buildOptions: {

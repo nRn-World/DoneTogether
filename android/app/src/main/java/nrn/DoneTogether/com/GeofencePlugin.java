@@ -1,15 +1,13 @@
 package nrn.DoneTogether.com;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.getcapacitor.Bridge;
 import com.getcapacitor.JSArray;
@@ -35,7 +33,7 @@ import java.util.List;
 public class GeofencePlugin extends Plugin {
     private static final String TAG = "GeofencePlugin";
     private GeofencingClient geofencingClient;
-    private final List<Geofence> geofenceList = new ArrayList<>();
+    private final List<String> geofenceIds = new ArrayList<>();
 
     @Override
     public void load() {
@@ -56,6 +54,7 @@ public class GeofencePlugin extends Plugin {
         try {
             JSONArray geofences = new JSONArray(geofencesArray.toString());
             List<Geofence> newGeofences = new ArrayList<>();
+            geofenceIds.clear();
 
             for (int i = 0; i < geofences.length(); i++) {
                 JSONObject geo = geofences.getJSONObject(i);
@@ -70,17 +69,15 @@ public class GeofencePlugin extends Plugin {
                     .setExpirationDuration(Geofence.NEVER_EXPIRE)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                     .build());
+                geofenceIds.add(id);
             }
-
-            geofenceList.clear();
-            geofenceList.addAll(newGeofences);
 
             if (ContextCompat.checkSelfPermission(bridge.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) 
                     == PackageManager.PERMISSION_GRANTED) {
                 
                 GeofencingRequest request = new GeofencingRequest.Builder()
                     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                    .addGeofences(geofenceList)
+                    .addGeofences(newGeofences)
                     .build();
 
                 geofencingClient.addGeofences(request, getGeofencePendingIntent())
@@ -103,9 +100,14 @@ public class GeofencePlugin extends Plugin {
 
     @PluginMethod
     public void removeGeofences(PluginCall call) {
-        geofencingClient.removeGeofences(geofenceList)
+        if (geofenceIds.isEmpty()) {
+            call.resolve(new JSObject().put("success", true));
+            return;
+        }
+        
+        geofencingClient.removeGeofences(geofenceIds)
             .addOnSuccessListener(aVoid -> {
-                geofenceList.clear();
+                geofenceIds.clear();
                 call.resolve(new JSObject().put("success", true));
             })
             .addOnFailureListener(e -> {
@@ -115,13 +117,10 @@ public class GeofencePlugin extends Plugin {
 
     @PluginMethod
     public void requestPermission(PluginCall call) {
-        // Request permission - this will be handled by the app
-        // For now, we check if we already have permission
         if (ContextCompat.checkSelfPermission(bridge.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) 
                 == PackageManager.PERMISSION_GRANTED) {
             call.resolve(new JSObject().put("granted", true));
         } else {
-            // Store the call to resolve after permission is granted
             call.resolve(new JSObject().put("granted", false));
         }
     }
