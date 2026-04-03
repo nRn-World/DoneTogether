@@ -18,19 +18,8 @@
 <body>
   <div id="root"></div>
   <script>
-    window.__firebaseConfig = {
-      apiKey: "%VITE_FIREBASE_API_KEY%",
-      authDomain: "%VITE_FIREBASE_AUTH_DOMAIN%",
-      projectId: "%VITE_FIREBASE_PROJECT_ID%",
-      storageBucket: "%VITE_FIREBASE_STORAGE_BUCKET%",
-      messagingSenderId: "%VITE_FIREBASE_MESSAGING_SENDER_ID%",
-      appId: "%VITE_FIREBASE_APP_ID%",
-      measurementId: "%VITE_FIREBASE_MEASUREMENT_ID%"
-    };
-  </script>
     function renderStartupError(title, details, trace) {
       document.body.textContent = '';
-
       const root = document.createElement('div');
       root.style.background = '#09090b';
       root.style.color = '#fff';
@@ -38,26 +27,21 @@
       root.style.padding = '20px';
       root.style.fontFamily = 'monospace';
       root.style.fontSize = '14px';
-
       const heading = document.createElement('h1');
       heading.style.color = '#ef4444';
       heading.style.marginBottom = '20px';
       heading.textContent = title;
-
       const card = document.createElement('div');
       card.style.background = '#18181b';
       card.style.padding = '20px';
       card.style.border = '1px solid #27272a';
       card.style.borderRadius = '12px';
       card.style.overflow = 'auto';
-
       const detailsEl = document.createElement('div');
       detailsEl.style.color = '#f87171';
       detailsEl.style.marginBottom = '10px';
       detailsEl.textContent = details;
-
       card.appendChild(detailsEl);
-
       if (trace) {
         const traceEl = document.createElement('pre');
         traceEl.style.marginTop = '15px';
@@ -66,18 +50,15 @@
         traceEl.textContent = trace;
         card.appendChild(traceEl);
       }
-
       root.appendChild(heading);
       root.appendChild(card);
       document.body.appendChild(root);
     }
-
     window.onerror = function (message, source, lineno, colno, error) {
       const details = `${String(message)} (${String(source)}:${String(lineno)}:${String(colno)})`;
       const trace = error && error.stack ? error.stack : 'No stack trace';
       renderStartupError('CRITICAL ERROR (Pre-React)', details, trace);
     };
-    // Catch unhandled promise rejections
     window.onunhandledrejection = function (event) {
       const reason = event && event.reason != null ? String(event.reason) : 'Unknown reason';
       renderStartupError('UNHANDLED PROMISE REJECTION', `Reason: ${reason}`);

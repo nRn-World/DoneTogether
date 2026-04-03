@@ -5,13 +5,13 @@ import { getMessaging } from 'firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDsGmC9FOrwuJQMqFKhmCuxiJIP0vxoTBU',
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'donetogether-v1.firebaseapp.com',
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'donetogether-v1',
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'donetogether-v1.firebasestorage.app',
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '677287957451',
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:677287957451:web:812a897c8f906a63b8dc4e',
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-XXXXXXXXXX'
 };
 
 // Initialize Firebase

@@ -17,7 +17,7 @@ export function useNotifications(userId: string | undefined) {
                     const permission = await Notification.requestPermission();
                     if (permission === 'granted' && messaging) {
                         const currentToken = await getToken(messaging, {
-                            vapidKey: import.meta.env.VITE_VAPID_KEY
+                            vapidKey: import.meta.env.VITE_VAPID_KEY || 'BN4q6ahLqD56ssLIqw8C0CYOb70yDq_7ePfJ8xLO1wL8Uxz9nds2RzRB8gPsJ6_JSq37AxVI-z3ssg11Hz7KU3A'
                         });
 
                         if (currentToken) {
