@@ -127,6 +127,7 @@ export async function searchAddress(query: string): Promise<AddressPrediction[]>
                             componentRestrictions: { country: 'se' }
                         },
                         (predictions: any[] | null, status: string) => {
+                            console.log('Google Places status:', status, 'predictions:', predictions?.length);
                             if (status === 'OK' && predictions && predictions.length > 0) {
                                 resolve(predictions.map((p: any) => ({
                                     place_id: p.place_id,
@@ -134,17 +135,22 @@ export async function searchAddress(query: string): Promise<AddressPrediction[]>
                                     main_text: p.structured_formatting?.main_text,
                                     secondary_text: p.structured_formatting?.secondary_text
                                 })));
-                            } else {
+                            } else if (status === 'ZERO_RESULTS') {
                                 resolve([]);
+                            } else {
+                                console.log('Google Places failed, trying Nominatim fallback');
+                                resolve(searchWithNominatim(query));
                             }
                         }
                     );
                 });
             }
-        } catch {
+        } catch (e) {
+            console.log('Google Places error:', e);
         }
     }
 
+    console.log('Google not available, using Nominatim');
     return searchWithNominatim(query);
 }
 
