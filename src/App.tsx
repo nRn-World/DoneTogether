@@ -30,6 +30,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import type { Plan, Item } from './types';
 
 import { useLocation } from './hooks/useLocation';
+import { useGeofence } from './hooks/useGeofence';
 import { AddressAutocomplete } from './components/AddressAutocomplete';
 import { doc, updateDoc, deleteField } from 'firebase/firestore';
 import { db } from './lib/firebase';
@@ -55,6 +56,9 @@ function App() {
 
   // Initialize location tracking
   const { permissionStatus, isTracking, getCurrentLocation } = useLocation(user?.uid);
+  
+  // Initialize geofence monitoring for active items
+  useGeofence(user?.uid);
 
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
 
