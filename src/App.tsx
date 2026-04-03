@@ -1202,10 +1202,13 @@ function App() {
 
                   {/* Copyright Footer */}
                   <div className="w-full text-center py-6 mt-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
-                        Created 2026 by © nRn World
-                      </p>
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
+                      Created 2026 by © nRn World
+                    </p>
+                    <div className="flex items-center justify-center gap-1 mt-1">
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium">
+                        bynrnworld@gmail.com
+                      </span>
                       <button 
                         onClick={() => {
                           navigator.clipboard.writeText('bynrnworld@gmail.com');
@@ -1216,9 +1219,6 @@ function App() {
                       >
                         <Copy className="w-3 h-3 text-zinc-400 dark:text-zinc-600" />
                       </button>
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium">
-                        bynrnworld@gmail.com
-                      </span>
                     </div>
                   </div>
                 </div>
