@@ -5,7 +5,7 @@ import { getMessaging } from 'firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDsGmC9FOrwuJQMqFKhmCuxiJIP0vxoTBU',
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCA_1UxB7z86TvyIEpgqnTwnUgqOWTEf_4',
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'donetogether-v1.firebaseapp.com',
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'donetogether-v1',
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'donetogether-v1.firebasestorage.app',
