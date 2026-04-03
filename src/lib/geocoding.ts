@@ -27,7 +27,7 @@ let googleMapsLoadingPromise: Promise<void> | null = null;
 async function loadGoogleMaps(): Promise<boolean> {
     if (googleMapsLoaded) return true;
 
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyCqyQBJ5NkThxyguGymmHSEOIfVDitD7vY';
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyCA_1UxB7z86TvyIEpgqnTwnUgqOWTEf_4';
     if (!apiKey) return false;
 
     if (googleMapsLoadingPromise) return googleMapsLoadingPromise.then(() => true);
@@ -58,16 +58,16 @@ async function loadGoogleMaps(): Promise<boolean> {
 
 async function searchWithNominatim(query: string): Promise<AddressPrediction[]> {
     try {
-        const lang = navigator.language || 'en';
-        const country = lang.slice(-2).toLowerCase() || 'us';
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&accept-language=${lang}&countrycodes=${country}`;
+        const lang = 'sv';
+        const country = 'se';
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=8&accept-language=${lang}&countrycodes=${country}&viewbox=10.0,55.0,24.0,69.0&bounded=0`;
         const response = await fetch(url, {
             headers: { 'User-Agent': 'DoneTogether/1.0' }
         });
         if (!response.ok) return [];
         const data = await response.json();
         return data.map((item: any) => ({
-            place_id: item.place_id || item.osm_id || item.lat + ',' + item.lon,
+            place_id: String(item.place_id),
             description: item.display_name,
             main_text: item.name || item.address?.road || item.address?.city || '',
             secondary_text: [item.address?.city, item.address?.town, item.address?.village, item.address?.country].filter(Boolean).join(', ')
@@ -123,8 +123,8 @@ export async function searchAddress(query: string): Promise<AddressPrediction[]>
                         {
                             input: query.trim(),
                             types: ['geocode'],
-                            language: navigator.language || 'en',
-                            componentRestrictions: { country: navigator.language?.slice(-2).toLowerCase() || 'us' }
+                            language: 'sv',
+                            componentRestrictions: { country: 'se' }
                         },
                         (predictions: any[] | null, status: string) => {
                             if (status === 'OK' && predictions && predictions.length > 0) {
