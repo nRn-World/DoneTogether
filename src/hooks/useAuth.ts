@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type User, signOut as firebaseSignOut, GoogleAuthProvider, signInWithCredential, signInWithPopup } from 'firebase/auth';
+import { type User, signOut as firebaseSignOut, GoogleAuthProvider, signInWithCredential, signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { doc, setDoc, Timestamp, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import type { UserProfile } from '../types';
@@ -17,6 +17,19 @@ export function useAuth() {
     useEffect(() => {
         let profileUnsubscribe: (() => void) | null = null;
         let cancelled = false;
+
+        // Handle redirect result on native platform
+        const handleRedirectResult = async () => {
+            if (Capacitor.isNativePlatform()) {
+                try {
+                    // This will throw if there's no pending redirect result
+                    await getRedirectResult(auth);
+                } catch (e) {
+                    // No pending result - this is normal
+                }
+            }
+        };
+        handleRedirectResult();
 
         const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
             if (cancelled) return;
@@ -79,22 +92,34 @@ export function useAuth() {
             setLoading(true);
             setError(null);
 
+            // For native Android, use Google Sign-In plugin
             if (Capacitor.isNativePlatform()) {
-                const googleUser = await GoogleAuth.signIn();
-                const idToken = googleUser.authentication.idToken;
+                try {
+                    const googleUser = await GoogleAuth.signIn();
+                    const idToken = googleUser.authentication.idToken;
 
-                if (!idToken) {
-                    throw new Error("No idToken received from Google Auth");
+                    if (!idToken) {
+                        throw new Error("No idToken received from Google Auth");
+                    }
+
+                    const credential = GoogleAuthProvider.credential(idToken);
+                    await signInWithCredential(auth, credential);
+                } catch (nativeErr: any) {
+                    console.error('Native Google Auth failed:', nativeErr);
+                    // Try alternative method using redirect (works in WebView)
+                    const provider = new GoogleAuthProvider();
+                    provider.setCustomParameters({
+                        prompt: 'select_account'
+                    });
+                    // Use redirect instead of popup for native
+                    await signInWithRedirect(auth, provider);
                 }
-
-                const credential = GoogleAuthProvider.credential(idToken);
-                await signInWithCredential(auth, credential);
             } else {
+                // Web - use popup
                 const provider = new GoogleAuthProvider();
                 provider.setCustomParameters({
                     prompt: 'select_account'
                 });
-
                 await signInWithPopup(auth, provider);
             }
 

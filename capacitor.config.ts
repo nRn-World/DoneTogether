@@ -7,7 +7,8 @@ const config: CapacitorConfig = {
   plugins: {
     GoogleAuth: {
       scopes: ['profile', 'email'],
-      serverClientId: process.env.VITE_GOOGLE_SERVER_CLIENT_ID || '677287957451-6vja60qu97qvobgr61li4b3dlrj1pslq.apps.googleusercontent.com',
+      // Use Android OAuth client ID for native
+      serverClientId: '677287957451-bioldnmggdnnhirnpi7v8optqhotup32.apps.googleusercontent.com',
       forceCodeForRefreshToken: true
     },
     GeofencePlugin: {}
