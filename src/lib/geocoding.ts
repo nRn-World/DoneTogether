@@ -24,104 +24,92 @@ export interface AddressPrediction {
     googlePlaceId?: string;
 }
 
-// Extraherar husnummer från Nominatim display_name
-function extractHouseNumber(item: any): { mainText: string; houseNumber: string } {
-    const addr = item.address || {};
-    const road = addr.road || addr.pedestrian || addr.highway || '';
-    const osmHouseNumber = addr.house_number || '';
-    const displayName = item.display_name || '';
-    const firstPart = displayName.split(',')[0];
-
-    if (osmHouseNumber && road) {
-        return { mainText: `${road} ${osmHouseNumber}`, houseNumber: osmHouseNumber };
-    }
-
-    // Försök hitta husnummer i display_name
-    // Mönster: "Gatunamn 144, Stad" eller "Gatunamn 144A, Stad"
-    const patterns = [
-        /^(.+?)\s+(\d+[a-zA-Z]?)\s*[,]/,  // "Ribegatan 144,"
-        /^(.+?)\s+(\d+[a-zA-Z]?)$/,         // "Ribegatan 144"
-    ];
-
-    for (const pattern of patterns) {
-        const match = firstPart.match(pattern);
-        if (match) {
-            const streetName = match[1].trim();
-            const extractedNumber = match[2];
-            // Verifiera att gatunamnet liknar road
-            if (road && streetName.toLowerCase().includes(road.toLowerCase().split(' ')[0])) {
-                return { mainText: `${road} ${extractedNumber}`, houseNumber: extractedNumber };
-            }
-            // Även om vi inte matchar road, använd det extraherade
-            if (extractedNumber.match(/^\d+[a-zA-Z]?$/)) {
-                return { mainText: `${road || streetName} ${extractedNumber}`, houseNumber: extractedNumber };
-            }
-        }
-    }
-
-    if (road) {
-        return { mainText: road, houseNumber: '' };
-    }
-
-    return { mainText: firstPart || 'Okänd adress', houseNumber: '' };
-}
+declare const google: any;
 
 export async function searchAddress(query: string): Promise<AddressPrediction[]> {
     if (!query || query.trim().length < 2) return [];
 
+    // Försök med Google Places Autocomplete (JavaScript API - ingen CORS)
+    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+        return new Promise((resolve) => {
+            const service = new google.maps.places.AutocompleteService();
+            service.getPlacePredictions(
+                {
+                    input: query,
+                    componentRestrictions: { country: 'se' },
+                    types: ['address']
+                },
+                (predictions: any, status: any) => {
+                    if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+                        // Fallback till Nominatim
+                        searchAddressNominatim(query).then(resolve);
+                        return;
+                    }
+
+                    const results: AddressPrediction[] = predictions.map((p: any) => ({
+                        place_id: p.place_id,
+                        description: p.description,
+                        main_text: p.structured_formatting.main_text,
+                        secondary_text: p.structured_formatting.secondary_text,
+                        googlePlaceId: p.place_id
+                    }));
+
+                    resolve(results);
+                }
+            );
+        });
+    }
+
+    // Fallback: Nominatim om Google inte laddat än
+    return searchAddressNominatim(query);
+}
+
+async function searchAddressNominatim(query: string): Promise<AddressPrediction[]> {
     try {
         const trimmedQuery = query.trim();
+        const searchQuery = trimmedQuery.includes(',') ? trimmedQuery : `${trimmedQuery}, Sverige`;
         
-        // Försök med specifikt svensk adressformat
-        const queries = [
-            `${trimmedQuery}, Sverige`,
-            trimmedQuery
-        ];
+        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(searchQuery)}&countrycodes=se&limit=10&addressdetails=1&accept-language=sv`;
+        const response = await fetch(nominatimUrl, {
+            headers: { 'User-Agent': 'DoneTogether/1.0' }
+        });
 
-        const allResults: AddressPrediction[] = [];
+        if (!response.ok) return [];
+        const data = await response.json();
 
-        for (const searchQuery of queries) {
-            const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(searchQuery)}&countrycodes=se&limit=15&addressdetails=1&accept-language=sv`;
-            const response = await fetch(nominatimUrl, {
-                headers: { 'User-Agent': 'DoneTogether/1.0' }
-            });
+        if (!data || data.length === 0) return [];
 
-            if (!response.ok) continue;
-            const data = await response.json();
-
-            if (!data || data.length === 0) continue;
-
-            for (const item of data) {
-                const { mainText } = extractHouseNumber(item);
-                const addr = item.address || {};
-                const city = addr.city || addr.town || addr.village || addr.municipality || '';
-                const postcode = addr.postcode || '';
-                const context = [city, postcode, "Sverige"].filter(Boolean).join(', ');
-
-                const prediction: AddressPrediction = {
-                    place_id: item.place_id || `${item.lat},${item.lon}`,
-                    description: `${mainText}, ${context}`,
-                    main_text: mainText,
-                    secondary_text: context,
-                    lat: String(item.lat),
-                    lon: String(item.lon)
-                };
-
-                // Undvik dupliceringar
-                if (!allResults.some(r => r.place_id === prediction.place_id)) {
-                    allResults.push(prediction);
-                }
+        return data.map((item: any) => {
+            const addr = item.address || {};
+            const road = addr.road || addr.pedestrian || addr.highway || '';
+            const houseNumber = addr.house_number || '';
+            
+            let mainText = '';
+            if (road && houseNumber) {
+                mainText = `${road} ${houseNumber}`;
+            } else if (road) {
+                mainText = road;
+            } else if (item.display_name) {
+                mainText = item.display_name.split(',')[0];
+            } else {
+                mainText = 'Okänd adress';
             }
 
-            // Om vi fick resultat med husnummer, sluta här
-            if (allResults.some(r => r.main_text?.match(/\d+[a-zA-Z]?$/))) {
-                break;
-            }
-        }
+            const city = addr.city || addr.town || addr.village || addr.municipality || '';
+            const postcode = addr.postcode || '';
+            const context = [city, postcode, "Sverige"].filter(Boolean).join(', ');
 
-        return allResults.slice(0, 10);
+            return {
+                place_id: item.place_id || `${item.lat},${item.lon}`,
+                description: `${mainText}, ${context}`,
+                main_text: mainText,
+                secondary_text: context,
+                lat: String(item.lat),
+                lon: String(item.lon)
+            };
+        });
     } catch (e) {
-        console.error('[geocoding] Search error:', e);
+        console.error('[geocoding] Nominatim search error:', e);
         return [];
     }
 }
