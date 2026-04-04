@@ -4,15 +4,6 @@ android {
     namespace "nrn.DoneTogether.com"
     compileSdk rootProject.ext.compileSdkVersion
     
-    signingConfigs {
-        debug {
-            storeFile file('../../donetogether-release.keystore')
-            storePassword 'android123'
-            keyAlias 'donetogether'
-            keyPassword 'android123'
-        }
-    }
-    
     defaultConfig {
         applicationId "nrn.DoneTogether.com"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -28,12 +19,11 @@ android {
     }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            minifyEnabled false
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
-            signingConfig signingConfigs.debug
         }
     }
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type User, signOut as firebaseSignOut, GoogleAuthProvider, signInWithCredential, signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { type User, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'firebase/auth';
 import { doc, setDoc, Timestamp, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import type { UserProfile } from '../types';
@@ -18,24 +18,24 @@ export function useAuth() {
         let profileUnsubscribe: (() => void) | null = null;
         let cancelled = false;
 
-        // Handle redirect result on native platform
-        const handleRedirectResult = async () => {
-            if (Capacitor.isNativePlatform()) {
-                try {
-                    // This will throw if there's no pending redirect result
-                    await getRedirectResult(auth);
-                } catch (e) {
-                    // No pending result - this is normal
-                }
+        console.log('[useAuth] Setting up onAuthStateChanged listener');
+
+        // Add a fallback timeout to prevent infinite loading screen
+        const timeoutId = setTimeout(() => {
+            if (!cancelled && loading) {
+                console.warn('[useAuth] Auth listener timed out after 10s. Forcing loading to false.');
+                setLoading(false);
             }
-        };
-        handleRedirectResult();
+        }, 10000);
 
         const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+            console.log('[useAuth] onAuthStateChanged triggered, user:', firebaseUser?.email || 'null', 'cancelled:', cancelled);
+            clearTimeout(timeoutId);
             if (cancelled) return;
             try {
                 setUser(firebaseUser);
                 if (firebaseUser) {
+                    console.log('[useAuth] User logged in, setting up profile listener for uid:', firebaseUser.uid);
                     const userRef = doc(db, 'users', firebaseUser.uid);
 
                     profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
@@ -88,34 +88,29 @@ export function useAuth() {
     }, []);
 
     const signInWithGoogle = async () => {
+        console.log('[useAuth] signInWithGoogle started');
         try {
             setLoading(true);
             setError(null);
 
-            // For native Android, use Google Sign-In plugin
+            console.log('[useAuth] Native platform:', Capacitor.isNativePlatform());
+
             if (Capacitor.isNativePlatform()) {
-                try {
-                    const googleUser = await GoogleAuth.signIn();
-                    const idToken = googleUser.authentication.idToken;
+                console.log('[useAuth] Calling GoogleAuth.signIn()');
+                const googleUser = await GoogleAuth.signIn();
+                console.log('[useAuth] GoogleAuth.signIn() success, user:', googleUser.email);
 
-                    if (!idToken) {
-                        throw new Error("No idToken received from Google Auth");
-                    }
-
-                    const credential = GoogleAuthProvider.credential(idToken);
-                    await signInWithCredential(auth, credential);
-                } catch (nativeErr: any) {
-                    console.error('Native Google Auth failed:', nativeErr);
-                    // Try alternative method using redirect (works in WebView)
-                    const provider = new GoogleAuthProvider();
-                    provider.setCustomParameters({
-                        prompt: 'select_account'
-                    });
-                    // Use redirect instead of popup for native
-                    await signInWithRedirect(auth, provider);
+                const idToken = googleUser.authentication.idToken;
+                if (!idToken) {
+                    throw new Error("No idToken received from Google Auth");
                 }
+
+                console.log('[useAuth] Creating credential and signing in with Firebase');
+                const credential = GoogleAuthProvider.credential(idToken);
+                const result = await signInWithCredential(auth, credential);
+                console.log('[useAuth] Firebase sign-in success:', result.user.email);
             } else {
-                // Web - use popup
+                console.log('[useAuth] Web platform, calling signInWithPopup');
                 const provider = new GoogleAuthProvider();
                 provider.setCustomParameters({
                     prompt: 'select_account'
@@ -136,9 +131,6 @@ export function useAuth() {
         try {
             setError(null);
             await firebaseSignOut(auth);
-            if (Capacitor.isNativePlatform()) {
-                await GoogleAuth.signOut();
-            }
         } catch (err: any) {
             console.error('Sign out error:', err);
             setError('Utloggning misslyckades');

@@ -56,13 +56,14 @@ export function AddressAutocomplete({ onSelect, placeholder = "Search address...
     const handleSelect = async (prediction: AddressPrediction) => {
         setIsFetchingDetails(true);
         try {
-            const details = await getPlaceDetails(prediction.place_id);
+            // Vi använder koordinaterna direkt från sökresultatet om de finns
+            const details = await getPlaceDetails(prediction.googlePlaceId || prediction.place_id, prediction.lat, prediction.lon);
             if (details) {
                 onSelect({
                     latitude: parseFloat(details.lat),
                     longitude: parseFloat(details.lon),
-                    address: details.display_name,
-                    name: details.name || details.display_name.split(',')[0]
+                    address: prediction.description,
+                    name: prediction.main_text || prediction.description.split(',')[0]
                 });
             }
             setQuery('');
