@@ -24,12 +24,52 @@ export interface AddressPrediction {
     googlePlaceId?: string;
 }
 
+declare const google: any;
+
 export async function searchAddress(query: string): Promise<AddressPrediction[]> {
     if (!query || query.trim().length < 2) return [];
 
+    // Försök med Google Places Autocomplete (JavaScript API - ingen CORS)
+    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+        return new Promise((resolve) => {
+            const service = new google.maps.places.AutocompleteService();
+            service.getPlacePredictions(
+                {
+                    input: query,
+                    componentRestrictions: { country: 'se' },
+                    types: ['address']
+                },
+                (predictions: any, status: any) => {
+                    if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
+                        // Fallback till Nominatim
+                        searchAddressNominatim(query).then(resolve);
+                        return;
+                    }
+
+                    const results: AddressPrediction[] = predictions.map((p: any) => ({
+                        place_id: p.place_id,
+                        description: p.description,
+                        main_text: p.structured_formatting.main_text,
+                        secondary_text: p.structured_formatting.secondary_text,
+                        googlePlaceId: p.place_id
+                    }));
+
+                    resolve(results);
+                }
+            );
+        });
+    }
+
+    // Fallback: Nominatim om Google inte laddat än
+    return searchAddressNominatim(query);
+}
+
+async function searchAddressNominatim(query: string): Promise<AddressPrediction[]> {
     try {
-        // Primär: Nominatim (OpenStreetMap) - stöder CORS, bra svensk täckning
-        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&countrycodes=se&limit=10&addressdetails=1&accept-language=sv`;
+        const trimmedQuery = query.trim();
+        const searchQuery = trimmedQuery.includes(',') ? trimmedQuery : `${trimmedQuery}, Sverige`;
+        
+        const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(searchQuery)}&countrycodes=se&limit=10&addressdetails=1&accept-language=sv`;
         const response = await fetch(nominatimUrl, {
             headers: { 'User-Agent': 'DoneTogether/1.0' }
         });
@@ -41,10 +81,10 @@ export async function searchAddress(query: string): Promise<AddressPrediction[]>
 
         return data.map((item: any) => {
             const addr = item.address || {};
-            const road = addr.road || addr.pedestrian || '';
+            const road = addr.road || addr.pedestrian || addr.highway || '';
             const houseNumber = addr.house_number || '';
+            
             let mainText = '';
-
             if (road && houseNumber) {
                 mainText = `${road} ${houseNumber}`;
             } else if (road) {
@@ -76,32 +116,45 @@ export async function searchAddress(query: string): Promise<AddressPrediction[]>
 
 export async function getPlaceDetails(placeId: string, lat?: string, lon?: string): Promise<GeocodingResult | null> {
     try {
-        // Försök med Google Places Details API först (fungerar på native)
-        const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-        if (googleApiKey && placeId && !placeId.includes(',')) {
-            const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${googleApiKey}&fields=geometry,formatted_address,address_components`;
-            const response = await fetch(url);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.status === 'OK' && data.result) {
-                    const loc = data.result.geometry.location;
-                    const addr = data.result.address_components || [];
-                    const address: any = {};
-                    addr.forEach((c: any) => {
-                        if (c.types.includes('route')) address.road = c.long_name;
-                        if (c.types.includes('street_number')) address.house_number = c.long_name;
-                        if (c.types.includes('locality')) address.city = c.long_name;
-                        if (c.types.includes('postal_code')) address.postcode = c.long_name;
-                        if (c.types.includes('country')) address.country = c.long_name;
-                    });
-                    return {
-                        lat: String(loc.lat),
-                        lon: String(loc.lng),
-                        display_name: data.result.formatted_address || '',
-                        address
-                    };
-                }
-            }
+        // Försök med Google Places Details (JavaScript API)
+        if (typeof google !== 'undefined' && google.maps && google.maps.places && placeId && !placeId.includes(',')) {
+            return new Promise((resolve) => {
+                const div = document.createElement('div');
+                const service = new google.maps.places.PlacesService(div);
+                service.getDetails(
+                    {
+                        placeId: placeId,
+                        fields: ['geometry', 'formatted_address', 'address_components']
+                    },
+                    (result: any, status: any) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && result) {
+                            const loc = result.geometry?.location;
+                            const addr = result.address_components || [];
+                            const address: any = {};
+                            addr.forEach((c: any) => {
+                                if (c.types.includes('route')) address.road = c.long_name;
+                                if (c.types.includes('street_number')) address.house_number = c.long_name;
+                                if (c.types.includes('locality')) address.city = c.long_name;
+                                if (c.types.includes('postal_code')) address.postcode = c.long_name;
+                                if (c.types.includes('country')) address.country = c.long_name;
+                            });
+                            resolve({
+                                lat: String(loc?.lat()),
+                                lon: String(loc?.lng()),
+                                display_name: result.formatted_address || '',
+                                address
+                            });
+                        } else {
+                            // Fallback
+                            if (lat && lon) {
+                                resolve({ lat, lon, display_name: '', address: {} });
+                            } else {
+                                resolve(null);
+                            }
+                        }
+                    }
+                );
+            });
         }
 
         // Fallback: använd koordinater direkt
