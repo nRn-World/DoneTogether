@@ -9,13 +9,28 @@ import {
     doc,
     getDoc,
     getDocs,
+    setDoc,
+    deleteDoc,
     Timestamp,
-    arrayUnion,
-    arrayRemove,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { FriendRequest, UserProfile } from '../types';
 import { sendAppNotification } from '../lib/notifications';
+
+function getFriendshipId(a: string, b: string) {
+    return [a, b].sort().join('_');
+}
+
+async function ensureFriendship(a: string, b: string) {
+    const friendshipId = getFriendshipId(a, b);
+    const ref = doc(db, 'friendships', friendshipId);
+    const snap = await getDoc(ref);
+    if (snap.exists()) return;
+    await setDoc(ref, {
+        members: [a, b],
+        createdAt: Timestamp.now()
+    });
+}
 
 export function useFriends(userId: string | undefined) {
     const [friends, setFriends] = useState<UserProfile[]>([]);
@@ -28,17 +43,33 @@ export function useFriends(userId: string | undefined) {
             return;
         }
 
-        const userRef = doc(db, 'users', userId);
-
-        const unsubscribe = onSnapshot(userRef, async (snapshot) => {
-            if (!snapshot.exists()) {
-                setFriends([]);
-                setLoading(false);
-                return;
+        const migrateLegacyFriends = async () => {
+            try {
+                const userSnap = await getDoc(doc(db, 'users', userId));
+                const legacyFriends = (userSnap.data() as UserProfile | undefined)?.friends || [];
+                if (!Array.isArray(legacyFriends) || legacyFriends.length === 0) return;
+                await Promise.all(
+                    legacyFriends.map(async (friendId) => {
+                        if (typeof friendId !== 'string' || friendId.length === 0) return;
+                        await ensureFriendship(userId, friendId);
+                    })
+                );
+            } catch (err) {
+                console.error('Error migrating legacy friends:', err);
             }
+        };
+        migrateLegacyFriends();
 
-            const userData = snapshot.data() as UserProfile;
-            const friendIds = userData.friends || [];
+        const friendshipsQuery = query(
+            collection(db, 'friendships'),
+            where('members', 'array-contains', userId)
+        );
+
+        const unsubscribe = onSnapshot(friendshipsQuery, async (snapshot) => {
+            const friendIds = snapshot.docs
+                .map((d) => (d.data() as { members?: string[] })?.members || [])
+                .map((members) => members.find((m) => m !== userId))
+                .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
             if (friendIds.length === 0) {
                 setFriends([]);
@@ -46,7 +77,6 @@ export function useFriends(userId: string | undefined) {
                 return;
             }
 
-            // Fetch friend profiles
             const friendProfiles = await Promise.all(
                 friendIds.map(async (friendId) => {
                     const friendDoc = await getDoc(doc(db, 'users', friendId));
@@ -55,6 +85,10 @@ export function useFriends(userId: string | undefined) {
             );
 
             setFriends(friendProfiles.filter((f): f is UserProfile => f !== null));
+            setLoading(false);
+        }, (error) => {
+            console.error('Error fetching friendships:', error);
+            setFriends([]);
             setLoading(false);
         });
 
@@ -131,6 +165,12 @@ export async function sendFriendRequest(
     fromUser: UserProfile,
     toUser: UserProfile
 ): Promise<void> {
+    const friendshipId = getFriendshipId(fromUser.uid, toUser.uid);
+    const existingFriendship = await getDoc(doc(db, 'friendships', friendshipId));
+    if (existingFriendship.exists()) {
+        throw new Error('Already friends');
+    }
+
     // Check if request already exists
     const existingQuery = query(
         collection(db, 'friendRequests'),
@@ -142,11 +182,6 @@ export async function sendFriendRequest(
 
     if (!existing.empty) {
         throw new Error('Friend request already sent');
-    }
-
-    // Check if they're already friends
-    if (fromUser.friends.includes(toUser.uid)) {
-        throw new Error('Already friends');
     }
 
     // Create friend request
@@ -178,17 +213,7 @@ export async function acceptFriendRequest(requestId: string): Promise<void> {
 
     const request = requestSnap.data() as FriendRequest;
 
-    // Add each user to the other's friends list
-    const fromUserRef = doc(db, 'users', request.from);
-    const toUserRef = doc(db, 'users', request.to);
-
-    await updateDoc(fromUserRef, {
-        friends: arrayUnion(request.to),
-    });
-
-    await updateDoc(toUserRef, {
-        friends: arrayUnion(request.from),
-    });
+    await ensureFriendship(request.from, request.to);
 
     // Update request status
     await updateDoc(requestRef, {
@@ -212,14 +237,6 @@ export async function declineFriendRequest(requestId: string): Promise<void> {
 }
 
 export async function removeFriend(userId: string, friendId: string): Promise<void> {
-    const userRef = doc(db, 'users', userId);
-    const friendRef = doc(db, 'users', friendId);
-
-    await updateDoc(userRef, {
-        friends: arrayRemove(friendId),
-    });
-
-    await updateDoc(friendRef, {
-        friends: arrayRemove(userId),
-    });
+    const friendshipId = getFriendshipId(userId, friendId);
+    await deleteDoc(doc(db, 'friendships', friendshipId));
 }

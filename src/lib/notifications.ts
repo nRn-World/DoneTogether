@@ -32,6 +32,7 @@ export async function sendAppNotification(
             status: 'pending',
             createdAt: Timestamp.now()
         });
-    } catch {
+    } catch (err) {
+        console.error('[sendAppNotification] Failed:', err);
     }
 }

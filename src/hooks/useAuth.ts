@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type User, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithCredential } from 'firebase/auth';
+import {
+    type User,
+    signOut as firebaseSignOut,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    signInWithCredential
+} from 'firebase/auth';
 import { doc, setDoc, Timestamp, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import type { UserProfile } from '../types';
@@ -20,12 +28,22 @@ export function useAuth() {
 
         console.log('[useAuth] Setting up onAuthStateChanged listener');
 
+        getRedirectResult(auth).catch((err: any) => {
+            console.error('[useAuth] getRedirectResult error:', err);
+            if (cancelled) return;
+            const errorCode = err?.code as string | undefined;
+            const errorMessage = err?.message || 'Something went wrong';
+            setError(`Inloggning misslyckades: ${errorCode ? `${errorCode}: ` : ''}${errorMessage}`);
+        });
+
         // Add a fallback timeout to prevent infinite loading screen
         const timeoutId = setTimeout(() => {
-            if (!cancelled && loading) {
+            if (cancelled) return;
+            setLoading((prev) => {
+                if (!prev) return prev;
                 console.warn('[useAuth] Auth listener timed out after 10s. Forcing loading to false.');
-                setLoading(false);
-            }
+                return false;
+            });
         }, 10000);
 
         const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -85,7 +103,7 @@ export function useAuth() {
                 profileUnsubscribe = null;
             }
         };
-    }, []);
+    }, [i18n]);
 
     const signInWithGoogle = async () => {
         console.log('[useAuth] signInWithGoogle started');
@@ -110,18 +128,34 @@ export function useAuth() {
                 const result = await signInWithCredential(auth, credential);
                 console.log('[useAuth] Firebase sign-in success:', result.user.email);
             } else {
-                console.log('[useAuth] Web platform, calling signInWithPopup');
                 const provider = new GoogleAuthProvider();
                 provider.setCustomParameters({
                     prompt: 'select_account'
                 });
-                await signInWithPopup(auth, provider);
+                console.log('[useAuth] Web platform, calling signInWithPopup (fallback to redirect)');
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (err: any) {
+                    const code = err?.code as string | undefined;
+                    const shouldFallbackToRedirect = code === 'auth/popup-blocked'
+                        || code === 'auth/popup-closed-by-user'
+                        || code === 'auth/cancelled-popup-request'
+                        || code === 'auth/operation-not-supported-in-this-environment';
+
+                    if (shouldFallbackToRedirect) {
+                        await signInWithRedirect(auth, provider);
+                        return;
+                    }
+
+                    throw err;
+                }
             }
 
         } catch (err: any) {
             console.error('Sign in error:', err);
-            const errorMessage = err.message || "Something went wrong";
-            setError(`Inloggning misslyckades: ${errorMessage}`);
+            const errorCode = err?.code as string | undefined;
+            const errorMessage = err?.message || "Something went wrong";
+            setError(`Inloggning misslyckades: ${errorCode ? `${errorCode}: ` : ''}${errorMessage}`);
         } finally {
             setLoading(false);
         }

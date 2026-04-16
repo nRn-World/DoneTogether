@@ -29,7 +29,10 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
             const code = await getOrCreatePlanInvite(plan.id, plan.name, currentUserId, currentUserName);
             const link = generateInviteLink(code);
             setInviteLink(link);
-        } catch {
+        } catch (err) {
+            console.error('[ShareModal] Failed to generate invite link:', err);
+            setShareMessage('Kunde inte skapa inbjudningslänk');
+            setTimeout(() => setShareMessage(''), 2000);
         } finally {
             setGenerating(false);
         }
@@ -46,7 +49,10 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
             await addMemberToPlan(plan.id, friendUid, friendEmail, friendName, friendPhoto);
             setShareMessage(`${friendName} ${t('plans.item_added')}`);
             setTimeout(() => setShareMessage(''), 2000);
-        } catch {
+        } catch (err) {
+            console.error('[ShareModal] Failed to add member to plan:', err);
+            setShareMessage('Kunde inte bjuda in vän');
+            setTimeout(() => setShareMessage(''), 2000);
         }
     };
 

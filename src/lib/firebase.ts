@@ -4,14 +4,22 @@ import { initializeFirestore } from 'firebase/firestore';
 import { getMessaging } from 'firebase/messaging';
 import { Capacitor } from '@capacitor/core';
 
+const apiKey = import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCA_1UxB7z86TvyIEpgqnTwnUgqOWTEf_4';
+const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'donetogether-v1.firebaseapp.com';
+const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'donetogether-v1';
+const storageBucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'donetogether-v1.firebasestorage.app';
+const messagingSenderId = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '677287957451';
+const appId = import.meta.env.VITE_FIREBASE_APP_ID || '1:677287957451:web:812a897c8f906a63b8dc4e';
+const measurementId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-XXXXXXXXXX';
+
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCA_1UxB7z86TvyIEpgqnTwnUgqOWTEf_4',
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'donetogether-v1.firebaseapp.com',
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'donetogether-v1',
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'donetogether-v1.firebasestorage.app',
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '677287957451',
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:677287957451:web:812a897c8f906a63b8dc4e',
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-XXXXXXXXXX'
+    apiKey,
+    authDomain,
+    projectId,
+    storageBucket,
+    messagingSenderId,
+    appId,
+    measurementId
 };
 
 // Initialize Firebase
@@ -28,8 +36,8 @@ try {
   if (!Capacitor.isNativePlatform()) {
     messagingInstance = getMessaging(app);
   }
-} catch (error) {
-  console.error('Firebase Messaging initialization failed');
+} catch (err) {
+  console.error('Firebase Messaging initialization failed', err);
 }
 export const messaging = messagingInstance;
 

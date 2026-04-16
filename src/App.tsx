@@ -18,7 +18,7 @@ import {
   addMemberToPlan,
   toggleReaction
 } from './hooks/useFirestore';
-import { useFriendRequests } from './hooks/useFriends';
+import { useFriends, useFriendRequests } from './hooks/useFriends';
 import { validateAndIncrementInvite } from './hooks/useInvites';
 import { useNotifications } from './hooks/useNotifications';
 import { JoinModal } from './components/JoinModal';
@@ -53,6 +53,7 @@ function App() {
   }, [theme]);
   const { user, userProfile, loading: authLoading, error: authError, signInWithGoogle, signOut, isAuthenticated } = useAuth();
   const { plans } = usePlans(user?.uid);
+  const { friends } = useFriends(user?.uid);
 
   // Initialize location tracking
   const { permissionStatus, isTracking, getCurrentLocation } = useLocation(user?.uid);
@@ -77,7 +78,7 @@ function App() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [plans, isTracking]);
+  }, [plans, isTracking, t]);
   const { plan: currentPlan } = usePlan(currentPlanId);
   const { incomingRequests } = useFriendRequests(user?.uid);
 
@@ -1004,7 +1005,7 @@ function App() {
                       </div>
                     </button>
                     <button onClick={() => setShowFriendsModal(true)} className="bg-zinc-50 dark:bg-zinc-800/40 p-6 rounded-[28px] text-center border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/20 dark:hover:border-emerald-500/30 transition-all hover:-translate-y-1">
-                      <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">{userProfile.friends?.length || 0}</div>
+                      <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">{friends.length}</div>
                       <div className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex items-center justify-center gap-2">
                         <Users className="w-3 h-3" /> {t('common.friends') || 'Friends'}
                       </div>
@@ -1354,6 +1355,7 @@ function App() {
       <AnimatePresence>
         {showAuthModal && (
           <AuthModal
+            key="auth-modal"
             onClose={() => setShowAuthModal(false)}
             onSignIn={signInWithGoogle}
             error={authError || undefined}
@@ -1361,7 +1363,7 @@ function App() {
         )}
 
         {showCreateModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
+          <div key="create-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCreateModal(false)} className="absolute inset-0 bg-white/60 dark:bg-zinc-950/95 backdrop-blur-md" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[40px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500" />
@@ -1428,19 +1430,19 @@ function App() {
         )}
 
         {showFriendsModal && userProfile && (
-          <FriendsModal onClose={() => setShowFriendsModal(false)} currentUser={userProfile} />
+          <FriendsModal key="friends-modal" onClose={() => setShowFriendsModal(false)} currentUser={userProfile} />
         )}
 
         {showJoinModal && user && userProfile && (
-          <JoinModal onClose={() => setShowJoinModal(false)} onJoin={(planId) => { setCurrentPlanId(planId); setActiveTab('plans'); showToast('Gick med i planen!'); }} user={user} userProfile={userProfile} />
+          <JoinModal key="join-modal" onClose={() => setShowJoinModal(false)} onJoin={(planId) => { setCurrentPlanId(planId); setActiveTab('plans'); showToast('Gick med i planen!'); }} user={user} userProfile={userProfile} />
         )}
 
         {showShareModal && currentPlan && userProfile && (
-          <ShareModal onClose={() => setShowShareModal(false)} plan={currentPlan} currentUserId={user?.uid || ''} currentUserName={userProfile.displayName} />
+          <ShareModal key="share-modal" onClose={() => setShowShareModal(false)} plan={currentPlan} currentUserId={user?.uid || ''} currentUserName={userProfile.displayName} />
         )}
 
         {showEditModal && editingItem && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
+          <div key="edit-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setShowEditModal(false); setEditingItem(null); }} className="absolute inset-0 bg-white/60 dark:bg-zinc-950/95 backdrop-blur-md" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[32px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl overflow-hidden">
               <div className="space-y-6">
@@ -1679,7 +1681,7 @@ function App() {
 
         {/* Fullscreen Image Preview */}
         {fullscreenImage && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+          <div key="fullscreen-image" className="fixed inset-0 z-[300] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -1712,6 +1714,7 @@ function App() {
         <AnimatePresence>
           {toast && (
             <motion.div
+              key="toast"
               initial={{ opacity: 0, y: 60, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
