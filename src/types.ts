@@ -19,6 +19,7 @@ export interface Item {
         latitude: number;
         longitude: number;
         name: string;
+        address?: string;
         radius: number; // in meters
         active: boolean; // if tracking is enabled
     };

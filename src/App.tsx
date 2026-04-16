@@ -762,6 +762,7 @@ function App() {
                                           latitude: location.latitude,
                                           longitude: location.longitude,
                                           name: location.name,
+                                          address: location.address,
                                           radius: 100,
                                           active: true
                                         });
@@ -794,6 +795,7 @@ function App() {
                                               latitude: loc.latitude,
                                               longitude: loc.longitude,
                                               name: customName || place.label,
+                                              address: loc.address,
                                               radius: 100,
                                               active: true
                                             });
@@ -1577,6 +1579,7 @@ function App() {
                                     latitude: location.latitude,
                                     longitude: location.longitude,
                                     name: location.name,
+                                    address: location.address,
                                     radius: 100,
                                     active: true
                                   };
@@ -1614,6 +1617,7 @@ function App() {
                                         latitude: loc.latitude,
                                         longitude: loc.longitude,
                                         name: customName || place.label,
+                                        address: loc.address,
                                         radius: 100,
                                         active: true
                                       };

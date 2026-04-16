@@ -1,27 +1,27 @@
 package nrn.DoneTogether.com;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.getcapacitor.Bridge;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,9 +29,26 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-@CapacitorPlugin(name = "GeofencePlugin")
+@CapacitorPlugin(
+    name = "GeofencePlugin",
+    permissions = {
+        @Permission(
+            alias = "location",
+            strings = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            }
+        ),
+        @Permission(
+            alias = "notifications",
+            strings = { Manifest.permission.POST_NOTIFICATIONS }
+        )
+    }
+)
 public class GeofencePlugin extends Plugin {
     private static final String TAG = "GeofencePlugin";
+    private static final String PREFS_NAME = "donetogether_geofence_map";
     private GeofencingClient geofencingClient;
     private final List<String> geofenceIds = new ArrayList<>();
 
@@ -52,9 +69,14 @@ public class GeofencePlugin extends Plugin {
         }
 
         try {
+            Context context = bridge.getContext();
             JSONArray geofences = new JSONArray(geofencesArray.toString());
             List<Geofence> newGeofences = new ArrayList<>();
             geofenceIds.clear();
+
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
 
             for (int i = 0; i < geofences.length(); i++) {
                 JSONObject geo = geofences.getJSONObject(i);
@@ -62,6 +84,8 @@ public class GeofencePlugin extends Plugin {
                 double lat = geo.getDouble("latitude");
                 double lng = geo.getDouble("longitude");
                 float radius = (float) geo.optDouble("radius", 100);
+                String title = geo.optString("title", "DoneTogether");
+                String message = geo.optString("message", id);
 
                 newGeofences.add(new Geofence.Builder()
                     .setRequestId(id)
@@ -70,9 +94,12 @@ public class GeofencePlugin extends Plugin {
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                     .build());
                 geofenceIds.add(id);
+                editor.putString("title:" + id, title);
+                editor.putString("message:" + id, message);
             }
+            editor.apply();
 
-            if (ContextCompat.checkSelfPermission(bridge.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) 
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                 
                 GeofencingRequest request = new GeofencingRequest.Builder()
@@ -100,14 +127,12 @@ public class GeofencePlugin extends Plugin {
 
     @PluginMethod
     public void removeGeofences(PluginCall call) {
-        if (geofenceIds.isEmpty()) {
-            call.resolve(new JSObject().put("success", true));
-            return;
-        }
-        
-        geofencingClient.removeGeofences(geofenceIds)
+        Context context = bridge.getContext();
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit().clear().apply();
+        geofenceIds.clear();
+
+        geofencingClient.removeGeofences(getGeofencePendingIntent())
             .addOnSuccessListener(aVoid -> {
-                geofenceIds.clear();
                 call.resolve(new JSObject().put("success", true));
             })
             .addOnFailureListener(e -> {
@@ -117,12 +142,24 @@ public class GeofencePlugin extends Plugin {
 
     @PluginMethod
     public void requestPermission(PluginCall call) {
-        if (ContextCompat.checkSelfPermission(bridge.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) 
-                == PackageManager.PERMISSION_GRANTED) {
+        boolean locationGranted = getPermissionState("location") == PermissionState.GRANTED;
+        boolean notificationsGranted = android.os.Build.VERSION.SDK_INT < 33
+            || getPermissionState("notifications") == PermissionState.GRANTED;
+
+        if (locationGranted && notificationsGranted) {
             call.resolve(new JSObject().put("granted", true));
-        } else {
-            call.resolve(new JSObject().put("granted", false));
+            return;
         }
+
+        requestAllPermissions(call, "permissionsCallback");
+    }
+
+    @PermissionCallback
+    private void permissionsCallback(PluginCall call) {
+        boolean locationGranted = getPermissionState("location") == PermissionState.GRANTED;
+        boolean notificationsGranted = android.os.Build.VERSION.SDK_INT < 33
+            || getPermissionState("notifications") == PermissionState.GRANTED;
+        call.resolve(new JSObject().put("granted", locationGranted && notificationsGranted));
     }
 
     private android.app.PendingIntent getGeofencePendingIntent() {

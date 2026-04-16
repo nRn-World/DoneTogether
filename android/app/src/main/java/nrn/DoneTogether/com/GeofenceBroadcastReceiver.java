@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "GeofenceBroadcast";
     private static final String CHANNEL_ID = "donetogether_geofence";
+    private static final String PREFS_NAME = "donetogether_geofence_map";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -42,17 +44,14 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
             
             if (triggeringGeofences != null && !triggeringGeofences.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
+                SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 for (Geofence geofence : triggeringGeofences) {
-                    sb.append(geofence.getRequestId()).append(", ");
+                    String id = geofence.getRequestId();
+                    String title = prefs.getString("title:" + id, "DoneTogether");
+                    String message = prefs.getString("message:" + id, "Du är framme.");
+                    Log.d(TAG, "Entered geofence: " + id);
+                    showNotification(context, title, message);
                 }
-                String geofenceIds = sb.toString();
-                if (geofenceIds.endsWith(", ")) {
-                    geofenceIds = geofenceIds.substring(0, geofenceIds.length() - 2);
-                }
-                
-                Log.d(TAG, "Entered geofence: " + geofenceIds);
-                showNotification(context, "DoneTogether", "Du har kommit till: " + geofenceIds);
             }
         }
     }
