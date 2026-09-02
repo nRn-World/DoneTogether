@@ -134,7 +134,7 @@
         "fav1_place": "Favori 1",
         "fav2_place": "Favori 2",
         "no_place_saved": "Kayıtlı yer yok",
-        "search_address_placeholder": "Adresi manuel ara...",
+        "search_address_placeholder": "Yer ara, örn. ICA Maxi Kista...",
         "gps_saved_toast": "{{type}} güncellendi!",
         "gps_reminder": "GPS Hatırlatıcı",
         "use_current_location": "Mevcut konumumu kullan",
@@ -142,14 +142,18 @@
         "location_selected_toast": "{{type}} seçildi!",
         "current_location_name": "Konumum",
         "manual_location_name": "Seçilen yer",
-        "wall_of_fame": {
-            "title": "Şöhret Duvarı",
-            "subtitle": "Geliştirmeyi Destekle & Katkıda Bulunanlara Katıl",
-            "text1": "Bu projeyi bağımsız olarak geliştiriyorum ve desteğiniz kodumu geliştirmeme ve herkes için ücretsiz tutmama yardımcı oluyor.",
-            "text2": "Minnettarlığımın bir göstergesi olarak, bana bir kahve ile destek olan herkes bir sonraki projemin \"Özel Teşekkürler\" bölümünde yer alacak!",
-            "text3": "Lütfen mesajınıza adınızı veya bir imza ekleyin, böylece size hak ettiğiniz krediyi verebilirim. Desteğiniz gelecekteki gelişmeyi mümkün kılan şeydir.",
-            "text4": "Desteğiniz, sevdiğiniz araçları geliştirmeye ve iyileştirmeye devam etmem için bana güç veriyor.",
-            "signature": "— Robin Ayzit"
-        }
+        "gps_trigger_enter": "Geldiğimde",
+        "gps_trigger_exit": "Ayrıldığımda",
+        "gps_radius_text": "Bu yerin 100m yakınına geldiğinizde bildirim gönderilir.",
+        "gps_radius_text_exit": "Bu yerden ayrıldığınızda bildirim gönderilir (örn. evden çıkınca)."
+    },
+    "wall_of_fame": {
+        "title": "Şöhret Duvarı",
+        "subtitle": "Geliştirmeyi Destekle & Katkıda Bulunanlara Katıl",
+        "text1": "Bu projeyi bağımsız olarak geliştiriyorum ve desteğiniz kodumu geliştirmeme ve herkes için ücretsiz tutmama yardımcı oluyor.",
+        "text2": "Minnettarlığımın bir göstergesi olarak, bana bir kahve ile destek olan herkes bir sonraki projemin \"Özel Teşekkürler\" bölümünde yer alacak!",
+        "text3": "Lütfen mesajınıza adınızı veya bir imza ekleyin, böylece size hak ettiğiniz krediyi verebilirim. Desteğiniz gelecekteki gelişmeyi mümkün kılan şeydir.",
+        "text4": "Desteğiniz, sevdiğiniz araçları geliştirmeye ve iyileştirmeye devam etmem için bana güç veriyor.",
+        "signature": "— Robin Ayzit"
     }
 }

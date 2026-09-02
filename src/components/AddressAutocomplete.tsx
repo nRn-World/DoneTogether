@@ -119,7 +119,7 @@ export function AddressAutocomplete({ onSelect, placeholder = "Search address...
 
             {isOpen && query.trim().length >= 2 && !isSearching && results.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 p-3 text-center">
-                    <p className="text-[10px] text-zinc-400 italic">No addresses found</p>
+                    <p className="text-[10px] text-zinc-400 italic">Inga platser hittades</p>
                 </div>
             )}
         </div>

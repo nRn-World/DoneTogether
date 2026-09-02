@@ -5,15 +5,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+/**
+ * Re-registers persisted geofences after device reboot.
+ * Android clears all geofences on reboot until the app restores them.
+ */
 public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = "BootReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            Log.d(TAG, "Device booted, will restore geofence monitoring");
-            // The app will restore geofences when it starts
-            // The webview/bridge will handle this on app launch
+        if (intent == null) return;
+        String action = intent.getAction();
+        if (!Intent.ACTION_BOOT_COMPLETED.equals(action)
+                && !"android.intent.action.QUICKBOOT_POWERON".equals(action)
+                && !"com.htc.intent.action.QUICKBOOT_POWERON".equals(action)) {
+            return;
         }
+
+        Log.d(TAG, "Device booted — restoring geofence monitoring");
+        GeofenceRestorer.restoreFromPrefsAsync(context.getApplicationContext());
     }
 }

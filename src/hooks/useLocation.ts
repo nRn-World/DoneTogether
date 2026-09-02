@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { Geolocation, type Position } from '@capacitor/geolocation';
-
-// Check if we're in a web browser
-const isWeb = typeof window !== 'undefined' && !('Capacitor' in window);
 
 export function useLocation(userId: string | undefined) {
     const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
@@ -10,38 +8,41 @@ export function useLocation(userId: string | undefined) {
     const [isTracking, setIsTracking] = useState(false);
     const watchIdRef = useRef<string | number | null>(null);
 
-    // Request permissions and start watching
     useEffect(() => {
+        const isNative = Capacitor.isNativePlatform();
+
         const startWatching = async () => {
             try {
-                if (isWeb) {
-                    // Web browser geolocation
-
+                if (!isNative) {
                     if (!navigator.geolocation) {
                         console.error('Geolocation is not supported by this browser');
                         setPermissionStatus('denied');
+                        setIsTracking(false);
                         return;
                     }
 
-                    // Check permission status (may not exist in all browsers, e.g. Safari)
                     try {
-                        const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+                        const permission = await navigator.permissions.query({
+                            name: 'geolocation' as PermissionName
+                        });
                         setPermissionStatus(permission.state);
                         if (permission.state === 'denied') {
+                            setIsTracking(false);
                             return;
                         }
-                        // Listen for permission changes
-                        permission.onchange = () => setPermissionStatus(permission.state);
+                        permission.onchange = () => {
+                            setPermissionStatus(permission.state);
+                            if (permission.state === 'denied') setIsTracking(false);
+                        };
                     } catch {
-                        // permissions.query not supported (e.g. Safari) – assume prompt, let getCurrentPosition trigger dialog
                         setPermissionStatus('prompt');
                     }
 
-                    // Start watching position (will prompt user on first fix if permission is 'prompt')
                     watchIdRef.current = navigator.geolocation.watchPosition(
                         (position) => {
-                            setPermissionStatus('granted'); // We got position, so permission was granted
-                            const webPosition: Position = {
+                            setPermissionStatus('granted');
+                            setIsTracking(true);
+                            setCurrentPosition({
                                 coords: {
                                     latitude: position.coords.latitude,
                                     longitude: position.coords.longitude,
@@ -52,12 +53,14 @@ export function useLocation(userId: string | undefined) {
                                     speed: position.coords.speed
                                 },
                                 timestamp: position.timestamp
-                            };
-                            setCurrentPosition(webPosition);
+                            });
                         },
                         (error) => {
                             console.error('Web geolocation error:', error);
-                            if (error.code === 1) setPermissionStatus('denied'); // PERMISSION_DENIED
+                            if (error.code === 1) {
+                                setPermissionStatus('denied');
+                                setIsTracking(false);
+                            }
                         },
                         {
                             enableHighAccuracy: true,
@@ -65,9 +68,7 @@ export function useLocation(userId: string | undefined) {
                             maximumAge: 3000
                         }
                     );
-                    setIsTracking(true);
                 } else {
-                    // Capacitor native geolocation
                     let permission = await Geolocation.checkPermissions();
 
                     if (permission.location !== 'granted') {
@@ -83,7 +84,6 @@ export function useLocation(userId: string | undefined) {
 
                     setIsTracking(true);
 
-                    // Clear any existing watch
                     if (watchIdRef.current) {
                         await Geolocation.clearWatch({ id: watchIdRef.current as string });
                     }
@@ -113,7 +113,7 @@ export function useLocation(userId: string | undefined) {
 
         return () => {
             if (watchIdRef.current !== null) {
-                if (isWeb) {
+                if (!Capacitor.isNativePlatform()) {
                     navigator.geolocation.clearWatch(watchIdRef.current as number);
                 } else {
                     Geolocation.clearWatch({ id: watchIdRef.current as string });
@@ -122,14 +122,14 @@ export function useLocation(userId: string | undefined) {
         };
     }, [userId]);
 
-    // Get current location manually
     const getCurrentLocation = async () => {
         try {
-            if (isWeb) {
+            if (!Capacitor.isNativePlatform()) {
                 return new Promise<Position>((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             setPermissionStatus('granted');
+                            setIsTracking(true);
                             const webPosition: Position = {
                                 coords: {
                                     latitude: position.coords.latitude,
@@ -146,28 +146,33 @@ export function useLocation(userId: string | undefined) {
                         },
                         (error) => {
                             console.error('Web geolocation error:', error);
-                            if (error.code === 1) setPermissionStatus('denied'); // PERMISSION_DENIED
+                            if (error.code === 1) {
+                                setPermissionStatus('denied');
+                                setIsTracking(false);
+                            }
                             reject(error);
                         },
-                        { 
-                            enableHighAccuracy: true, 
-                            timeout: 15000, 
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 15000,
                             maximumAge: 0
                         }
                     );
                 });
-            } else {
-                const coordinates = await Geolocation.getCurrentPosition({
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 0
-                });
-                return coordinates;
             }
+
+            const coordinates = await Geolocation.getCurrentPosition({
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            });
+            return coordinates;
         } catch (error) {
             console.error('Error getting current position:', error);
-            if (isWeb) {
-                alert('Could not fetch your location. Please make sure location is enabled in your browser settings.');
+            if (!Capacitor.isNativePlatform()) {
+                alert(
+                    'Could not fetch your location. Please make sure location is enabled in your browser settings.'
+                );
             }
             return null;
         }

@@ -99,9 +99,11 @@ Created 2026 by © nRn World
 If you like this project, consider:
 
 ⭐ Starring the project on GitHub  
-☕ Buying me a coffee  
+☕ **Support development**: [Buy me a coffee 💜](https://ko-fi.com/nrnworld)  
 📢 Sharing with your friends
 
 ---
 
 *Last updated: March 2026*
+
+Created by ❤️ © nRn World

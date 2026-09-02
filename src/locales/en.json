@@ -142,7 +142,7 @@
         "fav1_place": "Favorite 1",
         "fav2_place": "Favorite 2",
         "no_place_saved": "No place saved",
-        "search_address_placeholder": "Search address manually...",
+        "search_address_placeholder": "Search place, e.g. ICA Maxi Kista...",
         "gps_saved_toast": "{{type}} updated!",
         "gps_reminder": "GPS Reminder",
         "use_current_location": "Use my current location",
@@ -150,15 +150,18 @@
         "location_selected_toast": "{{type}} selected!",
         "current_location_name": "My position",
         "manual_location_name": "Selected place",
+        "gps_trigger_enter": "When I arrive",
+        "gps_trigger_exit": "When I leave",
         "gps_radius_text": "Notification is sent when you are within 100m of this location.",
-        "wall_of_fame": {
-            "title": "The Wall of Fame",
-            "subtitle": "Support the Development & Join the Credits",
-            "text1": "I'm developing this project independently, and your support helps me improve the code and keep it free for everyone.",
-            "text2": "As a token of my gratitude, everyone who supports me with a coffee will be featured in the \"Special Thanks\" section of my next project!",
-            "text3": "Please include your name or a signature in your message so I can give you the credit you deserve. Your support is what makes future development possible.",
-            "text4": "Your support empowers me to keep building and refining the tools you love.",
-            "signature": "— Robin Ayzit"
-        }
+        "gps_radius_text_exit": "Notification is sent when you leave this place (e.g. home)."
+    },
+    "wall_of_fame": {
+        "title": "The Wall of Fame",
+        "subtitle": "Support the Development & Join the Credits",
+        "text1": "I'm developing this project independently, and your support helps me improve the code and keep it free for everyone.",
+        "text2": "As a token of my gratitude, everyone who supports me with a coffee will be featured in the \"Special Thanks\" section of my next project!",
+        "text3": "Please include your name or a signature in your message so I can give you the credit you deserve. Your support is what makes future development possible.",
+        "text4": "Your support empowers me to keep building and refining the tools you love.",
+        "signature": "— Robin Ayzit"
     }
 }

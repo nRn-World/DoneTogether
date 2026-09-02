@@ -22,6 +22,8 @@ export interface Item {
         address?: string;
         radius: number; // in meters
         active: boolean; // if tracking is enabled
+        /** enter = near place (store); exit = leave place (home / matsäck) */
+        trigger?: 'enter' | 'exit';
     };
 }
 

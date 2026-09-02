@@ -142,7 +142,7 @@
         "fav1_place": "Favorit 1",
         "fav2_place": "Favorit 2",
         "no_place_saved": "Ingen plats sparad",
-        "search_address_placeholder": "Sök adress manuellt...",
+        "search_address_placeholder": "Sök plats, t.ex. ICA Maxi Kista...",
         "gps_saved_toast": "{{type}} uppdaterad!",
         "gps_reminder": "GPS-påminnelse",
         "use_current_location": "Använd min nuvarande plats",
@@ -150,7 +150,10 @@
         "location_selected_toast": "{{type}} vald!",
         "current_location_name": "Min position",
         "manual_location_name": "Vald plats",
-        "gps_radius_text": "Notis skickas när du är inom 100m från denna plats."
+        "gps_trigger_enter": "När jag kommer",
+        "gps_trigger_exit": "När jag lämnar",
+        "gps_radius_text": "Notis skickas när du är inom 100m från denna plats.",
+        "gps_radius_text_exit": "Notis skickas när du lämnar platsen (t.ex. hemifrån)."
     },
     "wall_of_fame": {
         "title": "Hedersväggen",

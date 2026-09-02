@@ -58,12 +58,15 @@
             android:name=".GeofenceBroadcastReceiver"
             android:exported="false" />
 
-        <!-- Boot Receiver to restart geofence monitoring -->
+        <!-- Boot Receiver to restart geofence monitoring (exported required for BOOT_COMPLETED) -->
         <receiver
             android:name=".BootReceiver"
-            android:exported="false">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
     </application>

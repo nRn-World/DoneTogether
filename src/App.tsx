@@ -741,7 +741,8 @@ function App() {
                                         longitude: location.coords.longitude,
                                         name: t('profile.current_location_name'),
                                         radius: 100,
-                                        active: true
+                                        active: true,
+                                        trigger: 'enter'
                                       });
                                       showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
                                     }
@@ -764,7 +765,8 @@ function App() {
                                           name: location.name,
                                           address: location.address,
                                           radius: 100,
-                                          active: true
+                                          active: true,
+                                          trigger: 'enter'
                                         });
                                         showToast(t('profile.location_selected_toast', { type: location.name }));
                                       }}
@@ -774,10 +776,10 @@ function App() {
                                   {/* Favorites Section */}
                                   <div className="grid grid-cols-2 gap-3">
                                     {([
-                                      { id: 'home', label: t('profile.home_place'), icon: '🏠' },
-                                      { id: 'work', label: t('profile.work_place'), icon: '💼' },
-                                      { id: 'fav1', label: t('profile.fav1_place'), icon: '✨' },
-                                      { id: 'fav2', label: t('profile.fav2_place'), icon: '🔥' }
+                                      { id: 'home', label: t('profile.home_place'), icon: '🏠', defaultTrigger: 'exit' as const },
+                                      { id: 'work', label: t('profile.work_place'), icon: '💼', defaultTrigger: 'enter' as const },
+                                      { id: 'fav1', label: t('profile.fav1_place'), icon: '✨', defaultTrigger: 'enter' as const },
+                                      { id: 'fav2', label: t('profile.fav2_place'), icon: '🔥', defaultTrigger: 'enter' as const }
                                     ] as const).map((place) => {
                                       const loc = (userProfile?.savedLocations as any)?.[place.id];
                                       const customName = (userProfile?.savedLocations as any)?.customLabels?.[place.id];
@@ -797,7 +799,8 @@ function App() {
                                               name: customName || place.label,
                                               address: loc.address,
                                               radius: 100,
-                                              active: true
+                                              active: true,
+                                              trigger: place.defaultTrigger
                                             });
                                             showToast(t('profile.location_selected_toast', { type: customName || place.label }));
                                           }}
@@ -811,8 +814,37 @@ function App() {
                                   </div>
                                 </div>
 
+                                {selectedAddLocation && (
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedAddLocation({ ...selectedAddLocation, trigger: 'enter' })}
+                                      className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                        (selectedAddLocation.trigger || 'enter') === 'enter'
+                                          ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                                          : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                      }`}
+                                    >
+                                      {t('profile.gps_trigger_enter')}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedAddLocation({ ...selectedAddLocation, trigger: 'exit' })}
+                                      className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                        selectedAddLocation.trigger === 'exit'
+                                          ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                                          : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                      }`}
+                                    >
+                                      {t('profile.gps_trigger_exit')}
+                                    </button>
+                                  </div>
+                                )}
+
                                 <p className="text-[10px] text-zinc-600 italic font-medium ml-1">
-                                  {t('profile.gps_radius_text')}
+                                  {selectedAddLocation?.trigger === 'exit'
+                                    ? t('profile.gps_radius_text_exit')
+                                    : t('profile.gps_radius_text')}
                                 </p>
 
                                 {selectedAddLocation && (
@@ -888,10 +920,11 @@ function App() {
                             )}
 
                             {item.location && item.location.active && (
-                              <div className="mt-3 flex items-center gap-2 bg-emerald-500/5 dark:bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/10 w-fit">
+                                    <div className="mt-3 flex items-center gap-2 bg-emerald-500/5 dark:bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/10 w-fit">
                                 <MapPin className="w-3 h-3 text-emerald-500" />
                                 <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
                                   GPS: {item.location.name}
+                                  {item.location.trigger === 'exit' ? ` · ${t('profile.gps_trigger_exit')}` : ''}
                                 </span>
                               </div>
                             )}
@@ -1553,7 +1586,8 @@ function App() {
                                   longitude: location.coords.longitude,
                                   name: t('profile.current_location_name'),
                                   radius: 100,
-                                  active: true
+                                  active: true,
+                                  trigger: 'enter' as const
                                 };
                                 await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
                                 setEditingItem({
@@ -1581,7 +1615,8 @@ function App() {
                                     name: location.name,
                                     address: location.address,
                                     radius: 100,
-                                    active: true
+                                    active: true,
+                                    trigger: 'enter' as const
                                   };
                                   await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
                                   setEditingItem({
@@ -1596,10 +1631,10 @@ function App() {
                             {/* Favorites Section */}
                             <div className="grid grid-cols-2 gap-3">
                               {([
-                                { id: 'home', label: t('profile.home_place'), icon: '🏠' },
-                                { id: 'work', label: t('profile.work_place'), icon: '💼' },
-                                { id: 'fav1', label: t('profile.fav1_place'), icon: '✨' },
-                                { id: 'fav2', label: t('profile.fav2_place'), icon: '🔥' }
+                                { id: 'home', label: t('profile.home_place'), icon: '🏠', defaultTrigger: 'exit' as const },
+                                { id: 'work', label: t('profile.work_place'), icon: '💼', defaultTrigger: 'enter' as const },
+                                { id: 'fav1', label: t('profile.fav1_place'), icon: '✨', defaultTrigger: 'enter' as const },
+                                { id: 'fav2', label: t('profile.fav2_place'), icon: '🔥', defaultTrigger: 'enter' as const }
                               ] as const).map((place) => {
                                 const loc = (userProfile?.savedLocations as any)?.[place.id];
                                 const customName = (userProfile?.savedLocations as any)?.customLabels?.[place.id];
@@ -1619,7 +1654,8 @@ function App() {
                                         name: customName || place.label,
                                         address: loc.address,
                                         radius: 100,
-                                        active: true
+                                        active: true,
+                                        trigger: place.defaultTrigger
                                       };
                                       await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
                                       setEditingItem({
@@ -1638,8 +1674,51 @@ function App() {
                             </div>
                           </div>
 
+                          {editingItem.item.location && (
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const newLocation = { ...editingItem.item.location!, trigger: 'enter' as const };
+                                  await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
+                                  setEditingItem({
+                                    ...editingItem,
+                                    item: { ...editingItem.item, location: newLocation }
+                                  });
+                                }}
+                                className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                  (editingItem.item.location.trigger || 'enter') === 'enter'
+                                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                                    : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                }`}
+                              >
+                                {t('profile.gps_trigger_enter')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const newLocation = { ...editingItem.item.location!, trigger: 'exit' as const };
+                                  await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
+                                  setEditingItem({
+                                    ...editingItem,
+                                    item: { ...editingItem.item, location: newLocation }
+                                  });
+                                }}
+                                className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                  editingItem.item.location.trigger === 'exit'
+                                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                                    : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                }`}
+                              >
+                                {t('profile.gps_trigger_exit')}
+                              </button>
+                            </div>
+                          )}
+
                           <p className="text-[10px] text-zinc-600 italic font-medium ml-1">
-                            {t('profile.gps_radius_text')}
+                            {editingItem.item.location?.trigger === 'exit'
+                              ? t('profile.gps_radius_text_exit')
+                              : t('profile.gps_radius_text')}
                           </p>
 
                           {editingItem.item.location && (

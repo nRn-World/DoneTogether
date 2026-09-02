@@ -21,12 +21,11 @@ import java.util.List;
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "GeofenceBroadcast";
     private static final String CHANNEL_ID = "donetogether_geofence";
-    private static final String PREFS_NAME = "donetogether_geofence_map";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
-        
+
         if (geofencingEvent == null) {
             Log.e(TAG, "GeofencingEvent is null");
             return;
@@ -39,20 +38,33 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         }
 
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
-        
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-            List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-            
-            if (triggeringGeofences != null && !triggeringGeofences.isEmpty()) {
-                SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                for (Geofence geofence : triggeringGeofences) {
-                    String id = geofence.getRequestId();
-                    String title = prefs.getString("title:" + id, "DoneTogether");
-                    String message = prefs.getString("message:" + id, "Du är framme.");
-                    Log.d(TAG, "Entered geofence: " + id);
-                    showNotification(context, title, message);
-                }
-            }
+        boolean isEnter = geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER;
+        boolean isExit = geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT;
+
+        if (!isEnter && !isExit) {
+            return;
+        }
+
+        List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
+        if (triggeringGeofences == null || triggeringGeofences.isEmpty()) {
+            return;
+        }
+
+        SharedPreferences prefs = context.getSharedPreferences(GeofenceRestorer.PREFS_NAME, Context.MODE_PRIVATE);
+        for (Geofence geofence : triggeringGeofences) {
+            String id = geofence.getRequestId();
+            String expected = prefs.getString("trigger:" + id, "enter");
+            boolean expectsExit = "exit".equalsIgnoreCase(expected);
+
+            // Only fire if transition matches what this fence was registered for
+            if (expectsExit && !isExit) continue;
+            if (!expectsExit && !isEnter) continue;
+
+            String title = prefs.getString("title:" + id, "DoneTogether");
+            String message = prefs.getString("message:" + id,
+                expectsExit ? "Du lämnade platsen." : "Du är framme.");
+            Log.d(TAG, (isExit ? "Exited" : "Entered") + " geofence: " + id);
+            showNotification(context, title, message);
         }
     }
 
@@ -61,7 +73,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        
+
         PendingIntent pendingIntent = PendingIntent.getActivity(
             context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
@@ -74,12 +86,17 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent);
 
-        NotificationManager notificationManager = 
+        NotificationManager notificationManager =
             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        
+
         if (notificationManager != null) {
-            notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+            int notifyId = (idHash(title + message) & 0x7fffffff);
+            notificationManager.notify(notifyId, builder.build());
         }
+    }
+
+    private static int idHash(String s) {
+        return s == null ? (int) System.currentTimeMillis() : s.hashCode();
     }
 
     private void createNotificationChannel(Context context) {
@@ -89,8 +106,8 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                 "DoneTogether Geofence",
                 NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Notiser när du närmar dig sparade platser");
-            
+            channel.setDescription("Notiser när du närmar dig eller lämnar sparade platser");
+
             NotificationManager manager = context.getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
