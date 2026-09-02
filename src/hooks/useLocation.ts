@@ -17,33 +17,54 @@ function toWebPosition(position: GeolocationPosition): Position {
     };
 }
 
-/** Browser getCurrentPosition that NEVER rejects — resolves null on failure. */
-function readBrowserPosition(options: PositionOptions): Promise<Position | null> {
+type GeoReadResult = {
+    position: Position | null;
+    /** 1 = denied, 2 = unavailable, 3 = timeout, 0 = ok / unknown */
+    errorCode: number;
+};
+
+/** Browser getCurrentPosition that NEVER rejects. */
+function readBrowserPosition(options: PositionOptions): Promise<GeoReadResult> {
     return new Promise((resolve) => {
         if (!navigator.geolocation) {
-            resolve(null);
+            resolve({ position: null, errorCode: 2 });
             return;
         }
         try {
             navigator.geolocation.getCurrentPosition(
-                (position) => resolve(toWebPosition(position)),
+                (position) => resolve({ position: toWebPosition(position), errorCode: 0 }),
                 (error) => {
                     console.warn('[GPS] getCurrentPosition failed:', error?.code, error?.message);
-                    resolve(null);
+                    resolve({ position: null, errorCode: error?.code || 2 });
                 },
                 options
             );
         } catch (e) {
             console.warn('[GPS] getCurrentPosition threw:', e);
-            resolve(null);
+            resolve({ position: null, errorCode: 2 });
         }
     });
+}
+
+async function requestNotificationPermission(): Promise<boolean> {
+    try {
+        if (!('Notification' in window)) return false;
+        if (Notification.permission === 'granted') return true;
+        if (Notification.permission === 'denied') return false;
+        const result = await Notification.requestPermission();
+        return result === 'granted';
+    } catch {
+        return false;
+    }
 }
 
 export function useLocation(userId: string | undefined) {
     const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
     const [permissionStatus, setPermissionStatus] = useState<string>('prompt');
     const [isTracking, setIsTracking] = useState(false);
+    const [notificationsAllowed, setNotificationsAllowed] = useState(
+        typeof Notification !== 'undefined' ? Notification.permission === 'granted' : false
+    );
     const watchIdRef = useRef<string | number | null>(null);
     const positionRef = useRef<Position | null>(null);
 
@@ -51,105 +72,175 @@ export function useLocation(userId: string | undefined) {
         positionRef.current = currentPosition;
     }, [currentPosition]);
 
+    const applyGrantedPosition = useCallback((position: Position) => {
+        setPermissionStatus('granted');
+        setIsTracking(true);
+        positionRef.current = position;
+        setCurrentPosition(position);
+    }, []);
+
+    const startWebWatch = useCallback(() => {
+        if (!navigator.geolocation) return;
+        if (watchIdRef.current !== null) {
+            try {
+                navigator.geolocation.clearWatch(watchIdRef.current as number);
+            } catch {
+                /* ignore */
+            }
+            watchIdRef.current = null;
+        }
+
+        watchIdRef.current = navigator.geolocation.watchPosition(
+            (position) => {
+                applyGrantedPosition(toWebPosition(position));
+            },
+            (error) => {
+                console.warn('[GPS] watchPosition error:', error?.code, error?.message);
+                // Only mark denied on explicit permission denial
+                if (error?.code === 1) {
+                    setPermissionStatus('denied');
+                    setIsTracking(false);
+                }
+            },
+            {
+                enableHighAccuracy: false,
+                maximumAge: 15000
+            }
+        );
+    }, [applyGrantedPosition]);
+
+    /**
+     * Explicitly ask the user for GPS (+ notifications on web).
+     * Safe to call from a button (user gesture) or after login.
+     */
+    const requestPermissions = useCallback(async (): Promise<boolean> => {
+        const notifOk = await requestNotificationPermission();
+        setNotificationsAllowed(notifOk);
+
+        if (Capacitor.isNativePlatform()) {
+            try {
+                let permission = await Geolocation.checkPermissions();
+                if (permission.location !== 'granted') {
+                    permission = await Geolocation.requestPermissions();
+                }
+                setPermissionStatus(permission.location);
+                if (permission.location !== 'granted') {
+                    setIsTracking(false);
+                    return false;
+                }
+                setIsTracking(true);
+                const coordinates = await Geolocation.getCurrentPosition({
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 30000
+                }).catch(() => null);
+                if (coordinates) applyGrantedPosition(coordinates);
+                return true;
+            } catch (e) {
+                console.warn('[GPS] native requestPermissions failed:', e);
+                setPermissionStatus('denied');
+                return false;
+            }
+        }
+
+        if (!navigator.geolocation) {
+            setPermissionStatus('denied');
+            return false;
+        }
+
+        // This triggers the browser's location permission dialog
+        let result = await readBrowserPosition({
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        });
+
+        if (!result.position) {
+            result = await readBrowserPosition({
+                enableHighAccuracy: false,
+                timeout: 20000,
+                maximumAge: 60000
+            });
+        }
+
+        if (result.position) {
+            applyGrantedPosition(result.position);
+            startWebWatch();
+            return true;
+        }
+
+        if (result.errorCode === 1) {
+            setPermissionStatus('denied');
+            setIsTracking(false);
+            return false;
+        }
+
+        // Unavailable/timeout — keep as prompt so user can retry
+        setPermissionStatus('prompt');
+        setIsTracking(false);
+        return false;
+    }, [applyGrantedPosition, startWebWatch]);
+
+    // After login: sync permission state (do not auto-spam dialog if already decided)
     useEffect(() => {
         const isNative = Capacitor.isNativePlatform();
         let cancelled = false;
 
-        const startWatching = async () => {
-            try {
-                if (!isNative) {
-                    if (!navigator.geolocation) {
-                        setPermissionStatus('denied');
-                        setIsTracking(false);
-                        return;
-                    }
+        const init = async () => {
+            if (!userId) return;
 
-                    try {
-                        const permission = await navigator.permissions.query({
-                            name: 'geolocation' as PermissionName
-                        });
-                        if (cancelled) return;
+            if (!isNative) {
+                if (!navigator.geolocation) {
+                    setPermissionStatus('denied');
+                    return;
+                }
+
+                try {
+                    const permission = await navigator.permissions.query({
+                        name: 'geolocation' as PermissionName
+                    });
+                    if (cancelled) return;
+                    setPermissionStatus(permission.state);
+                    permission.onchange = () => {
                         setPermissionStatus(permission.state);
-                        if (permission.state === 'denied') {
-                            setIsTracking(false);
-                            return;
-                        }
-                        permission.onchange = () => {
-                            setPermissionStatus(permission.state);
-                            if (permission.state === 'denied') setIsTracking(false);
-                        };
-                    } catch {
-                        setPermissionStatus('prompt');
+                        if (permission.state === 'denied') setIsTracking(false);
+                        if (permission.state === 'granted') startWebWatch();
+                    };
+
+                    if (permission.state === 'granted') {
+                        startWebWatch();
                     }
+                    // If 'prompt' — App shows permission modal and calls requestPermissions()
+                } catch {
+                    setPermissionStatus('prompt');
+                }
 
-                    // Soft watch — no short timeout (timeout on watchPosition causes repeated errors)
-                    watchIdRef.current = navigator.geolocation.watchPosition(
-                        (position) => {
-                            if (cancelled) return;
-                            setPermissionStatus('granted');
-                            setIsTracking(true);
-                            const webPos = toWebPosition(position);
-                            positionRef.current = webPos;
-                            setCurrentPosition(webPos);
-                        },
-                        (error) => {
-                            console.warn('[GPS] watchPosition error:', error?.code, error?.message);
-                            if (error?.code === 1) {
-                                setPermissionStatus('denied');
-                                setIsTracking(false);
-                            }
-                        },
-                        {
-                            enableHighAccuracy: false,
-                            maximumAge: 15000
-                            // no timeout — avoids GeolocationPositionError spam
-                        }
-                    );
-                } else {
-                    let permission = await Geolocation.checkPermissions();
-                    if (cancelled) return;
+                if ('Notification' in window) {
+                    setNotificationsAllowed(Notification.permission === 'granted');
+                }
+                return;
+            }
 
-                    if (permission.location !== 'granted') {
-                        permission = await Geolocation.requestPermissions();
-                    }
-                    if (cancelled) return;
-
-                    setPermissionStatus(permission.location);
-
-                    if (permission.location !== 'granted') {
-                        setIsTracking(false);
-                        return;
-                    }
-
+            try {
+                const permission = await Geolocation.checkPermissions();
+                if (cancelled) return;
+                setPermissionStatus(permission.location);
+                if (permission.location === 'granted') {
                     setIsTracking(true);
-
-                    if (watchIdRef.current) {
-                        await Geolocation.clearWatch({ id: watchIdRef.current as string });
-                    }
-
                     watchIdRef.current = await Geolocation.watchPosition(
                         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
                         (position, err) => {
-                            if (err) {
-                                console.warn('[GPS] native watch error:', err);
-                                return;
-                            }
-                            if (position && !cancelled) {
-                                positionRef.current = position;
-                                setCurrentPosition(position);
-                            }
+                            if (err || !position || cancelled) return;
+                            applyGrantedPosition(position);
                         }
                     );
                 }
-            } catch (error) {
-                console.warn('[GPS] startWatching failed:', error);
-                setIsTracking(false);
+            } catch (e) {
+                console.warn('[GPS] native init failed:', e);
             }
         };
 
-        if (userId) {
-            void startWatching();
-        }
+        void init();
 
         return () => {
             cancelled = true;
@@ -166,66 +257,65 @@ export function useLocation(userId: string | undefined) {
                 watchIdRef.current = null;
             }
         };
-    }, [userId]);
+    }, [userId, applyGrantedPosition, startWebWatch]);
 
     const getCurrentLocation = useCallback(async (): Promise<Position | null> => {
-        // Prefer last known position from the watch (instant, no new prompt)
         if (positionRef.current?.coords) {
             return positionRef.current;
         }
 
+        // Ask again if needed (triggers browser dialog when still "prompt")
+        if (permissionStatus !== 'granted') {
+            const ok = await requestPermissions();
+            if (ok && positionRef.current) return positionRef.current;
+        }
+
         try {
             if (!Capacitor.isNativePlatform()) {
-                // Try accurate first, then coarse — never throw
-                let position = await readBrowserPosition({
+                const first = await readBrowserPosition({
                     enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 30000
                 });
+                const result =
+                    first.position != null
+                        ? first
+                        : await readBrowserPosition({
+                              enableHighAccuracy: false,
+                              timeout: 20000,
+                              maximumAge: 60000
+                          });
 
-                if (!position) {
-                    position = await readBrowserPosition({
-                        enableHighAccuracy: false,
-                        timeout: 20000,
-                        maximumAge: 60000
-                    });
+                if (result.position) {
+                    applyGrantedPosition(result.position);
+                    return result.position;
                 }
-
-                if (position) {
-                    setPermissionStatus('granted');
-                    setIsTracking(true);
-                    positionRef.current = position;
-                    setCurrentPosition(position);
-                    return position;
-                }
-
-                // If we got here, GPS failed — don't change permission unless we know it's denied
+                if (result.errorCode === 1) setPermissionStatus('denied');
                 return null;
             }
 
-            try {
-                const coordinates = await Geolocation.getCurrentPosition({
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 30000
-                });
-                positionRef.current = coordinates;
-                setCurrentPosition(coordinates);
+            const coordinates = await Geolocation.getCurrentPosition({
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 30000
+            }).catch(() => null);
+            if (coordinates) {
+                applyGrantedPosition(coordinates);
                 return coordinates;
-            } catch (nativeErr) {
-                console.warn('[GPS] native getCurrentPosition failed:', nativeErr);
-                return null;
             }
+            return null;
         } catch (error) {
             console.warn('[GPS] getCurrentLocation unexpected error:', error);
             return null;
         }
-    }, []);
+    }, [permissionStatus, requestPermissions, applyGrantedPosition]);
 
     return {
         currentPosition,
         permissionStatus,
         isTracking,
-        getCurrentLocation
+        notificationsAllowed,
+        getCurrentLocation,
+        requestPermissions
     };
 }

@@ -56,12 +56,33 @@ function App() {
   const { friends } = useFriends(user?.uid);
 
   // Initialize location tracking
-  const { permissionStatus, isTracking, getCurrentLocation } = useLocation(user?.uid);
+  const { permissionStatus, isTracking, getCurrentLocation, requestPermissions } = useLocation(user?.uid);
   
   // Initialize geofence monitoring for active items
   useGeofence(user?.uid);
 
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
+  const [showGpsPermissionModal, setShowGpsPermissionModal] = useState(false);
+  const [gpsPermissionLoading, setGpsPermissionLoading] = useState(false);
+
+  // Ask for GPS + notifications shortly after login (once per session until granted)
+  useEffect(() => {
+    if (!user) {
+      setShowGpsPermissionModal(false);
+      return;
+    }
+    if (permissionStatus === 'granted') {
+      setShowGpsPermissionModal(false);
+      return;
+    }
+    if (permissionStatus !== 'prompt' && permissionStatus !== 'denied') return;
+
+    const dismissed = sessionStorage.getItem('dt_gps_perm_dismissed') === '1';
+    if (dismissed && permissionStatus === 'denied') return;
+
+    const timer = setTimeout(() => setShowGpsPermissionModal(true), 500);
+    return () => clearTimeout(timer);
+  }, [user, permissionStatus]);
 
   // Show warning if GPS is needed but not tracking
   useEffect(() => {
@@ -71,14 +92,14 @@ function App() {
       !plan.completed && plan.items.some(item => !item.checked && item.location && item.location.active)
     );
 
-    if (hasActiveGeoFences && !isTracking) {
+    if (hasActiveGeoFences && !isTracking && permissionStatus !== 'prompt') {
       // Debounce toast
       const timer = setTimeout(() => {
         showToast(t('plans.gps_required_toast'));
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [plans, isTracking, t]);
+  }, [plans, isTracking, permissionStatus, t]);
   const { plan: currentPlan } = usePlan(currentPlanId);
   const { incomingRequests } = useFriendRequests(user?.uid);
 
@@ -735,8 +756,14 @@ function App() {
                                   type="button"
                                   onClick={async () => {
                                     try {
-                                      if (permissionStatus === 'denied') {
-                                        showToast(t('plans.gps_denied_toast'));
+                                      setGpsPermissionLoading(true);
+                                      const granted = await requestPermissions();
+                                      if (!granted) {
+                                        showToast(
+                                          permissionStatus === 'denied' || !granted
+                                            ? t('plans.gps_denied_toast')
+                                            : t('plans.gps_unavailable_toast')
+                                        );
                                         return;
                                       }
                                       const location = await getCurrentLocation();
@@ -751,20 +778,18 @@ function App() {
                                         });
                                         showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
                                       } else {
-                                        showToast(
-                                          permissionStatus === 'denied'
-                                            ? t('plans.gps_denied_toast')
-                                            : t('plans.gps_unavailable_toast')
-                                        );
+                                        showToast(t('plans.gps_unavailable_toast'));
                                       }
                                     } catch {
                                       showToast(t('plans.gps_unavailable_toast'));
+                                    } finally {
+                                      setGpsPermissionLoading(false);
                                     }
                                   }}
                                   className="w-full py-5 px-6 bg-[#18181b] border border-zinc-800/80 rounded-[20px] text-xs font-bold text-zinc-300 hover:border-emerald-500/30 hover:bg-[#1d1d21] transition-all flex items-center justify-center gap-3 shadow-lg"
                                 >
                                   <MapPin className="w-4 h-4 text-emerald-500/50" />
-                                  {t('profile.use_current_location')}
+                                  {gpsPermissionLoading ? '...' : t('profile.use_current_location')}
                                 </button>
 
                                 <div className="space-y-3">
@@ -1590,7 +1615,9 @@ function App() {
                             type="button"
                             onClick={async () => {
                               try {
-                                if (permissionStatus === 'denied') {
+                                setGpsPermissionLoading(true);
+                                const granted = await requestPermissions();
+                                if (!granted) {
                                   showToast(t('plans.gps_denied_toast'));
                                   return;
                                 }
@@ -1611,20 +1638,18 @@ function App() {
                                   });
                                   showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
                                 } else {
-                                  showToast(
-                                    permissionStatus === 'denied'
-                                      ? t('plans.gps_denied_toast')
-                                      : t('plans.gps_unavailable_toast')
-                                  );
+                                  showToast(t('plans.gps_unavailable_toast'));
                                 }
                               } catch {
                                 showToast(t('plans.gps_unavailable_toast'));
+                              } finally {
+                                setGpsPermissionLoading(false);
                               }
                             }}
                             className="w-full py-5 px-6 bg-[#18181b] border border-zinc-800/80 rounded-[20px] text-xs font-bold text-zinc-300 hover:border-emerald-500/30 hover:bg-[#1d1d21] transition-all flex items-center justify-center gap-3 shadow-lg"
                           >
                             <MapPin className="w-4 h-4 text-emerald-500/50" />
-                            {t('profile.use_current_location')}
+                            {gpsPermissionLoading ? '...' : t('profile.use_current_location')}
                           </button>
 
                           <div className="space-y-3">
@@ -1813,6 +1838,72 @@ function App() {
               >
                 <X className="w-6 h-6 stroke-[3px]" />
               </button>
+            </motion.div>
+          </div>
+        )}
+
+        {/* GPS + notification permission prompt */}
+        {showGpsPermissionModal && user && (
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={() => {
+                sessionStorage.setItem('dt_gps_perm_dismissed', '1');
+                setShowGpsPermissionModal(false);
+              }}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="relative w-full max-w-sm rounded-3xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl space-y-5"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-emerald-500" />
+                </div>
+                <h3 className="text-lg font-black italic tracking-tight text-white">
+                  {t('plans.gps_permission_title')}
+                </h3>
+              </div>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                {permissionStatus === 'denied'
+                  ? t('plans.gps_denied_toast')
+                  : t('plans.gps_permission_body')}
+              </p>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={gpsPermissionLoading}
+                  onClick={async () => {
+                    setGpsPermissionLoading(true);
+                    try {
+                      const granted = await requestPermissions();
+                      if (granted) {
+                        setShowGpsPermissionModal(false);
+                        sessionStorage.removeItem('dt_gps_perm_dismissed');
+                        showToast(t('plans.gps_permission_granted_toast'));
+                      } else {
+                        showToast(t('plans.gps_permission_denied_toast'));
+                      }
+                    } finally {
+                      setGpsPermissionLoading(false);
+                    }
+                  }}
+                  className="w-full py-4 rounded-2xl bg-emerald-500 text-black text-xs font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {gpsPermissionLoading ? '...' : t('plans.gps_permission_allow')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sessionStorage.setItem('dt_gps_perm_dismissed', '1');
+                    setShowGpsPermissionModal(false);
+                  }}
+                  className="w-full py-3 rounded-2xl text-zinc-500 text-[10px] font-black uppercase tracking-widest hover:text-zinc-300 transition-colors"
+                >
+                  {t('plans.gps_permission_later')}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
