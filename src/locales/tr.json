@@ -161,13 +161,9 @@
         "map_unavailable": "Harita yüklenemedi. Arama ve favorileri hâlâ kullanabilirsiniz.",
         "resolving_address": "Adres alınıyor...",
         "wall_of_fame": {
-            "title": "Şöhret Duvarı",
-            "subtitle": "Geliştirmeyi Destekle & Katkıda Bulunanlara Katıl",
-            "text1": "Bu projeyi bağımsız olarak geliştiriyorum ve desteğiniz kodumu geliştirmeme ve herkes için ücretsiz tutmama yardımcı oluyor.",
-            "text2": "Minnettarlığımın bir göstergesi olarak, bana bir kahve ile destek olan herkes bir sonraki projemin \"Özel Teşekkürler\" bölümünde yer alacak!",
-            "text3": "Lütfen mesajınıza adınızı veya bir imza ekleyin, böylece size hak ettiğiniz krediyi verebilirim. Desteğiniz gelecekteki gelişmeyi mümkün kılan şeydir.",
-            "text4": "Desteğiniz, sevdiğiniz araçları geliştirmeye ve iyileştirmeye devam etmem için bana güç veriyor.",
-            "signature": "— Robin Ayzit"
+            "title": "The Wall of Fame",
+            "description": "DoneTogether geliştirmesini bir kahve ısmarlayarak destekleyin. Katkınız uygulamanın ücretsiz kalmasına ve sürekli gelişmesine yardımcı olur!",
+            "button": "Kahve ısmarlamak için tıklayın"
         }
     }
 }

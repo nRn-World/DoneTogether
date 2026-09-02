@@ -170,12 +170,8 @@
         "resolving_address": "Fetching address...",
         "wall_of_fame": {
             "title": "The Wall of Fame",
-            "subtitle": "Support the Development & Join the Credits",
-            "text1": "I'm developing this project independently, and your support helps me improve the code and keep it free for everyone.",
-            "text2": "As a token of my gratitude, everyone who supports me with a coffee will be featured in the \"Special Thanks\" section of my next project!",
-            "text3": "Please include your name or a signature in your message so I can give you the credit you deserve. Your support is what makes future development possible.",
-            "text4": "Your support empowers me to keep building and refining the tools you love.",
-            "signature": "— Robin Ayzit"
+            "description": "Support the development of DoneTogether by buying me a coffee. Your contribution helps keep this app free and continuously improving!",
+            "button": "Click here to buy me a coffee"
         }
     }
 }

@@ -1296,28 +1296,18 @@ function App() {
                         <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <img src="coffee-icon.png" alt="Coffee" className="w-full h-full object-contain" />
                         </div>
-                        <div className="flex-1 text-left">
-                          <h4 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight mb-2">
+                        <div className="flex-1 min-w-0 text-left">
+                          <h4 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight flex items-center gap-2">
+                            <span aria-hidden>☕</span>
                             {t('profile.wall_of_fame.title')}
                           </h4>
-                          <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-3 leading-relaxed">
-                            {t('profile.wall_of_fame.subtitle')} ☕
+                          <p className="text-xs text-zinc-700 dark:text-zinc-300 mt-2 leading-relaxed">
+                            {t('profile.wall_of_fame.description')}
                           </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text1')}
-                          </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text2')}
-                          </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text3')}
-                          </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text4')}
-                          </p>
-                          <p className="text-[9px] text-zinc-600 dark:text-zinc-400 italic font-semibold">
-                            {t('profile.wall_of_fame.signature')}
-                          </p>
+                          <span className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white text-xs font-bold group-hover:bg-amber-400 transition-colors">
+                            <span aria-hidden>☕</span>
+                            {t('profile.wall_of_fame.button')}
+                          </span>
                         </div>
                       </div>
                     </a>

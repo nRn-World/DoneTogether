@@ -169,13 +169,9 @@
         "map_unavailable": "Kartan kunde inte laddas. Du kan fortfarande använda sök och favoriter.",
         "resolving_address": "Hämtar adress...",
         "wall_of_fame": {
-            "title": "Hedersväggen",
-            "subtitle": "Stöd Utvecklingen & Bli Med i Krediterna",
-            "text1": "Jag utvecklar detta projekt självständigt, och ditt stöd hjälper mig att förbättra koden och hålla den gratis för alla.",
-            "text2": "Som ett tecken på min tacksamhet kommer alla som stödjer mig med ett kaffe att visas i \"Särskilt Tack\"-sektionen i mitt nästa projekt!",
-            "text3": "Vänligen inkludera ditt namn eller en signatur i ditt meddelande så att jag kan ge dig den kredit du förtjänar. Ditt stöd är det som möjliggör framtida utveckling.",
-            "text4": "Ditt stöd ger mig kraft att fortsätta bygga och förfina verktygen du älskar.",
-            "signature": "— Robin Ayzit"
+            "title": "The Wall of Fame",
+            "description": "Stöd utvecklingen av DoneTogether genom att bjuda mig på en kaffe. Ditt bidrag hjälper till att hålla appen gratis och i ständig utveckling!",
+            "button": "Klicka här för att bjuda på en kaffe"
         }
     }
 }
