@@ -17,7 +17,7 @@ export function publicAssetUrl(file: string): string {
 async function waitUntilActive(reg: ServiceWorkerRegistration): Promise<ServiceWorkerRegistration> {
     const sw = reg.installing || reg.waiting || reg.active;
     if (!sw) return reg;
-    if (sw.state === 'activated' || sw.state === 'active') return reg;
+    if (sw.state === 'activated') return reg;
 
     await new Promise<void>((resolve) => {
         const onChange = () => {
@@ -91,7 +91,6 @@ export async function showLocalNotification(
         icon,
         badge: icon,
         tag,
-        renotify: true,
         requireInteraction: opts?.requireInteraction ?? true,
         data: { url: window.location.href }
     };
