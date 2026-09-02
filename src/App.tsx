@@ -1284,40 +1284,30 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Buy Me A Coffee Section */}
+                  {/* Buy Me A Coffee / Wall of Fame */}
                   <div className="w-full mb-6">
                     <a
-                      href="https://buymeacoffee.com/nrnworld"
+                      href="https://ko-fi.com/nrnworld"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-6 rounded-[28px] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-900/30 hover:border-amber-300 dark:hover:border-amber-800/50 transition-all hover:shadow-lg hover:-translate-y-1 group"
+                      className="block p-5 rounded-2xl bg-zinc-950 border border-sky-400 hover:border-sky-300 transition-all hover:shadow-[0_0_24px_rgba(56,189,248,0.25)] group"
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <img src="coffee-icon.png" alt="Coffee" className="w-full h-full object-contain" />
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 shadow-lg shadow-orange-500/30 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
+                          <img src="coffee-icon.png" alt="" className="w-10 h-10 object-contain" />
                         </div>
-                        <div className="flex-1 text-left">
-                          <h4 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight mb-2">
+                        <div className="flex-1 min-w-0 text-left">
+                          <h4 className="text-sm font-black text-sky-400 uppercase tracking-wide flex items-center gap-2">
+                            <span aria-hidden>☕</span>
                             {t('profile.wall_of_fame.title')}
                           </h4>
-                          <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mb-3 leading-relaxed">
-                            {t('profile.wall_of_fame.subtitle')} ☕
+                          <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
+                            {t('profile.wall_of_fame.description')}
                           </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text1')}
-                          </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text2')}
-                          </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text3')}
-                          </p>
-                          <p className="text-[10px] text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
-                            {t('profile.wall_of_fame.text4')}
-                          </p>
-                          <p className="text-[9px] text-zinc-600 dark:text-zinc-400 italic font-semibold">
-                            {t('profile.wall_of_fame.signature')}
-                          </p>
+                          <span className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-400 text-white text-xs font-bold group-hover:bg-sky-300 transition-colors">
+                            <span aria-hidden>☕</span>
+                            {t('profile.wall_of_fame.button')}
+                          </span>
                         </div>
                       </div>
                     </a>
