@@ -19,28 +19,27 @@ service cloud.firestore {
         && request.resource.data.members[request.auth.uid] != null;
     }
 
+    function canInviteMemberToPlan() {
+      return isSignedIn()
+        && isPlanMember(resource.data)
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
+        && request.resource.data.members.diff(resource.data.members).removedKeys().size() == 0
+        && request.resource.data.members.diff(resource.data.members).addedKeys().size() == 1;
+    }
+
     function canSelfJoinPlan() {
       return isSignedIn()
         && resource.data.members[request.auth.uid] == null
         && request.resource.data.members[request.auth.uid] != null
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
-        && request.resource.data.members.diff(resource.data.members).addedKeys().hasOnly([request.auth.uid]);
+        && request.resource.data.members.diff(resource.data.members).addedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.members.diff(resource.data.members).removedKeys().size() == 0;
     }
 
     function canUpdatePlanContent() {
       return isSignedIn()
         && isPlanMember(resource.data)
         && request.resource.data.diff(resource.data).changedKeys().hasOnly(['items', 'completed', 'completedAt', 'lastModified']);
-    }
-
-    function canInviteMemberToPlan() {
-      return isSignedIn()
-        && isPlanMember(resource.data)
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
-        && request.resource.data.members.diff(resource.data.members).removedKeys().size() == 0
-        && request.resource.data.members.diff(resource.data.members).changedKeys().size()
-          == request.resource.data.members.diff(resource.data.members).addedKeys().size()
-        && request.resource.data.members.diff(resource.data.members).addedKeys().size() == 1;
     }
 
     function canRemoveMemberFromPlan() {

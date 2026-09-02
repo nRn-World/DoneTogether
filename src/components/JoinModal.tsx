@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { X, ArrowRight, Loader, Link as LinkIcon } from 'lucide-react';
-import { validateAndIncrementInvite } from '../hooks/useInvites';
+import { validateAndIncrementInvite, extractInviteCode } from '../hooks/useInvites';
 import { addMemberToPlan } from '../hooks/useFirestore';
 import type { UserProfile } from '../types';
 
@@ -26,10 +26,11 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
         setError('');
 
         try {
-            // Extract code from URL if full link is pasted
-            let code = input.trim();
-            if (code.includes('/join/')) {
-                code = code.split('/join/')[1];
+            const code = extractInviteCode(input);
+            if (!code) {
+                setError(t('plans.join_invalid'));
+                setLoading(false);
+                return;
             }
 
             const invite = await validateAndIncrementInvite(code);

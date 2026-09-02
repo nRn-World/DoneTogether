@@ -19,7 +19,7 @@ import {
   toggleReaction
 } from './hooks/useFirestore';
 import { useFriends, useFriendRequests } from './hooks/useFriends';
-import { validateAndIncrementInvite } from './hooks/useInvites';
+import { validateAndIncrementInvite, extractInviteCode } from './hooks/useInvites';
 import { useNotifications } from './hooks/useNotifications';
 import { JoinModal } from './components/JoinModal';
 import { AuthModal } from './components/AuthModal';
@@ -138,13 +138,10 @@ function App() {
 
   // Check for invite code in URL on mount
   useEffect(() => {
-    const path = window.location.pathname;
+    const path = window.location.pathname + window.location.search;
     if (path.includes('/join/')) {
-      const parts = path.split('/join/');
-      const code = parts[parts.length - 1];
-      if (code) {
-        setPendingInviteCode(code);
-      }
+      const code = extractInviteCode(path);
+      if (code) setPendingInviteCode(code);
     }
   }, []);
 

@@ -301,28 +301,50 @@ export async function addMemberToPlan(
     role: 'editor' | 'viewer' = 'editor'
 ): Promise<void> {
     const planRef = doc(db, 'plans', planId);
+
+    // Already a member? Treat as success (e.g. retry after partial join)
+    const existing = await getDoc(planRef).catch(() => null);
+    if (existing?.exists() && existing.data()?.members?.[userId]) {
+        return;
+    }
+
     const member: PlanMember = {
         uid: userId,
-        email: userEmail,
-        displayName,
-        photoURL,
+        email: userEmail || '',
+        displayName: displayName || 'Medlem',
         role,
         joinedAt: Timestamp.now(),
     };
+    // Firestore rejects explicit `undefined` field values
+    if (photoURL) {
+        member.photoURL = photoURL;
+    }
 
     await updateDoc(planRef, {
         [`members.${userId}`]: member,
         lastModified: Timestamp.now(),
     });
 
-    // Notify the user they were added
-    await sendAppNotification(
-        userId,
-        'Du har lagts till i en plan! 🤝',
-        `Du är nu medlem i planen "${(await getDoc(planRef)).data()?.name}".`,
-        'plan_update',
-        planId
-    );
+    // Notify plan owner / other members (never self — rules forbid to == from)
+    try {
+        const planSnap = await getDoc(planRef);
+        const plan = planSnap.data();
+        const planName = plan?.name || 'en plan';
+        const memberIds = Object.keys(plan?.members || {}).filter((uid) => uid !== userId);
+        await Promise.all(
+            memberIds.map((uid) =>
+                sendAppNotification(
+                    uid,
+                    'Ny medlem i planen! 🤝',
+                    `${displayName || 'Någon'} gick med i "${planName}".`,
+                    'plan_update',
+                    planId
+                )
+            )
+        );
+    } catch (err) {
+        console.warn('[addMemberToPlan] notify skipped:', err);
+    }
 }
 
 export async function removeMemberFromPlan(planId: string, userId: string): Promise<void> {

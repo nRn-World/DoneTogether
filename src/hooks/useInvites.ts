@@ -23,7 +23,44 @@ function generateInviteCode(): string {
     return code;
 }
 
+/** Normalize pasted invite input → 6-char code */
+export function extractInviteCode(raw: string): string {
+    let code = raw.trim();
+    try {
+        if (code.includes('://') || code.startsWith('/')) {
+            const url = code.includes('://') ? new URL(code) : new URL(code, window.location.origin);
+            code = url.pathname;
+        }
+    } catch {
+        /* keep as-is */
+    }
 
+    if (code.includes('/join/')) {
+        code = code.split('/join/').pop() || code;
+    }
+
+    // Strip query/hash/trailing slash and non-code chars
+    code = code.split('?')[0].split('#')[0].replace(/\/+$/, '');
+    code = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    return code;
+}
+
+function appBasePath(): string {
+    // Vite base is "./" on GitHub Pages → pathname like /DoneTogether/ or /DoneTogether/index.html
+    const path = window.location.pathname;
+    if (path.includes('/DoneTogether')) {
+        return '/DoneTogether';
+    }
+    // Local / custom domain
+    const segments = path.split('/').filter(Boolean);
+    if (segments.length > 0 && !segments[0].includes('.')) {
+        // If hosted in a subfolder SPA, keep first segment only when not join
+        if (segments[0].toLowerCase() !== 'join') {
+            // default: origin root for local vite
+        }
+    }
+    return '';
+}
 
 export async function getOrCreatePlanInvite(
     planId: string,
@@ -31,18 +68,11 @@ export async function getOrCreatePlanInvite(
     createdBy: string,
     createdByName: string
 ): Promise<string> {
-    // Check for existing invite
-    // querying only by planId to avoid needing a composite index for (planId + expiresAt)
-    const q = query(
-        collection(db, 'planInvites'),
-        where('planId', '==', planId)
-    );
+    const q = query(collection(db, 'planInvites'), where('planId', '==', planId));
     const querySnapshot = await getDocs(q);
 
-    // Find valid active invite in memory
-    const activeInvite = querySnapshot.docs.find(doc => {
-        const data = doc.data();
-        // Check if expired (if expiresAt exists)
+    const activeInvite = querySnapshot.docs.find((d) => {
+        const data = d.data();
         if (!data.expiresAt) return true;
         return data.expiresAt.toMillis() > Date.now();
     });
@@ -51,8 +81,6 @@ export async function getOrCreatePlanInvite(
         return activeInvite.id;
     }
 
-    // Create new one if none exists
-    // Default expiration: 7 days
     return createPlanInvite(planId, planName, createdBy, createdByName, 7);
 }
 
@@ -79,8 +107,6 @@ export async function createPlanInvite(
         useCount: 0,
     };
 
-    // Use setDoc with custom ID (the code) instead of addDoc to make lookup easier if needed, 
-    // but here we use the code as ID for easy joining.
     await setDoc(doc(db, 'planInvites', code), invite);
     return code;
 }
@@ -93,12 +119,10 @@ export async function getInviteByCode(code: string): Promise<PlanInvite | null> 
 
     const invite = { id: inviteSnap.id, ...inviteSnap.data() } as PlanInvite;
 
-    // Check if expired
     if (invite.expiresAt && invite.expiresAt.toMillis() < Date.now()) {
         return null;
     }
 
-    // Check if max uses reached
     if (invite.maxUses && invite.useCount >= invite.maxUses) {
         return null;
     }
@@ -114,7 +138,10 @@ export async function incrementInviteUse(code: string): Promise<void> {
 }
 
 export async function validateAndIncrementInvite(code: string): Promise<PlanInvite | null> {
-    const inviteRef = doc(db, 'planInvites', code);
+    const normalized = extractInviteCode(code);
+    if (!normalized) return null;
+
+    const inviteRef = doc(db, 'planInvites', normalized);
 
     try {
         const invite = await runTransaction(db, async (transaction) => {
@@ -140,11 +167,13 @@ export async function validateAndIncrementInvite(code: string): Promise<PlanInvi
         });
 
         return invite;
-    } catch {
+    } catch (err) {
+        console.error('[validateAndIncrementInvite]', err);
         return null;
     }
 }
 
 export function generateInviteLink(code: string): string {
-    return `${window.location.origin}/join/${code}`;
+    const base = appBasePath();
+    return `${window.location.origin}${base}/join/${code}`;
 }
