@@ -4,7 +4,6 @@ import {
     getDoc,
     getDocs,
     doc,
-    updateDoc,
     increment,
     Timestamp,
     query,
@@ -12,9 +11,8 @@ import {
     runTransaction,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import type { PlanInvite } from '../types';
+import type { PlanInvite, UserProfile } from '../types';
 import { addMemberToPlan } from './useFirestore';
-import type { UserProfile } from '../types';
 
 function generateInviteCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
