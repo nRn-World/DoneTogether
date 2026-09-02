@@ -305,12 +305,6 @@ export async function addMemberToPlan(
 ): Promise<void> {
     const planRef = doc(db, 'plans', planId);
 
-    // Already a member? Treat as success (e.g. retry after partial join)
-    const existing = await getDoc(planRef).catch(() => null);
-    if (existing?.exists() && existing.data()?.members?.[userId]) {
-        return;
-    }
-
     const member: PlanMember = {
         uid: userId,
         email: userEmail || '',
@@ -318,17 +312,24 @@ export async function addMemberToPlan(
         role,
         joinedAt: Timestamp.now(),
     };
-    // Firestore rejects explicit `undefined` field values
     if (photoURL) {
         member.photoURL = photoURL;
     }
 
-    await updateDoc(planRef, {
-        [`members.${userId}`]: member,
-        lastModified: Timestamp.now(),
-    });
+    try {
+        await updateDoc(planRef, {
+            [`members.${userId}`]: member,
+            lastModified: Timestamp.now(),
+        });
+    } catch (err: unknown) {
+        // If already a member, some rule sets reject "re-adding" — treat as success when readable
+        const existing = await getDoc(planRef).catch(() => null);
+        if (existing?.exists() && existing.data()?.members?.[userId]) {
+            return;
+        }
+        throw err;
+    }
 
-    // Notify plan owner / other members (never self — rules forbid to == from)
     try {
         const planSnap = await getDoc(planRef);
         const plan = planSnap.data();

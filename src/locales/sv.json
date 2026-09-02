@@ -81,6 +81,8 @@
         "join_invalid": "Ogiltig eller utgången inbjudningslänk",
         "join_success": "Gick med i {{name}}!",
         "join_error": "Kunde inte gå med i planen",
+        "join_permission_denied": "Firebase blockerar join. Öppna Firebase Console → Firestore → Rules, klistra in senaste reglerna från projektet och tryck Publish.",
+        "join_invalid_data": "Ogiltig profildata. Logga ut och in igen, försök sedan på nytt.",
         "update_error": "Kunde inte uppdatera",
         "create_error": "Kunde inte skapa planen",
         "plan_not_found": "Planen kunde inte hittas.",

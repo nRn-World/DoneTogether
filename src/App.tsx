@@ -15,11 +15,10 @@ import {
   addItemToPlan,
   deletePlan,
   updatePlan,
-  addMemberToPlan,
   toggleReaction
 } from './hooks/useFirestore';
 import { useFriends, useFriendRequests } from './hooks/useFriends';
-import { validateAndIncrementInvite, extractInviteCode } from './hooks/useInvites';
+import { joinPlanWithInviteCode, extractInviteCode } from './hooks/useInvites';
 import { useNotifications } from './hooks/useNotifications';
 import { JoinModal } from './components/JoinModal';
 import { AuthModal } from './components/AuthModal';
@@ -152,33 +151,27 @@ function App() {
 
       setJoiningPlan(true);
       try {
-        const invite = await validateAndIncrementInvite(pendingInviteCode);
+        const result = await joinPlanWithInviteCode(pendingInviteCode, {
+          uid: user.uid,
+          email: userProfile.email,
+          displayName: userProfile.displayName,
+          photoURL: userProfile.photoURL
+        });
 
-        if (!invite) {
-          showToast(t('plans.join_invalid'));
-          setPendingInviteCode(null);
-          window.history.replaceState({}, '', '/');
-          return;
-        }
-
-        await addMemberToPlan(
-          invite.planId,
-          user.uid,
-          userProfile.email,
-          userProfile.displayName,
-          userProfile.photoURL
-        );
-
-        showToast(t('plans.join_success', { name: invite.planName }));
-        setCurrentPlanId(invite.planId);
+        showToast(t('plans.join_success', { name: result.planName }));
+        setCurrentPlanId(result.planId);
         setActiveTab('plans');
 
-        // Cleanup
         setPendingInviteCode(null);
-        window.history.replaceState({}, '', '/');
+        const base = window.location.pathname.includes('/DoneTogether') ? '/DoneTogether/' : '/';
+        window.history.replaceState({}, '', base);
       } catch (error) {
         console.error('Error joining plan:', error);
-        showToast(t('plans.join_error'));
+        const key = error instanceof Error ? error.message : '';
+        if (key === 'INVALID_CODE') showToast(t('plans.join_invalid'));
+        else if (key === 'PERMISSION_DENIED') showToast(t('plans.join_permission_denied'));
+        else showToast(t('plans.join_error'));
+        setPendingInviteCode(null);
       } finally {
         setJoiningPlan(false);
       }

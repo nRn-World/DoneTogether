@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { X, ArrowRight, Loader, Link as LinkIcon } from 'lucide-react';
-import { validateAndIncrementInvite, extractInviteCode } from '../hooks/useInvites';
-import { addMemberToPlan } from '../hooks/useFirestore';
+import { joinPlanWithInviteCode } from '../hooks/useInvites';
 import type { UserProfile } from '../types';
 
 interface JoinModalProps {
@@ -26,34 +25,26 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
         setError('');
 
         try {
-            const code = extractInviteCode(input);
-            if (!code) {
-                setError(t('plans.join_invalid'));
-                setLoading(false);
-                return;
-            }
-
-            const invite = await validateAndIncrementInvite(code);
-
-            if (!invite) {
-                setError(t('plans.join_invalid'));
-                setLoading(false);
-                return;
-            }
-
-            await addMemberToPlan(
-                invite.planId,
-                user.uid,
-                userProfile.email,
-                userProfile.displayName,
-                userProfile.photoURL
-            );
-
-            onJoin(invite.planId);
+            const result = await joinPlanWithInviteCode(input, {
+                uid: user.uid,
+                email: userProfile.email,
+                displayName: userProfile.displayName,
+                photoURL: userProfile.photoURL
+            });
+            onJoin(result.planId);
             onClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error joining plan:', err);
-            setError(t('plans.join_error_text'));
+            const key = err instanceof Error ? err.message : '';
+            if (key === 'INVALID_CODE') {
+                setError(t('plans.join_invalid'));
+            } else if (key === 'PERMISSION_DENIED') {
+                setError(t('plans.join_permission_denied'));
+            } else if (key === 'INVALID_DATA') {
+                setError(t('plans.join_invalid_data'));
+            } else {
+                setError(t('plans.join_error_text'));
+            }
         } finally {
             setLoading(false);
         }

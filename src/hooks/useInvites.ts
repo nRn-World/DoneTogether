@@ -13,6 +13,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { PlanInvite } from '../types';
+import { addMemberToPlan } from './useFirestore';
+import type { UserProfile } from '../types';
 
 function generateInviteCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -39,25 +41,15 @@ export function extractInviteCode(raw: string): string {
         code = code.split('/join/').pop() || code;
     }
 
-    // Strip query/hash/trailing slash and non-code chars
     code = code.split('?')[0].split('#')[0].replace(/\/+$/, '');
     code = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     return code;
 }
 
 function appBasePath(): string {
-    // Vite base is "./" on GitHub Pages → pathname like /DoneTogether/ or /DoneTogether/index.html
     const path = window.location.pathname;
     if (path.includes('/DoneTogether')) {
         return '/DoneTogether';
-    }
-    // Local / custom domain
-    const segments = path.split('/').filter(Boolean);
-    if (segments.length > 0 && !segments[0].includes('.')) {
-        // If hosted in a subfolder SPA, keep first segment only when not join
-        if (segments[0].toLowerCase() !== 'join') {
-            // default: origin root for local vite
-        }
     }
     return '';
 }
@@ -111,32 +103,6 @@ export async function createPlanInvite(
     return code;
 }
 
-export async function getInviteByCode(code: string): Promise<PlanInvite | null> {
-    const inviteRef = doc(db, 'planInvites', code);
-    const inviteSnap = await getDoc(inviteRef);
-
-    if (!inviteSnap.exists()) return null;
-
-    const invite = { id: inviteSnap.id, ...inviteSnap.data() } as PlanInvite;
-
-    if (invite.expiresAt && invite.expiresAt.toMillis() < Date.now()) {
-        return null;
-    }
-
-    if (invite.maxUses && invite.useCount >= invite.maxUses) {
-        return null;
-    }
-
-    return invite;
-}
-
-export async function incrementInviteUse(code: string): Promise<void> {
-    const inviteRef = doc(db, 'planInvites', code);
-    await updateDoc(inviteRef, {
-        useCount: increment(1),
-    });
-}
-
 export async function validateAndIncrementInvite(code: string): Promise<PlanInvite | null> {
     const normalized = extractInviteCode(code);
     if (!normalized) return null;
@@ -169,8 +135,66 @@ export async function validateAndIncrementInvite(code: string): Promise<PlanInvi
         return invite;
     } catch (err) {
         console.error('[validateAndIncrementInvite]', err);
-        return null;
+        // Fallback: read without increment (still allow join if invite is valid)
+        try {
+            const snap = await getDoc(inviteRef);
+            if (!snap.exists()) return null;
+            const data = { id: snap.id, ...snap.data() } as PlanInvite;
+            if (data.expiresAt && data.expiresAt.toMillis() < Date.now()) return null;
+            if (data.maxUses && data.useCount >= data.maxUses) return null;
+            return data;
+        } catch (e2) {
+            console.error('[validateAndIncrementInvite fallback]', e2);
+            return null;
+        }
     }
+}
+
+/**
+ * Full join flow with clear errors for the UI.
+ */
+export async function joinPlanWithInviteCode(
+    rawCode: string,
+    profile: Pick<UserProfile, 'uid' | 'email' | 'displayName' | 'photoURL'>
+): Promise<{ planId: string; planName: string }> {
+    const code = extractInviteCode(rawCode);
+    if (!code) {
+        throw new Error('INVALID_CODE');
+    }
+
+    const invite = await validateAndIncrementInvite(code);
+    if (!invite?.planId) {
+        throw new Error('INVALID_CODE');
+    }
+
+    try {
+        await addMemberToPlan(
+            invite.planId,
+            profile.uid,
+            profile.email,
+            profile.displayName,
+            profile.photoURL
+        );
+    } catch (err: unknown) {
+        const codeName =
+            err && typeof err === 'object' && 'code' in err
+                ? String((err as { code?: string }).code)
+                : '';
+        const message =
+            err && typeof err === 'object' && 'message' in err
+                ? String((err as { message?: string }).message)
+                : String(err);
+        console.error('[joinPlanWithInviteCode] addMember failed:', codeName, message);
+        if (codeName === 'permission-denied' || /permission/i.test(message)) {
+            throw new Error('PERMISSION_DENIED');
+        }
+        if (/unsupported field value|undefined/i.test(message)) {
+            throw new Error('INVALID_DATA');
+        }
+        throw new Error('JOIN_FAILED');
+    }
+
+    return { planId: invite.planId, planName: invite.planName };
 }
 
 export function generateInviteLink(code: string): string {

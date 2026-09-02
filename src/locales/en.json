@@ -81,6 +81,8 @@
         "join_invalid": "Invalid or expired invitation link",
         "join_success": "Joined {{name}}!",
         "join_error": "Could not join the plan",
+        "join_permission_denied": "Firebase is blocking join. Open Firebase Console → Firestore → Rules, paste the latest rules from the repo and click Publish.",
+        "join_invalid_data": "Invalid profile data. Sign out and back in, then try again.",
         "update_error": "Could not update",
         "create_error": "Could not create the plan",
         "plan_not_found": "Plan could not be found.",

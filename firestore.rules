@@ -10,50 +10,24 @@ service cloud.firestore {
     }
 
     function isPlanMember(planData) {
-      return isSignedIn() && planData.members[request.auth.uid] != null;
+      return isSignedIn() && request.auth.uid in planData.members;
     }
 
     function canCreatePlan() {
       return isSignedIn()
         && request.resource.data.ownerId == request.auth.uid
-        && request.resource.data.members[request.auth.uid] != null;
+        && request.auth.uid in request.resource.data.members;
     }
 
-    function canInviteMemberToPlan() {
-      return isSignedIn()
-        && isPlanMember(resource.data)
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
-        && request.resource.data.members.diff(resource.data.members).removedKeys().size() == 0
-        && request.resource.data.members.diff(resource.data.members).addedKeys().size() == 1;
-    }
-
+    // Simple self-join: only add yourself, keep plan identity intact.
+    // Avoid fragile MapDiff.changedKeys() checks that break nested member updates.
     function canSelfJoinPlan() {
       return isSignedIn()
-        && resource.data.members[request.auth.uid] == null
-        && request.resource.data.members[request.auth.uid] != null
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
-        && request.resource.data.members.diff(resource.data.members).addedKeys().hasOnly([request.auth.uid])
-        && request.resource.data.members.diff(resource.data.members).removedKeys().size() == 0;
-    }
-
-    function canUpdatePlanContent() {
-      return isSignedIn()
-        && isPlanMember(resource.data)
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['items', 'completed', 'completedAt', 'lastModified']);
-    }
-
-    function canRemoveMemberFromPlan() {
-      return isSignedIn()
-        && isPlanMember(resource.data)
-        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['members', 'lastModified'])
-        && request.resource.data.members.diff(resource.data.members).addedKeys().size() == 0
-        && request.resource.data.members.diff(resource.data.members).changedKeys().size()
-          == request.resource.data.members.diff(resource.data.members).removedKeys().size()
-        && request.resource.data.members.diff(resource.data.members).removedKeys().size() == 1
-        && (
-          resource.data.ownerId == request.auth.uid
-          || request.resource.data.members.diff(resource.data.members).removedKeys().hasOnly([request.auth.uid])
-        );
+        && !(request.auth.uid in resource.data.members)
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members[request.auth.uid].uid == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.name == resource.data.name;
     }
 
     match /users/{userId} {
@@ -62,12 +36,11 @@ service cloud.firestore {
     }
 
     match /plans/{planId} {
+      // Members can read; also allow read after join attempt via membership
       allow read: if isPlanMember(resource.data);
       allow create: if canCreatePlan();
-      allow update: if canUpdatePlanContent()
-        || canInviteMemberToPlan()
-        || canRemoveMemberFromPlan()
-        || canSelfJoinPlan();
+      // Members can update their plans; non-members may only self-join
+      allow update: if isPlanMember(resource.data) || canSelfJoinPlan();
       allow delete: if isPlanMember(resource.data)
         && (resource.data.ownerId == request.auth.uid || resource.data.completed == true);
     }

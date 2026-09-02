@@ -73,6 +73,8 @@
         "join_invalid": "Geçersiz veya süresi dolmuş davet bağlantısı",
         "join_success": "{{name}} planına katıldın!",
         "join_error": "Plana katılamadı",
+        "join_permission_denied": "Firebase katılmayı engelliyor. Firebase Console → Firestore → Rules bölümüne son kuralları yapıştırıp Publish edin.",
+        "join_invalid_data": "Geçersiz profil verisi. Çıkış yapıp tekrar giriş yapın, sonra yeniden deneyin.",
         "update_error": "Güncellenemedi",
         "create_error": "Plan oluşturulamadı",
         "plan_not_found": "Plan bulunamadı.",
