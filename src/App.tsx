@@ -29,7 +29,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import type { Plan, Item } from './types';
 
 import { useLocation } from './hooks/useLocation';
-import { useGeofence } from './hooks/useGeofence';
+import { useGeofence, GEOFENCE_EVENT, type GeofenceEventDetail } from './hooks/useGeofence';
 import { AddressAutocomplete } from './components/AddressAutocomplete';
 import { LocationPicker, formatRadius } from './components/LocationPicker';
 import { reverseGeocodeDetailed } from './lib/geocoding';
@@ -232,6 +232,19 @@ function App() {
     setToast(message);
     setTimeout(() => setToast(''), 2200);
   };
+
+  // In-app toast when a GPS reminder fires (web OS notifications are often blocked)
+  useEffect(() => {
+    const onGeofence = (event: Event) => {
+      const detail = (event as CustomEvent<GeofenceEventDetail>).detail;
+      if (!detail) return;
+      const msg = `${detail.title}: ${detail.body}`;
+      setToast(msg);
+      setTimeout(() => setToast((current) => (current === msg ? '' : current)), 5000);
+    };
+    window.addEventListener(GEOFENCE_EVENT, onGeofence);
+    return () => window.removeEventListener(GEOFENCE_EVENT, onGeofence);
+  }, []);
 
   const handleToggleReaction = async (planId: string, itemId: string, emoji: string) => {
     if (!user || !userProfile) return;

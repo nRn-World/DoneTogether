@@ -3,6 +3,15 @@ import { messaging, db } from '../lib/firebase';
 import { doc, updateDoc, arrayUnion, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
+import {
+    ensureMessagingServiceWorker,
+    ensureNotificationPermission,
+    showLocalNotification
+} from '../lib/notify';
+
+const VAPID_KEY =
+    import.meta.env.VITE_VAPID_KEY ||
+    'BN4q6ahLqD56ssLIqw8C0CYOb70yDq_7ePfJ8xLO1wL8Uxz9nds2RzRB8gPsJ6_JSq37AxVI-z3ssg11Hz7KU3A';
 
 export function useNotifications(userId: string | undefined) {
     const [token, setToken] = useState<string | null>(null);
@@ -10,79 +19,80 @@ export function useNotifications(userId: string | undefined) {
     useEffect(() => {
         if (!userId || Capacitor.isNativePlatform() || !messaging) return;
 
-        // 1. Request FCM Token for background push
-        if ('Notification' in window) {
-            const requestPermission = async () => {
-                try {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted' && messaging) {
-                        const currentToken = await getToken(messaging, {
-                            vapidKey: import.meta.env.VITE_VAPID_KEY || 'BN4q6ahLqD56ssLIqw8C0CYOb70yDq_7ePfJ8xLO1wL8Uxz9nds2RzRB8gPsJ6_JSq37AxVI-z3ssg11Hz7KU3A'
-                        });
+        let unsubscribeFirestore: (() => void) | undefined;
+        let unsubscribeFCM: (() => void) | undefined;
+        let cancelled = false;
 
-                        if (currentToken) {
+        const setup = async () => {
+            try {
+                const permissionOk = await ensureNotificationPermission();
+                if (cancelled || !permissionOk) return;
+
+                const registration = await ensureMessagingServiceWorker();
+                if (cancelled) return;
+
+                if (registration && messaging) {
+                    try {
+                        const currentToken = await getToken(messaging, {
+                            vapidKey: VAPID_KEY,
+                            serviceWorkerRegistration: registration
+                        });
+                        if (currentToken && !cancelled) {
                             setToken(currentToken);
                             const userRef = doc(db, 'users', userId);
                             await updateDoc(userRef, {
                                 fcmTokens: arrayUnion(currentToken)
                             });
+                            console.info('[notify] FCM token saved');
                         }
+                    } catch (error) {
+                        console.error('[notify] Error getting FCM token:', error);
                     }
-                } catch (error) {
-                    console.error('Error getting notification token:', error);
                 }
-            };
-            requestPermission();
-        }
 
-        // 2. Real-time Firestore Listener for "Smart Notifications" 
-        // This ensures the user gets a notification even if external push fails
-        const q = query(
-            collection(db, 'notifications'),
-            where('to', '==', userId),
-            where('status', '==', 'pending')
-        );
+                // Firestore "smart notifications" while the PWA is open
+                const q = query(
+                    collection(db, 'notifications'),
+                    where('to', '==', userId),
+                    where('status', '==', 'pending')
+                );
 
-        const unsubscribeFirestore = onSnapshot(q, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const data = change.doc.data();
-
-                    // Show local notification
-                    if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification(data.title || 'DoneTogether', {
-                            body: data.body,
-                            icon: '/pwa-icon.png'
+                unsubscribeFirestore = onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type !== 'added') return;
+                        const data = change.doc.data();
+                        void showLocalNotification(
+                            data.title || 'DoneTogether',
+                            data.body || '',
+                            { tag: `fs-${change.doc.id}`, requireInteraction: false }
+                        );
+                        updateDoc(change.doc.ref, { status: 'sent' }).catch((error) => {
+                            console.error('Error updating notification status:', error);
                         });
-                    }
+                    });
+                });
 
-                    // Mark as sent in DB so we don't notify twice
-                    updateDoc(change.doc.ref, { status: 'sent' }).catch((error) => {
-                        console.error('Error updating notification status:', error);
+                if (messaging) {
+                    unsubscribeFCM = onMessage(messaging, (payload) => {
+                        if (!payload.notification) return;
+                        void showLocalNotification(
+                            payload.notification.title || 'DoneTogether',
+                            payload.notification.body || '',
+                            { tag: `fcm-fg-${Date.now()}`, requireInteraction: false }
+                        );
                     });
                 }
-            });
-        });
+            } catch (e) {
+                console.error('[notify] setup failed', e);
+            }
+        };
 
-        // 3. Handle FCM foreground messages
-        if (messaging) {
-            const unsubscribeFCM = onMessage(messaging, (payload) => {
-                if (payload.notification && 'Notification' in window && Notification.permission === 'granted') {
-                    new Notification(payload.notification.title || 'DoneTogether', {
-                        body: payload.notification.body,
-                        icon: '/pwa-icon.png'
-                    });
-                }
-            });
-
-            return () => {
-                unsubscribeFirestore();
-                unsubscribeFCM();
-            };
-        }
+        void setup();
 
         return () => {
-            unsubscribeFirestore();
+            cancelled = true;
+            unsubscribeFirestore?.();
+            unsubscribeFCM?.();
         };
     }, [userId]);
 

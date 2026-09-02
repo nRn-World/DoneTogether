@@ -10,7 +10,7 @@ const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'donetogether-v1';
 const storageBucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'donetogether-v1.firebasestorage.app';
 const messagingSenderId = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '677287957451';
 const appId = import.meta.env.VITE_FIREBASE_APP_ID || '1:677287957451:web:812a897c8f906a63b8dc4e';
-const measurementId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-XXXXXXXXXX';
+const measurementId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-8L45T1C49B';
 
 const firebaseConfig = {
     apiKey,

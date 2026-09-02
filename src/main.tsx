@@ -56,6 +56,16 @@ window.addEventListener('unhandledrejection', (event) => {
 
 try {
   console.log('[main.tsx] Starting app initialization...')
+
+  // Register FCM/PWA service worker early (GitHub Pages subdirectory)
+  if ('serviceWorker' in navigator) {
+    const swUrl = new URL('firebase-messaging-sw.js', window.location.href).href
+    void navigator.serviceWorker.register(swUrl, { scope: new URL('./', window.location.href).href }).then(
+      () => console.log('[main.tsx] Service worker registered'),
+      (err) => console.warn('[main.tsx] Service worker register failed', err)
+    )
+  }
+
   const rootElement = document.getElementById('root')
   if (!rootElement) throw new Error('Root element not found')
 

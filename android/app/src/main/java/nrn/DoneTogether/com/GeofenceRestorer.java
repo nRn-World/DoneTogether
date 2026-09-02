@@ -101,15 +101,18 @@ public final class GeofenceRestorer {
             editor.putString(KEY_GEOFENCES_JSON, geofences.toString());
         }
 
-        List<Geofence> enterList = new ArrayList<>();
-        List<Geofence> exitList = new ArrayList<>();
+        // IMPORTANT: addGeofences() with the same PendingIntent REPLACES previous
+        // geofences. Enter + exit must be registered in a SINGLE call.
+        List<Geofence> fenceList = new ArrayList<>();
+        boolean hasEnter = false;
 
         for (int i = 0; i < geofences.length(); i++) {
             JSONObject geo = geofences.getJSONObject(i);
             String id = geo.getString("id");
             double lat = geo.getDouble("latitude");
             double lng = geo.getDouble("longitude");
-            float radius = (float) geo.optDouble("radius", 100);
+            // Play Services is unreliable below ~100m; keep a practical floor
+            float radius = Math.max((float) geo.optDouble("radius", 100), 50f);
             String title = geo.optString("title", "DoneTogether");
             String message = geo.optString("message", id);
             String trigger = geo.optString("trigger", "enter");
@@ -118,19 +121,17 @@ public final class GeofenceRestorer {
             int transition = isExit
                 ? Geofence.GEOFENCE_TRANSITION_EXIT
                 : Geofence.GEOFENCE_TRANSITION_ENTER;
+            if (!isExit) hasEnter = true;
 
             Geofence fence = new Geofence.Builder()
                 .setRequestId(id)
-                .setCircularRegion(lat, lng, Math.max(radius, 5f))
+                .setCircularRegion(lat, lng, radius)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(transition)
+                .setNotificationResponsiveness(15000)
                 .build();
 
-            if (isExit) {
-                exitList.add(fence);
-            } else {
-                enterList.add(fence);
-            }
+            fenceList.add(fence);
 
             if (persist) {
                 editor.putString("title:" + id, title);
@@ -143,28 +144,25 @@ public final class GeofenceRestorer {
             editor.apply();
         }
 
+        if (fenceList.isEmpty()) {
+            return 0;
+        }
+
         GeofencingClient client = LocationServices.getGeofencingClient(context);
         PendingIntent pendingIntent = getPendingIntent(context);
 
-        if (!enterList.isEmpty()) {
-            GeofencingRequest enterRequest = new GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofences(enterList)
-                .build();
-            Tasks.await(client.addGeofences(enterRequest, pendingIntent), 20, TimeUnit.SECONDS);
-            Log.d(TAG, "Registered " + enterList.size() + " ENTER geofences");
-        }
+        int initialTrigger = hasEnter
+            ? GeofencingRequest.INITIAL_TRIGGER_ENTER
+            : 0;
 
-        if (!exitList.isEmpty()) {
-            GeofencingRequest exitRequest = new GeofencingRequest.Builder()
-                .setInitialTrigger(0)
-                .addGeofences(exitList)
-                .build();
-            Tasks.await(client.addGeofences(exitRequest, pendingIntent), 20, TimeUnit.SECONDS);
-            Log.d(TAG, "Registered " + exitList.size() + " EXIT geofences");
-        }
+        GeofencingRequest request = new GeofencingRequest.Builder()
+            .setInitialTrigger(initialTrigger)
+            .addGeofences(fenceList)
+            .build();
+        Tasks.await(client.addGeofences(request, pendingIntent), 20, TimeUnit.SECONDS);
+        Log.d(TAG, "Registered " + fenceList.size() + " geofences (single request)");
 
-        return enterList.size() + exitList.size();
+        return fenceList.size();
     }
 
     public static void clearPrefs(Context context) {

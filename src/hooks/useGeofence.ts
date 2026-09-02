@@ -1,7 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { usePlans } from './useFirestore';
 import GeofencePlugin, { type GeofenceData } from '../lib/geofence';
+import { showLocalNotification } from '../lib/notify';
+
+export const GEOFENCE_EVENT = 'donetogether:geofence';
+
+export type GeofenceEventDetail = { title: string; body: string };
 
 function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371000;
@@ -29,7 +34,7 @@ function collectActiveGeofences(plans: ReturnType<typeof usePlans>['plans']): Ge
                     id: `${plan.id}:${item.id}`,
                     latitude: item.location.latitude,
                     longitude: item.location.longitude,
-                    radius: item.location.radius || 100,
+                    radius: Math.max(item.location.radius || 100, 50),
                     title: plan.name,
                     message: `${item.text} · ${destination}`,
                     trigger
@@ -41,37 +46,47 @@ function collectActiveGeofences(plans: ReturnType<typeof usePlans>['plans']): Ge
     return activeGeofences;
 }
 
-async function maybeNotifyWeb(title: string, body: string) {
+function signatureOf(fences: GeofenceData[]): string {
+    return fences
+        .map((g) => `${g.id}|${g.latitude}|${g.longitude}|${g.radius}|${g.trigger}|${g.title}|${g.message}`)
+        .sort()
+        .join(';');
+}
+
+function notifyGeofence(title: string, body: string, fenceId: string) {
     try {
-        if (!('Notification' in window)) return;
-        if (Notification.permission === 'default') {
-            await Notification.requestPermission();
-        }
-        if (Notification.permission === 'granted') {
-            new Notification(title, { body, icon: '/pwa-icon.png' });
-        } else {
-            // Fallback so user still sees something while tab is open
-            console.info(`[GPS] ${title}: ${body}`);
-        }
-    } catch (e) {
-        console.warn('Web notification failed', e);
+        window.dispatchEvent(
+            new CustomEvent<GeofenceEventDetail>(GEOFENCE_EVENT, {
+                detail: { title, body }
+            })
+        );
+    } catch {
+        // ignore
     }
+
+    void showLocalNotification(title, body, {
+        tag: `geo-${fenceId}`,
+        requireInteraction: true
+    });
 }
 
 export function useGeofence(userId: string | undefined) {
     const { plans } = usePlans(userId);
     const firedRef = useRef<Set<string>>(new Set());
     const insideRef = useRef<Map<string, boolean>>(new Map());
+    const lastNativeSig = useRef<string>('');
 
-    // Native Android: sync to Play Services geofencing
+    const activeGeofences = useMemo(() => collectActiveGeofences(plans), [plans]);
+    const signature = useMemo(() => signatureOf(activeGeofences), [activeGeofences]);
+
+    // Native Android: sync to Play Services only when fence set actually changes
     useEffect(() => {
-        if (!userId || !plans || !Capacitor.isNativePlatform()) return;
+        if (!userId || !Capacitor.isNativePlatform()) return;
+        if (signature === lastNativeSig.current && signature !== '') return;
 
         let cancelled = false;
 
         const setupGeofences = async () => {
-            const activeGeofences = collectActiveGeofences(plans);
-
             try {
                 const perm = await GeofencePlugin.requestPermission();
                 if (cancelled) return;
@@ -84,8 +99,13 @@ export function useGeofence(userId: string | undefined) {
                 if (cancelled) return;
 
                 if (activeGeofences.length > 0) {
-                    await GeofencePlugin.addGeofences({ geofences: activeGeofences });
+                    const result = await GeofencePlugin.addGeofences({ geofences: activeGeofences });
+                    console.info('[GPS] Native geofences registered:', result);
+                } else {
+                    console.info('[GPS] No active geofences to register');
                 }
+
+                if (!cancelled) lastNativeSig.current = signature;
             } catch (error) {
                 console.error('Failed to set up geofences:', error);
             }
@@ -95,46 +115,52 @@ export function useGeofence(userId: string | undefined) {
         return () => {
             cancelled = true;
         };
-    }, [userId, plans]);
+    }, [userId, signature, activeGeofences]);
 
-    // Web / foreground: proximity check while the tab is open
+    // Foreground proximity (web/PWA always; Android Capacitor as backup while open)
     useEffect(() => {
-        if (!userId || !plans || Capacitor.isNativePlatform()) return;
+        if (!userId) return;
         if (!navigator.geolocation) return;
-
-        const activeGeofences = collectActiveGeofences(plans);
         if (activeGeofences.length === 0) return;
 
-        // Drop fired markers for geofences that no longer exist
         const activeIds = new Set(activeGeofences.map((g) => g.id));
         for (const id of firedRef.current) {
             if (!activeIds.has(id)) firedRef.current.delete(id);
         }
+        for (const id of insideRef.current.keys()) {
+            if (!activeIds.has(id)) insideRef.current.delete(id);
+        }
 
-        const check = (lat: number, lon: number) => {
+        const check = (lat: number, lon: number, accuracy: number) => {
             for (const fence of activeGeofences) {
                 const dist = haversineMeters(lat, lon, fence.latitude, fence.longitude);
-                const radius = fence.radius || 100;
+                const radius = (fence.radius || 100) + Math.min(Math.max(accuracy || 0, 0), 40);
                 const inside = dist <= radius;
                 const wasInside = insideRef.current.get(fence.id);
-                insideRef.current.set(fence.id, inside);
+                const trigger = fence.trigger || 'enter';
 
                 if (wasInside === undefined) {
-                    // First sample — establish baseline, don't fire yet
+                    insideRef.current.set(fence.id, inside);
+                    if (trigger === 'enter' && inside && !firedRef.current.has(fence.id)) {
+                        firedRef.current.add(fence.id);
+                        console.info('[GPS] Initial ENTER', fence.id, Math.round(dist), 'm');
+                        notifyGeofence(fence.title || 'DoneTogether', fence.message || '', fence.id);
+                    }
                     continue;
                 }
 
-                const trigger = fence.trigger || 'enter';
+                insideRef.current.set(fence.id, inside);
+
                 const shouldFire =
                     (trigger === 'enter' && inside && !wasInside) ||
                     (trigger === 'exit' && !inside && wasInside);
 
                 if (shouldFire && !firedRef.current.has(fence.id)) {
                     firedRef.current.add(fence.id);
-                    void maybeNotifyWeb(fence.title || 'DoneTogether', fence.message || '');
+                    console.info('[GPS] Fired', trigger, fence.id, Math.round(dist), 'm');
+                    notifyGeofence(fence.title || 'DoneTogether', fence.message || '', fence.id);
                 }
 
-                // Allow re-fire after leaving then re-entering (or opposite)
                 if (trigger === 'enter' && !inside) {
                     firedRef.current.delete(fence.id);
                 }
@@ -144,15 +170,35 @@ export function useGeofence(userId: string | undefined) {
             }
         };
 
-        const watchId = navigator.geolocation.watchPosition(
-            (pos) => check(pos.coords.latitude, pos.coords.longitude),
-            (err) => console.warn('Web geofence watch error', err),
-            { enableHighAccuracy: false, maximumAge: 10000 }
-            // no timeout — avoids GeolocationPositionError unhandled rejections
+        console.info(
+            '[GPS] Watching',
+            activeGeofences.length,
+            'fence(s)',
+            Capacitor.isNativePlatform() ? '(native+fg)' : '(pwa/web)'
         );
 
-        return () => navigator.geolocation.clearWatch(watchId);
-    }, [userId, plans]);
+        const watchId = navigator.geolocation.watchPosition(
+            (pos) => check(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+            (err) => console.warn('Geofence watch error', err),
+            { enableHighAccuracy: true, maximumAge: 5000 }
+        );
 
-    return {};
+        // Re-check when user returns to the installed PWA
+        const onVisible = () => {
+            if (document.visibilityState !== 'visible') return;
+            navigator.geolocation.getCurrentPosition(
+                (pos) => check(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+                () => undefined,
+                { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+            );
+        };
+        document.addEventListener('visibilitychange', onVisible);
+
+        return () => {
+            navigator.geolocation.clearWatch(watchId);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
+    }, [userId, signature, activeGeofences]);
+
+    return { activeCount: activeGeofences.length };
 }
