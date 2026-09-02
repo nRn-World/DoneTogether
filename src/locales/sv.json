@@ -159,8 +159,13 @@
         "manual_location_name": "Vald plats",
         "gps_trigger_enter": "När jag kommer",
         "gps_trigger_exit": "När jag lämnar",
-        "gps_radius_text": "Notis skickas när du är inom 100m från denna plats.",
-        "gps_radius_text_exit": "Notis skickas när du lämnar platsen (t.ex. hemifrån)."
+        "gps_radius_text": "Välj hur nära du ska vara för att få påminnelsen.",
+        "gps_radius_text_exit": "Välj hur långt bort från platsen du ska gå innan påminnelsen triggas (t.ex. hemifrån).",
+        "gps_radius_label": "Påminn inom",
+        "gps_radius_hint": "Påminnelse vid {{radius}}",
+        "map_pin_hint": "Dra nålen eller tryck på kartan för exakt plats",
+        "map_unavailable": "Kartan kunde inte laddas. Du kan fortfarande använda sök och favoriter.",
+        "resolving_address": "Hämtar adress..."
     },
     "wall_of_fame": {
         "title": "Hedersväggen",

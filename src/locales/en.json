@@ -159,8 +159,13 @@
         "manual_location_name": "Selected place",
         "gps_trigger_enter": "When I arrive",
         "gps_trigger_exit": "When I leave",
-        "gps_radius_text": "Notification is sent when you are within 100m of this location.",
-        "gps_radius_text_exit": "Notification is sent when you leave this place (e.g. home)."
+        "gps_radius_text": "Choose how close you need to be for the reminder.",
+        "gps_radius_text_exit": "Choose how far from the place you must go before the reminder triggers (e.g. leaving home).",
+        "gps_radius_label": "Remind within",
+        "gps_radius_hint": "Reminder at {{radius}}",
+        "map_pin_hint": "Drag the pin or tap the map for the exact place",
+        "map_unavailable": "Map could not load. You can still use search and favorites.",
+        "resolving_address": "Fetching address..."
     },
     "wall_of_fame": {
         "title": "The Wall of Fame",

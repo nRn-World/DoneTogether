@@ -121,7 +121,7 @@ public final class GeofenceRestorer {
 
             Geofence fence = new Geofence.Builder()
                 .setRequestId(id)
-                .setCircularRegion(lat, lng, Math.max(radius, 50f))
+                .setCircularRegion(lat, lng, Math.max(radius, 5f))
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(transition)
                 .build();

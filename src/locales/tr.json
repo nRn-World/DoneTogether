@@ -151,8 +151,13 @@
         "manual_location_name": "Seçilen yer",
         "gps_trigger_enter": "Geldiğimde",
         "gps_trigger_exit": "Ayrıldığımda",
-        "gps_radius_text": "Bu yerin 100m yakınına geldiğinizde bildirim gönderilir.",
-        "gps_radius_text_exit": "Bu yerden ayrıldığınızda bildirim gönderilir (örn. evden çıkınca)."
+        "gps_radius_text": "Hatırlatma için ne kadar yakın olmanız gerektiğini seçin.",
+        "gps_radius_text_exit": "Hatırlatmanın tetiklenmesi için yerden ne kadar uzaklaşmanız gerektiğini seçin (örn. evden çıkınca).",
+        "gps_radius_label": "Şu mesafe içinde hatırlat",
+        "gps_radius_hint": "{{radius}} mesafede hatırlatma",
+        "map_pin_hint": "Tam konum için iğneyi sürükleyin veya haritaya dokunun",
+        "map_unavailable": "Harita yüklenemedi. Arama ve favorileri hâlâ kullanabilirsiniz.",
+        "resolving_address": "Adres alınıyor..."
     },
     "wall_of_fame": {
         "title": "Şöhret Duvarı",

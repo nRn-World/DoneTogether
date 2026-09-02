@@ -32,6 +32,8 @@ import type { Plan, Item } from './types';
 import { useLocation } from './hooks/useLocation';
 import { useGeofence } from './hooks/useGeofence';
 import { AddressAutocomplete } from './components/AddressAutocomplete';
+import { LocationPicker, formatRadius } from './components/LocationPicker';
+import { reverseGeocodeDetailed } from './lib/geocoding';
 import { doc, updateDoc, deleteField } from 'firebase/firestore';
 import { db } from './lib/firebase';
 
@@ -768,15 +770,19 @@ function App() {
                                       }
                                       const location = await getCurrentLocation();
                                       if (location && location.coords) {
+                                        const lat = location.coords.latitude;
+                                        const lng = location.coords.longitude;
+                                        const details = await reverseGeocodeDetailed(lat, lng);
                                         setSelectedAddLocation({
-                                          latitude: location.coords.latitude,
-                                          longitude: location.coords.longitude,
-                                          name: t('profile.current_location_name'),
-                                          radius: 100,
+                                          latitude: lat,
+                                          longitude: lng,
+                                          name: details.name || t('profile.current_location_name'),
+                                          address: details.address,
+                                          radius: selectedAddLocation?.radius || 100,
                                           active: true,
-                                          trigger: 'enter'
+                                          trigger: selectedAddLocation?.trigger || 'enter'
                                         });
-                                        showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
+                                        showToast(t('profile.location_selected_toast', { type: details.name || t('profile.current_location_name') }));
                                       } else {
                                         showToast(t('plans.gps_unavailable_toast'));
                                       }
@@ -803,9 +809,9 @@ function App() {
                                           longitude: location.longitude,
                                           name: location.name,
                                           address: location.address,
-                                          radius: 100,
+                                          radius: selectedAddLocation?.radius || 100,
                                           active: true,
-                                          trigger: 'enter'
+                                          trigger: selectedAddLocation?.trigger || 'enter'
                                         });
                                         showToast(t('profile.location_selected_toast', { type: location.name }));
                                       }}
@@ -837,7 +843,7 @@ function App() {
                                               longitude: loc.longitude,
                                               name: customName || place.label,
                                               address: loc.address,
-                                              radius: 100,
+                                              radius: selectedAddLocation?.radius || (place.defaultTrigger === 'exit' ? 50 : 100),
                                               active: true,
                                               trigger: place.defaultTrigger
                                             });
@@ -852,6 +858,28 @@ function App() {
                                     })}
                                   </div>
                                 </div>
+
+                                {selectedAddLocation && (
+                                  <LocationPicker
+                                    key="add-location-picker"
+                                    latitude={selectedAddLocation.latitude}
+                                    longitude={selectedAddLocation.longitude}
+                                    radius={selectedAddLocation.radius || 100}
+                                    name={selectedAddLocation.name}
+                                    address={selectedAddLocation.address}
+                                    onChange={(next) => {
+                                      setSelectedAddLocation({
+                                        ...selectedAddLocation,
+                                        latitude: next.latitude,
+                                        longitude: next.longitude,
+                                        name: next.name,
+                                        address: next.address,
+                                        radius: next.radius,
+                                        active: true
+                                      });
+                                    }}
+                                  />
+                                )}
 
                                 {selectedAddLocation && (
                                   <div className="grid grid-cols-2 gap-2">
@@ -887,18 +915,30 @@ function App() {
                                 </p>
 
                                 {selectedAddLocation && (
-                                  <div className="pt-2 flex items-center justify-between border-t border-zinc-800/30">
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                      <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-wider">{selectedAddLocation.name}</span>
+                                  <div className="pt-2 space-y-1 border-t border-zinc-800/30">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                                        <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-wider truncate">
+                                          {selectedAddLocation.name}
+                                        </span>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedAddLocation(null)}
+                                        className="text-[9px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-[0.2em] transition-colors shrink-0"
+                                      >
+                                        {t('profile.remove_location')}
+                                      </button>
                                     </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => setSelectedAddLocation(null)}
-                                      className="text-[9px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-[0.2em] transition-colors"
-                                    >
-                                      {t('profile.remove_location')}
-                                    </button>
+                                    {selectedAddLocation.address && (
+                                      <p className="text-[10px] text-zinc-400 pl-3.5 leading-snug">
+                                        {selectedAddLocation.address}
+                                      </p>
+                                    )}
+                                    <p className="text-[9px] text-zinc-500 pl-3.5">
+                                      {t('profile.gps_radius_hint', { radius: formatRadius(selectedAddLocation.radius || 100) })}
+                                    </p>
                                   </div>
                                 )}
                               </div>
@@ -959,12 +999,20 @@ function App() {
                             )}
 
                             {item.location && item.location.active && (
-                                    <div className="mt-3 flex items-center gap-2 bg-emerald-500/5 dark:bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/10 w-fit">
-                                <MapPin className="w-3 h-3 text-emerald-500" />
-                                <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                                  GPS: {item.location.name}
-                                  {item.location.trigger === 'exit' ? ` · ${t('profile.gps_trigger_exit')}` : ''}
-                                </span>
+                              <div className="mt-3 flex flex-col gap-1 bg-emerald-500/5 dark:bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/10 w-fit max-w-full">
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="w-3 h-3 text-emerald-500 shrink-0" />
+                                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                                    GPS: {item.location.name}
+                                    {item.location.trigger === 'exit' ? ` · ${t('profile.gps_trigger_exit')}` : ` · ${t('profile.gps_trigger_enter')}`}
+                                    {` · ${formatRadius(item.location.radius || 100)}`}
+                                  </span>
+                                </div>
+                                {item.location.address && (
+                                  <p className="text-[9px] text-emerald-800/70 dark:text-emerald-400/70 pl-5 leading-snug">
+                                    {item.location.address}
+                                  </p>
+                                )}
                               </div>
                             )}
 
@@ -1623,20 +1671,24 @@ function App() {
                                 }
                                 const location = await getCurrentLocation();
                                 if (location && location.coords) {
+                                  const lat = location.coords.latitude;
+                                  const lng = location.coords.longitude;
+                                  const details = await reverseGeocodeDetailed(lat, lng);
                                   const newLocation = {
-                                    latitude: location.coords.latitude,
-                                    longitude: location.coords.longitude,
-                                    name: t('profile.current_location_name'),
-                                    radius: 100,
+                                    latitude: lat,
+                                    longitude: lng,
+                                    name: details.name || t('profile.current_location_name'),
+                                    address: details.address,
+                                    radius: editingItem.item.location?.radius || 100,
                                     active: true,
-                                    trigger: 'enter' as const
+                                    trigger: (editingItem.item.location?.trigger || 'enter') as 'enter' | 'exit'
                                   };
                                   await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
                                   setEditingItem({
                                     ...editingItem,
                                     item: { ...editingItem.item, location: newLocation }
                                   });
-                                  showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
+                                  showToast(t('profile.location_selected_toast', { type: details.name || t('profile.current_location_name') }));
                                 } else {
                                   showToast(t('plans.gps_unavailable_toast'));
                                 }
@@ -1663,9 +1715,9 @@ function App() {
                                     longitude: location.longitude,
                                     name: location.name,
                                     address: location.address,
-                                    radius: 100,
+                                    radius: editingItem.item.location?.radius || 100,
                                     active: true,
-                                    trigger: 'enter' as const
+                                    trigger: (editingItem.item.location?.trigger || 'enter') as 'enter' | 'exit'
                                   };
                                   await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
                                   setEditingItem({
@@ -1702,7 +1754,7 @@ function App() {
                                         longitude: loc.longitude,
                                         name: customName || place.label,
                                         address: loc.address,
-                                        radius: 100,
+                                        radius: editingItem.item.location?.radius || (place.defaultTrigger === 'exit' ? 50 : 100),
                                         active: true,
                                         trigger: place.defaultTrigger
                                       };
@@ -1722,6 +1774,33 @@ function App() {
                               })}
                             </div>
                           </div>
+
+                          {editingItem.item.location && (
+                            <LocationPicker
+                              key="edit-location-picker"
+                              latitude={editingItem.item.location.latitude}
+                              longitude={editingItem.item.location.longitude}
+                              radius={editingItem.item.location.radius || 100}
+                              name={editingItem.item.location.name}
+                              address={editingItem.item.location.address}
+                              onChange={async (next) => {
+                                const newLocation = {
+                                  ...editingItem.item.location!,
+                                  latitude: next.latitude,
+                                  longitude: next.longitude,
+                                  name: next.name,
+                                  address: next.address,
+                                  radius: next.radius,
+                                  active: true
+                                };
+                                setEditingItem({
+                                  ...editingItem,
+                                  item: { ...editingItem.item, location: newLocation }
+                                });
+                                await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
+                              }}
+                            />
+                          )}
 
                           {editingItem.item.location && (
                             <div className="grid grid-cols-2 gap-2">
@@ -1771,25 +1850,37 @@ function App() {
                           </p>
 
                           {editingItem.item.location && (
-                            <div className="pt-2 flex items-center justify-between border-t border-zinc-800/30">
-                              <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-wider">{editingItem.item.location.name}</span>
+                            <div className="pt-2 space-y-1 border-t border-zinc-800/30">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                                  <span className="text-[10px] font-bold text-emerald-500/80 uppercase tracking-wider truncate">
+                                    {editingItem.item.location.name}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    await updateItem(editingItem.planId, editingItem.item.id, { location: undefined });
+                                    setEditingItem({
+                                      ...editingItem,
+                                      item: { ...editingItem.item, location: undefined }
+                                    });
+                                    showToast(t('profile.remove_location'));
+                                  }}
+                                  className="text-[9px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-[0.2em] transition-colors shrink-0"
+                                >
+                                  {t('profile.remove_location')}
+                                </button>
                               </div>
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  await updateItem(editingItem.planId, editingItem.item.id, { location: undefined });
-                                  setEditingItem({
-                                    ...editingItem,
-                                    item: { ...editingItem.item, location: undefined }
-                                  });
-                                  showToast(t('profile.remove_location'));
-                                }}
-                                className="text-[9px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-[0.2em] transition-colors"
-                              >
-                                {t('profile.remove_location')}
-                              </button>
+                              {editingItem.item.location.address && (
+                                <p className="text-[10px] text-zinc-400 pl-3.5 leading-snug">
+                                  {editingItem.item.location.address}
+                                </p>
+                              )}
+                              <p className="text-[9px] text-zinc-500 pl-3.5">
+                                {t('profile.gps_radius_hint', { radius: formatRadius(editingItem.item.location.radius || 100) })}
+                              </p>
                             </div>
                           )}
                         </div>

@@ -194,17 +194,65 @@ function getGooglePlaceDetails(placeId: string): Promise<GeocodingResult | null>
 }
 
 export async function reverseGeocode(lat: number, lon: number): Promise<string> {
+    const detailed = await reverseGeocodeDetailed(lat, lon);
+    return detailed.address || detailed.name || '';
+}
+
+export async function reverseGeocodeDetailed(
+    lat: number,
+    lon: number
+): Promise<{ name: string; address: string }> {
+    // Prefer Google Geocoder when available
+    if (typeof google !== 'undefined' && google.maps?.Geocoder) {
+        try {
+            const googleResult = await new Promise<{ name: string; address: string } | null>((resolve) => {
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode(
+                    { location: { lat, lng: lon }, language: 'sv' },
+                    (results: any, status: any) => {
+                        if (status !== 'OK' || !results?.[0]) {
+                            resolve(null);
+                            return;
+                        }
+                        const top = results[0];
+                        const formatted = top.formatted_address || '';
+                        const route = top.address_components?.find((c: any) =>
+                            c.types.includes('route')
+                        )?.long_name;
+                        const number = top.address_components?.find((c: any) =>
+                            c.types.includes('street_number')
+                        )?.long_name;
+                        const name =
+                            route && number ? `${route} ${number}` : route || formatted.split(',')[0];
+                        resolve({ name: name || formatted, address: formatted });
+                    }
+                );
+            });
+            if (googleResult?.address) return googleResult;
+        } catch (e) {
+            console.warn('[geocoding] Google reverse failed', e);
+        }
+    }
+
     try {
         const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=jsonv2&addressdetails=1&accept-language=sv`;
         const response = await fetch(url, { headers: { 'User-Agent': 'DoneTogether/1.0' } });
         const data = await response.json();
-        const addr = data.address;
-
-        if (addr && addr.road) {
-            return `${addr.road}${addr.house_number ? ' ' + addr.house_number : ''}`;
-        }
-        return data.display_name.split(',')[0];
+        const addr = data.address || {};
+        const road = addr.road || addr.pedestrian || '';
+        const house = addr.house_number ? ` ${addr.house_number}` : '';
+        const city = addr.city || addr.town || addr.village || addr.municipality || '';
+        const name = road ? `${road}${house}` : data.name || (data.display_name || '').split(',')[0];
+        const parts = [name, city, addr.postcode].filter(Boolean);
+        return {
+            name: name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`,
+            address: data.display_name || parts.join(', ')
+        };
     } catch {
-        return '';
+        return {
+            name: `${lat.toFixed(5)}, ${lon.toFixed(5)}`,
+            address: `${lat.toFixed(5)}, ${lon.toFixed(5)}`
+        };
     }
 }
+
