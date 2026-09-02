@@ -120,25 +120,28 @@ export async function createPlan(
     imageUrl?: string
 ): Promise<string> {
     const plansRef = collection(db, 'plans');
+    const ownerMember: PlanMember = {
+        uid: userId,
+        email: userEmail || '',
+        displayName: userName || 'Ägare',
+        role: 'owner',
+        joinedAt: Timestamp.now(),
+    };
+    if (userPhoto) ownerMember.photoURL = userPhoto;
+
     const newPlan: Omit<Plan, 'id'> = {
         name,
         ownerId: userId,
         members: {
-            [userId]: {
-                uid: userId,
-                email: userEmail,
-                displayName: userName,
-                photoURL: userPhoto,
-                role: 'owner',
-                joinedAt: Timestamp.now(),
-            },
+            [userId]: ownerMember,
         },
         items: [],
         created: Timestamp.now(),
         completed: false,
         lastModified: Timestamp.now(),
-        imageUrl
     };
+    if (imageUrl) newPlan.imageUrl = imageUrl;
+
     const docRef = await addDoc(plansRef, newPlan);
     return docRef.id;
 }
