@@ -5,22 +5,60 @@ import './i18n'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
-// Global error handler for debugging
-window.onerror = function (message, source, lineno, colno, error) {
-  console.error('[GLOBAL ERROR]', message, source, lineno, colno, error);
-  return false;
-};
+function isGeolocationRejection(reason: unknown): boolean {
+  if (reason == null) return false
+  try {
+    const anyReason = reason as { code?: number; message?: string; name?: string }
+    const text = [
+      Object.prototype.toString.call(reason),
+      String(reason),
+      anyReason.message || '',
+      anyReason.name || '',
+    ]
+      .join(' ')
+      .toLowerCase()
+    if (text.includes('geolocation') || text.includes('positionerror')) return true
+    if (typeof anyReason.code === 'number' && anyReason.code >= 1 && anyReason.code <= 3) {
+      return true
+    }
+  } catch {
+    /* ignore */
+  }
+  return false
+}
 
-window.addEventListener('unhandledrejection', function (event) {
-  console.error('[UNHANDLED PROMISE]', event.reason);
-});
+// Override aggressive index.html handlers — never wipe the UI for GPS errors
+window.onerror = function (message, _source, _lineno, _colno, error) {
+  const msg = String(message || '')
+  if (/geolocation|positionerror/i.test(msg) || isGeolocationRejection(error)) {
+    console.warn('[GPS] swallowed window.onerror:', message)
+    return true
+  }
+  console.error('[GLOBAL ERROR]', message, error)
+  return false
+}
+
+window.onunhandledrejection = function (event) {
+  if (isGeolocationRejection(event.reason)) {
+    console.warn('[GPS] swallowed unhandledrejection:', event.reason)
+    event.preventDefault()
+    return
+  }
+  console.error('[UNHANDLED PROMISE]', event.reason)
+}
+
+window.addEventListener('unhandledrejection', (event) => {
+  if (isGeolocationRejection(event.reason)) {
+    console.warn('[GPS] swallowed unhandledrejection listener:', event.reason)
+    event.preventDefault()
+  }
+})
 
 try {
-  console.log('[main.tsx] Starting app initialization...');
-  const rootElement = document.getElementById('root');
-  if (!rootElement) throw new Error('Root element not found');
+  console.log('[main.tsx] Starting app initialization...')
+  const rootElement = document.getElementById('root')
+  if (!rootElement) throw new Error('Root element not found')
 
-  console.log('[main.tsx] Root element found, creating React root...');
   createRoot(rootElement).render(
     <StrictMode>
       <ErrorBoundary>
@@ -28,26 +66,26 @@ try {
       </ErrorBoundary>
     </StrictMode>,
   )
-  console.log('[main.tsx] React app rendered successfully');
+  console.log('[main.tsx] React app rendered successfully')
 } catch (error) {
-  console.error('[main.tsx] CRITICAL ERROR during app initialization:', error);
-  document.body.textContent = '';
+  console.error('[main.tsx] CRITICAL ERROR during app initialization:', error)
+  document.body.textContent = ''
 
-  const wrapper = document.createElement('div');
-  wrapper.style.background = '#09090b';
-  wrapper.style.color = '#fff';
-  wrapper.style.minHeight = '100vh';
-  wrapper.style.padding = '20px';
-  wrapper.style.fontFamily = 'monospace';
+  const wrapper = document.createElement('div')
+  wrapper.style.background = '#09090b'
+  wrapper.style.color = '#fff'
+  wrapper.style.minHeight = '100vh'
+  wrapper.style.padding = '20px'
+  wrapper.style.fontFamily = 'monospace'
 
-  const title = document.createElement('h1');
-  title.style.color = '#ef4444';
-  title.textContent = 'Startup Error';
+  const title = document.createElement('h1')
+  title.style.color = '#ef4444'
+  title.textContent = 'Startup Error'
 
-  const pre = document.createElement('pre');
-  pre.textContent = error instanceof Error ? (error.stack || error.message) : String(error);
+  const pre = document.createElement('pre')
+  pre.textContent = error instanceof Error ? error.stack || error.message : String(error)
 
-  wrapper.appendChild(title);
-  wrapper.appendChild(pre);
-  document.body.appendChild(wrapper);
+  wrapper.appendChild(title)
+  wrapper.appendChild(pre)
+  document.body.appendChild(wrapper)
 }

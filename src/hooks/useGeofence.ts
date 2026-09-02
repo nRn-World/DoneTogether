@@ -147,7 +147,8 @@ export function useGeofence(userId: string | undefined) {
         const watchId = navigator.geolocation.watchPosition(
             (pos) => check(pos.coords.latitude, pos.coords.longitude),
             (err) => console.warn('Web geofence watch error', err),
-            { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+            { enableHighAccuracy: false, maximumAge: 10000 }
+            // no timeout — avoids GeolocationPositionError unhandled rejections
         );
 
         return () => navigator.geolocation.clearWatch(watchId);

@@ -19,50 +19,21 @@
 <body>
   <div id="root"></div>
   <script>
-    function renderStartupError(title, details, trace) {
-      document.body.textContent = '';
-      const root = document.createElement('div');
-      root.style.background = '#09090b';
-      root.style.color = '#fff';
-      root.style.minHeight = '100vh';
-      root.style.padding = '20px';
-      root.style.fontFamily = 'monospace';
-      root.style.fontSize = '14px';
-      const heading = document.createElement('h1');
-      heading.style.color = '#ef4444';
-      heading.style.marginBottom = '20px';
-      heading.textContent = title;
-      const card = document.createElement('div');
-      card.style.background = '#18181b';
-      card.style.padding = '20px';
-      card.style.border = '1px solid #27272a';
-      card.style.borderRadius = '12px';
-      card.style.overflow = 'auto';
-      const detailsEl = document.createElement('div');
-      detailsEl.style.color = '#f87171';
-      detailsEl.style.marginBottom = '10px';
-      detailsEl.textContent = details;
-      card.appendChild(detailsEl);
-      if (trace) {
-        const traceEl = document.createElement('pre');
-        traceEl.style.marginTop = '15px';
-        traceEl.style.color = '#a1a1aa';
-        traceEl.style.whiteSpace = 'pre-wrap';
-        traceEl.textContent = trace;
-        card.appendChild(traceEl);
-      }
-      root.appendChild(heading);
-      root.appendChild(card);
-      document.body.appendChild(root);
-    }
+    // Endast logga — rensa ALDRIG hela sidan vid runtime-fel (t.ex. GPS).
+    // Annars mister användaren appen vid vanliga GeolocationPositionError.
     window.onerror = function (message, source, lineno, colno, error) {
-      const details = `${String(message)} (${String(source)}:${String(lineno)}:${String(colno)})`;
-      const trace = error && error.stack ? error.stack : 'No stack trace';
-      renderStartupError('CRITICAL ERROR (Pre-React)', details, trace);
+      console.error('[Pre-React error]', message, source, lineno, colno, error);
+      return false;
     };
     window.onunhandledrejection = function (event) {
-      const reason = event && event.reason != null ? String(event.reason) : 'Unknown reason';
-      renderStartupError('UNHANDLED PROMISE REJECTION', `Reason: ${reason}`);
+      console.error('[Pre-React rejection]', event && event.reason);
+      try {
+        var r = event && event.reason;
+        var text = (r != null ? String(r) : '') + (r && r.message ? r.message : '');
+        if (/geolocation|positionerror/i.test(text) || (r && typeof r.code === 'number' && r.code >= 1 && r.code <= 3)) {
+          if (event.preventDefault) event.preventDefault();
+        }
+      } catch (e) {}
     };
   </script>
   <script type="module" src="/src/main.tsx"></script>

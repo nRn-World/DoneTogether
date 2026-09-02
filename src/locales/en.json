@@ -111,6 +111,7 @@
         "join_error_text": "Could not join the plan. Try again.",
         "gps_required_toast": "GPS required for your reminders!",
         "gps_denied_toast": "GPS denied. Open settings and allow location for the app.",
+        "gps_unavailable_toast": "Could not get your location. Allow location in the browser and try again.",
         "cover_image_label": "Cover image (Nice!)",
         "cover_image_placeholder": "Click to choose image",
         "plan_name_label": "What should the plan be called?",

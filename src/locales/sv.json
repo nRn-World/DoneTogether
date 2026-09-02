@@ -111,6 +111,7 @@
         "join_error_text": "Kunde inte gå med i planen. Försök igen.",
         "gps_required_toast": "GPS krävs för dina påminnelser!",
         "gps_denied_toast": "GPS nekad. Öppna inställningar och tillåt plats för appen.",
+        "gps_unavailable_toast": "Kunde inte hämta din plats. Tillåt plats i webbläsaren och försök igen.",
         "cover_image_label": "Omslagsbild (Snyggt!)",
         "cover_image_placeholder": "Klicka för att välja bild",
         "plan_name_label": "Vad ska planen heta?",

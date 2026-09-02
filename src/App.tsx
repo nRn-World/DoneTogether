@@ -734,17 +734,31 @@ function App() {
                                 <button
                                   type="button"
                                   onClick={async () => {
-                                     const location = await getCurrentLocation();
-                                    if (location && location.coords) {
-                                      setSelectedAddLocation({
-                                        latitude: location.coords.latitude,
-                                        longitude: location.coords.longitude,
-                                        name: t('profile.current_location_name'),
-                                        radius: 100,
-                                        active: true,
-                                        trigger: 'enter'
-                                      });
-                                      showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
+                                    try {
+                                      if (permissionStatus === 'denied') {
+                                        showToast(t('plans.gps_denied_toast'));
+                                        return;
+                                      }
+                                      const location = await getCurrentLocation();
+                                      if (location && location.coords) {
+                                        setSelectedAddLocation({
+                                          latitude: location.coords.latitude,
+                                          longitude: location.coords.longitude,
+                                          name: t('profile.current_location_name'),
+                                          radius: 100,
+                                          active: true,
+                                          trigger: 'enter'
+                                        });
+                                        showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
+                                      } else {
+                                        showToast(
+                                          permissionStatus === 'denied'
+                                            ? t('plans.gps_denied_toast')
+                                            : t('plans.gps_unavailable_toast')
+                                        );
+                                      }
+                                    } catch {
+                                      showToast(t('plans.gps_unavailable_toast'));
                                     }
                                   }}
                                   className="w-full py-5 px-6 bg-[#18181b] border border-zinc-800/80 rounded-[20px] text-xs font-bold text-zinc-300 hover:border-emerald-500/30 hover:bg-[#1d1d21] transition-all flex items-center justify-center gap-3 shadow-lg"
@@ -1575,26 +1589,36 @@ function App() {
                           <button
                             type="button"
                             onClick={async () => {
-                              if (permissionStatus === 'denied') {
-                                showToast(t('plans.gps_denied_toast'));
-                                return;
-                              }
-                              const location = await getCurrentLocation();
-                              if (location && location.coords) {
-                                const newLocation = {
-                                  latitude: location.coords.latitude,
-                                  longitude: location.coords.longitude,
-                                  name: t('profile.current_location_name'),
-                                  radius: 100,
-                                  active: true,
-                                  trigger: 'enter' as const
-                                };
-                                await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
-                                setEditingItem({
-                                  ...editingItem,
-                                  item: { ...editingItem.item, location: newLocation }
-                                });
-                                showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
+                              try {
+                                if (permissionStatus === 'denied') {
+                                  showToast(t('plans.gps_denied_toast'));
+                                  return;
+                                }
+                                const location = await getCurrentLocation();
+                                if (location && location.coords) {
+                                  const newLocation = {
+                                    latitude: location.coords.latitude,
+                                    longitude: location.coords.longitude,
+                                    name: t('profile.current_location_name'),
+                                    radius: 100,
+                                    active: true,
+                                    trigger: 'enter' as const
+                                  };
+                                  await updateItem(editingItem.planId, editingItem.item.id, { location: newLocation });
+                                  setEditingItem({
+                                    ...editingItem,
+                                    item: { ...editingItem.item, location: newLocation }
+                                  });
+                                  showToast(t('profile.location_selected_toast', { type: t('profile.current_location_name') }));
+                                } else {
+                                  showToast(
+                                    permissionStatus === 'denied'
+                                      ? t('plans.gps_denied_toast')
+                                      : t('plans.gps_unavailable_toast')
+                                  );
+                                }
+                              } catch {
+                                showToast(t('plans.gps_unavailable_toast'));
                               }
                             }}
                             className="w-full py-5 px-6 bg-[#18181b] border border-zinc-800/80 rounded-[20px] text-xs font-bold text-zinc-300 hover:border-emerald-500/30 hover:bg-[#1d1d21] transition-all flex items-center justify-center gap-3 shadow-lg"

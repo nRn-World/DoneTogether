@@ -103,6 +103,7 @@
         "join_error_text": "Plana katılamadı. Tekrar deneyin.",
         "gps_required_toast": "Hatırlatmalarınız için GPS gerekli!",
         "gps_denied_toast": "GPS reddedildi. Ayarları açın ve uygulama için konuma izin verin.",
+        "gps_unavailable_toast": "Konumunuz alınamadı. Tarayıcıda konuma izin verin ve tekrar deneyin.",
         "cover_image_label": "Kapak görseli (Güzel!)",
         "cover_image_placeholder": "Görsel seçmek için tıklayın",
         "plan_name_label": "Planın adı ne olsun?",
