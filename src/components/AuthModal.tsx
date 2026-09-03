@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { LogIn, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { APP_VERSION } from '../config/appVersion';
 
 interface AuthModalProps {
     onSignIn: () => void;
@@ -52,7 +53,6 @@ export function AuthModal({ onSignIn, onClose, error }: AuthModalProps) {
                             await onSignIn();
                         } catch (error) {
                             console.error('Error in onSignIn:', error);
-                            // Appen bör inte krascha här, men vi loggar felet
                         }
                     }}
                     className="w-full h-16 rounded-2xl bg-zinc-950 dark:bg-white text-white dark:text-black font-black italic uppercase tracking-widest flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10"
@@ -95,6 +95,10 @@ export function AuthModal({ onSignIn, onClose, error }: AuthModalProps) {
                     <LogIn className="w-5 h-5" />
                     {t('auth.login_email')} (snart)
                 </button>
+
+                <p className="mt-6 text-center text-[10px] font-medium tracking-wide text-zinc-400 dark:text-zinc-600">
+                    {t('update.version_label', { version: APP_VERSION })}
+                </p>
             </motion.div>
         </div>
     );

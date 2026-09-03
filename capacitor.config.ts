@@ -11,9 +11,8 @@ const config: CapacitorConfig = {
     hostname: 'nrnworld.one'
   },
   plugins: {
-    CapacitorHttp: {
-      enabled: true
-    },
+    // Do NOT enable CapacitorHttp globally — it strips Referer and breaks Firebase Auth
+    // (auth/requests-from-referer-<empty>-are-blocked). App update checks call CapacitorHttp explicitly.
     GoogleAuth: {
       scopes: ['profile', 'email'],
       serverClientId: '677287957451-6vja60qu97qvobgr61li4b3dlrj1pslq.apps.googleusercontent.com',

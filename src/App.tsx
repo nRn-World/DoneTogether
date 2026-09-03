@@ -1448,6 +1448,9 @@ function App() {
 
       {/* Navigation Bar */}
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-zinc-950/80 border-t border-zinc-200 dark:border-zinc-800/50 backdrop-blur-xl pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-none">
+        <p className="text-center text-[9px] font-medium tracking-wide text-zinc-400 dark:text-zinc-600 pt-1.5">
+          {t('update.version_label', { version: APP_VERSION })}
+        </p>
         <div className="max-w-3xl mx-auto px-10 h-20 flex items-center justify-between">
           <button
             onClick={() => setActiveTab('home')}
