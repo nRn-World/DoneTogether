@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.2.0",
-  "apkUrl": "https://github.com/nRn-World/DoneTogether/releases/download/v1.2.0/DoneTogether-1.2.0.apk",
-  "notes": "Riktig 1.2.0 med korrekt versionsnummer inbakat."
+  "version": "1.2.1",
+  "apkUrl": "https://github.com/nRn-World/DoneTogether/releases/download/v1.2.1/DoneTogether-1.2.1.apk",
+  "notes": "Fix Google-login (Referer) + visa appversion längst ner."
 }
