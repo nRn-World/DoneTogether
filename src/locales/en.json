@@ -120,6 +120,8 @@
         "gps_permission_later": "Later",
         "gps_permission_granted_toast": "Location allowed!",
         "gps_permission_denied_toast": "You denied location. You can enable it later via the lock icon in the browser.",
+        "gps_sim_button": "Test GPS (simulate)",
+        "gps_sim_start": "Simulating GPS… wait for notification",
         "cover_image_label": "Cover image (Nice!)",
         "cover_image_placeholder": "Click to choose image",
         "plan_name_label": "What should the plan be called?",

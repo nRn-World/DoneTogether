@@ -112,6 +112,8 @@
         "gps_permission_later": "Sonra",
         "gps_permission_granted_toast": "Konuma izin verildi!",
         "gps_permission_denied_toast": "Konumu reddettiniz. Daha sonra tarayıcıdaki kilit simgesinden açabilirsiniz.",
+        "gps_sim_button": "GPS test et (simüle)",
+        "gps_sim_start": "GPS simüle ediliyor… bildirimi bekleyin",
         "cover_image_label": "Kapak görseli (Güzel!)",
         "cover_image_placeholder": "Görsel seçmek için tıklayın",
         "plan_name_label": "Planın adı ne olsun?",

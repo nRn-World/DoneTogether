@@ -3,21 +3,14 @@ import { Capacitor } from '@capacitor/core';
 import { usePlans } from './useFirestore';
 import GeofencePlugin, { type GeofenceData } from '../lib/geofence';
 import { showLocalNotification } from '../lib/notify';
+import { evaluateGeofenceSample } from '../lib/geofenceLogic';
 
 export const GEOFENCE_EVENT = 'donetogether:geofence';
+/** Dispatch to inject a fake GPS fix (for testing without moving). */
+export const FAKE_LOCATION_EVENT = 'donetogether:fake-location';
 
 export type GeofenceEventDetail = { title: string; body: string };
-
-function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371000;
-    const toRad = (d: number) => (d * Math.PI) / 180;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+export type FakeLocationDetail = { latitude: number; longitude: number; accuracy?: number };
 
 function collectActiveGeofences(plans: ReturnType<typeof usePlans>['plans']): GeofenceData[] {
     const activeGeofences: GeofenceData[] = [];
@@ -70,14 +63,84 @@ function notifyGeofence(title: string, body: string, fenceId: string) {
     });
 }
 
+/** ~offset degrees ≈ meters / 111320 (rough, fine for sim near fence). */
+export function offsetLatLon(lat: number, lon: number, northMeters: number, eastMeters: number) {
+    const dLat = northMeters / 111320;
+    const dLon = eastMeters / (111320 * Math.cos((lat * Math.PI) / 180));
+    return { latitude: lat + dLat, longitude: lon + dLon };
+}
+
+/**
+ * Simulate walking: first outside the zone, then inside (ENTER),
+ * or first inside then outside (EXIT). Fires the same path as real GPS.
+ */
+export async function simulateGeofenceApproach(
+    fence: { latitude: number; longitude: number; radius: number; trigger?: 'enter' | 'exit' },
+    pauseMs = 800
+): Promise<void> {
+    const trigger = fence.trigger === 'exit' ? 'exit' : 'enter';
+    const outside = offsetLatLon(fence.latitude, fence.longitude, (fence.radius || 100) + 120, 0);
+    const inside = offsetLatLon(fence.latitude, fence.longitude, 5, 0);
+
+    const send = (latitude: number, longitude: number) => {
+        window.dispatchEvent(
+            new CustomEvent<FakeLocationDetail>(FAKE_LOCATION_EVENT, {
+                detail: { latitude, longitude, accuracy: 10 }
+            })
+        );
+    };
+
+    if (trigger === 'enter') {
+        send(outside.latitude, outside.longitude);
+        await new Promise((r) => setTimeout(r, pauseMs));
+        send(inside.latitude, inside.longitude);
+    } else {
+        send(inside.latitude, inside.longitude);
+        await new Promise((r) => setTimeout(r, pauseMs));
+        send(outside.latitude, outside.longitude);
+    }
+}
+
 export function useGeofence(userId: string | undefined) {
     const { plans } = usePlans(userId);
     const firedRef = useRef<Set<string>>(new Set());
     const insideRef = useRef<Map<string, boolean>>(new Map());
     const lastNativeSig = useRef<string>('');
+    const fencesRef = useRef<GeofenceData[]>([]);
 
     const activeGeofences = useMemo(() => collectActiveGeofences(plans), [plans]);
     const signature = useMemo(() => signatureOf(activeGeofences), [activeGeofences]);
+    fencesRef.current = activeGeofences;
+
+    const runCheck = (lat: number, lon: number, accuracy: number) => {
+        for (const fence of fencesRef.current) {
+            const prevInside = insideRef.current.get(fence.id);
+            const alreadyFired = firedRef.current.has(fence.id);
+            const result = evaluateGeofenceSample({
+                userLat: lat,
+                userLon: lon,
+                fenceLat: fence.latitude,
+                fenceLon: fence.longitude,
+                radiusMeters: fence.radius || 100,
+                accuracyMeters: accuracy,
+                trigger: fence.trigger === 'exit' ? 'exit' : 'enter',
+                prevInside,
+                alreadyFired
+            });
+
+            insideRef.current.set(fence.id, result.inside);
+
+            if (result.shouldNotify) {
+                firedRef.current.add(fence.id);
+                console.info('[GPS] Fired', fence.trigger || 'enter', fence.id, Math.round(result.distMeters), 'm');
+                notifyGeofence(fence.title || 'DoneTogether', fence.message || '', fence.id);
+            } else if (!result.fired) {
+                firedRef.current.delete(fence.id);
+            } else {
+                firedRef.current.add(fence.id);
+            }
+        }
+    };
 
     // Native Android: sync to Play Services only when fence set actually changes
     useEffect(() => {
@@ -117,7 +180,7 @@ export function useGeofence(userId: string | undefined) {
         };
     }, [userId, signature, activeGeofences]);
 
-    // Foreground proximity (web/PWA always; Android Capacitor as backup while open)
+    // Foreground proximity + fake GPS for testing
     useEffect(() => {
         if (!userId) return;
         if (!navigator.geolocation) return;
@@ -131,45 +194,6 @@ export function useGeofence(userId: string | undefined) {
             if (!activeIds.has(id)) insideRef.current.delete(id);
         }
 
-        const check = (lat: number, lon: number, accuracy: number) => {
-            for (const fence of activeGeofences) {
-                const dist = haversineMeters(lat, lon, fence.latitude, fence.longitude);
-                const radius = (fence.radius || 100) + Math.min(Math.max(accuracy || 0, 0), 40);
-                const inside = dist <= radius;
-                const wasInside = insideRef.current.get(fence.id);
-                const trigger = fence.trigger || 'enter';
-
-                if (wasInside === undefined) {
-                    insideRef.current.set(fence.id, inside);
-                    if (trigger === 'enter' && inside && !firedRef.current.has(fence.id)) {
-                        firedRef.current.add(fence.id);
-                        console.info('[GPS] Initial ENTER', fence.id, Math.round(dist), 'm');
-                        notifyGeofence(fence.title || 'DoneTogether', fence.message || '', fence.id);
-                    }
-                    continue;
-                }
-
-                insideRef.current.set(fence.id, inside);
-
-                const shouldFire =
-                    (trigger === 'enter' && inside && !wasInside) ||
-                    (trigger === 'exit' && !inside && wasInside);
-
-                if (shouldFire && !firedRef.current.has(fence.id)) {
-                    firedRef.current.add(fence.id);
-                    console.info('[GPS] Fired', trigger, fence.id, Math.round(dist), 'm');
-                    notifyGeofence(fence.title || 'DoneTogether', fence.message || '', fence.id);
-                }
-
-                if (trigger === 'enter' && !inside) {
-                    firedRef.current.delete(fence.id);
-                }
-                if (trigger === 'exit' && inside) {
-                    firedRef.current.delete(fence.id);
-                }
-            }
-        };
-
         console.info(
             '[GPS] Watching',
             activeGeofences.length,
@@ -178,27 +202,35 @@ export function useGeofence(userId: string | undefined) {
         );
 
         const watchId = navigator.geolocation.watchPosition(
-            (pos) => check(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+            (pos) => runCheck(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
             (err) => console.warn('Geofence watch error', err),
             { enableHighAccuracy: true, maximumAge: 5000 }
         );
 
-        // Re-check when user returns to the installed PWA
         const onVisible = () => {
             if (document.visibilityState !== 'visible') return;
             navigator.geolocation.getCurrentPosition(
-                (pos) => check(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+                (pos) => runCheck(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
                 () => undefined,
                 { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
             );
         };
         document.addEventListener('visibilitychange', onVisible);
 
+        const onFake = (event: Event) => {
+            const detail = (event as CustomEvent<FakeLocationDetail>).detail;
+            if (!detail) return;
+            console.info('[GPS] Fake location', detail.latitude, detail.longitude);
+            runCheck(detail.latitude, detail.longitude, detail.accuracy ?? 10);
+        };
+        window.addEventListener(FAKE_LOCATION_EVENT, onFake);
+
         return () => {
             navigator.geolocation.clearWatch(watchId);
             document.removeEventListener('visibilitychange', onVisible);
+            window.removeEventListener(FAKE_LOCATION_EVENT, onFake);
         };
     }, [userId, signature, activeGeofences]);
 
-    return { activeCount: activeGeofences.length };
+    return { activeCount: activeGeofences.length, activeGeofences };
 }

@@ -29,7 +29,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import type { Plan, Item } from './types';
 
 import { useLocation } from './hooks/useLocation';
-import { useGeofence, GEOFENCE_EVENT, type GeofenceEventDetail } from './hooks/useGeofence';
+import { useGeofence, GEOFENCE_EVENT, simulateGeofenceApproach, type GeofenceEventDetail } from './hooks/useGeofence';
 import { AddressAutocomplete } from './components/AddressAutocomplete';
 import { LocationPicker, formatRadius } from './components/LocationPicker';
 import { reverseGeocodeDetailed } from './lib/geocoding';
@@ -1016,6 +1016,21 @@ function App() {
                                     {item.location.address}
                                   </p>
                                 )}
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    showToast(t('plans.gps_sim_start'));
+                                    await simulateGeofenceApproach({
+                                      latitude: item.location!.latitude,
+                                      longitude: item.location!.longitude,
+                                      radius: item.location!.radius || 100,
+                                      trigger: item.location!.trigger === 'exit' ? 'exit' : 'enter'
+                                    });
+                                  }}
+                                  className="mt-1 ml-5 text-[9px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 hover:underline text-left"
+                                >
+                                  {t('plans.gps_sim_button')}
+                                </button>
                               </div>
                             )}
 

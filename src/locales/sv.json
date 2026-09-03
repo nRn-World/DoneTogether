@@ -120,6 +120,8 @@
         "gps_permission_later": "Senare",
         "gps_permission_granted_toast": "Plats tillåten!",
         "gps_permission_denied_toast": "Du nekade plats. Du kan aktivera det senare via lås-ikonen i webbläsaren.",
+        "gps_sim_button": "Testa GPS (simulera)",
+        "gps_sim_start": "Simulerar GPS… vänta på notis",
         "cover_image_label": "Omslagsbild (Snyggt!)",
         "cover_image_placeholder": "Klicka för att välja bild",
         "plan_name_label": "Vad ska planen heta?",
