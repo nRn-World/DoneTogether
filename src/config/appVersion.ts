@@ -3,7 +3,7 @@
  * Bump both when shipping a new APK, then publish a GitHub Release
  * tagged vX.Y.Z with the APK attached.
  */
-export const APP_VERSION = '1.1.5';
+export const APP_VERSION = '1.1.6';
 
 export const GITHUB_OWNER = 'nRn-World';
 export const GITHUB_REPO = 'DoneTogether';
