@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.2.1",
-  "apkUrl": "https://github.com/nRn-World/DoneTogether/releases/download/v1.2.1/DoneTogether-1.2.1.apk",
-  "notes": "Fix Google-login (Referer) + visa appversion längst ner."
+  "version": "1.2.2",
+  "apkUrl": "https://github.com/nRn-World/DoneTogether/releases/download/v1.2.2/DoneTogether-1.2.2.apk",
+  "notes": "Testuppdatering — ska visas automatiskt om du kör 1.2.1."
 }
