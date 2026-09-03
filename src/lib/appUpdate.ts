@@ -5,6 +5,7 @@ import {
   GITHUB_RELEASES_PAGE_URL,
   VERSION_JSON_URLS
 } from '../config/appVersion';
+import { ApkUpdater } from './apkUpdater';
 
 export type AppUpdateInfo = {
   latestVersion: string;
@@ -70,7 +71,6 @@ export function dismissUpdateVersion(version: string): void {
 }
 
 async function httpGetJson<T>(url: string): Promise<T> {
-  // Native HTTP bypasses WebView CORS (main reason the first checker failed).
   if (Capacitor.isNativePlatform()) {
     const res = await CapacitorHttp.get({
       url,
@@ -170,7 +170,6 @@ async function checkGithubRelease(currentVersion: string): Promise<AppUpdateInfo
 export async function checkForAppUpdate(
   currentVersion: string = APP_VERSION
 ): Promise<AppUpdateInfo | null> {
-  // Prefer static JSON (Pages), then GitHub Releases API.
   const fromJson = await checkVersionJson(currentVersion);
   if (fromJson) return fromJson;
 
@@ -182,7 +181,19 @@ export async function checkForAppUpdate(
   }
 }
 
-export function openUpdateDownload(url: string): void {
-  // Prefer system browser so Android can download the APK.
-  window.open(url, '_blank', 'noopener,noreferrer');
+/** Native download + system install prompt. Falls back to browser on web. */
+export async function openUpdateDownload(url: string): Promise<void> {
+  if (!Capacitor.isNativePlatform()) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  const permission = await ApkUpdater.canInstallPackages();
+  if (!permission.allowed) {
+    await ApkUpdater.openInstallPermissionSettings();
+    // User must toggle permission, then tap download again.
+    throw new Error('INSTALL_PERMISSION_REQUIRED');
+  }
+
+  await ApkUpdater.downloadAndInstall({ url });
 }

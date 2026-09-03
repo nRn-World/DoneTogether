@@ -17,9 +17,12 @@
         "title": "New version available",
         "description": "Version {{latest}} is out. You are on {{current}}.",
         "notes_label": "What's new",
-        "button": "Download update",
+        "button": "Download & install",
+        "downloading": "Downloading…",
         "later": "Later",
-        "hint": "Open the downloaded APK and install. Keep the same app — no need to uninstall.",
+        "hint": "Android opens the installer when the file is ready. Allow installs from DoneTogether if asked.",
+        "permission_hint": "Allow installs from this source in Settings, then come back and tap again.",
+        "download_failed": "Download failed. Check your network and try again.",
         "version_label": "App version {{version}}"
     },
     "friends": {

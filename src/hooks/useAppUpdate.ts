@@ -13,6 +13,8 @@ const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6h
 export function useAppUpdate() {
   const [update, setUpdate] = useState<AppUpdateInfo | null>(null);
   const [checking, setChecking] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   useEffect(() => {
     const platform = Capacitor.getPlatform();
@@ -28,7 +30,6 @@ export function useAppUpdate() {
         if (!cancelled) setUpdate(info);
       } catch (err) {
         console.warn('[useAppUpdate] check failed', err);
-        // Network race on cold start — retry a couple of times.
         if (!cancelled && attempt < 2) {
           window.setTimeout(() => { void run(attempt + 1); }, 5000 * (attempt + 1));
         }
@@ -48,16 +49,33 @@ export function useAppUpdate() {
   const dismiss = () => {
     if (update) dismissUpdateVersion(update.latestVersion);
     setUpdate(null);
+    setDownloadError(null);
   };
 
-  const openDownload = () => {
+  const openDownload = async () => {
     if (!update) return;
-    openUpdateDownload(update.downloadUrl);
+    setDownloading(true);
+    setDownloadError(null);
+    try {
+      await openUpdateDownload(update.downloadUrl);
+    } catch (err: any) {
+      const code = String(err?.message || err || '');
+      if (code.includes('INSTALL_PERMISSION_REQUIRED')) {
+        setDownloadError('permission');
+      } else {
+        console.warn('[useAppUpdate] download/install failed', err);
+        setDownloadError('failed');
+      }
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return {
     update,
     checking,
+    downloading,
+    downloadError,
     currentVersion: APP_VERSION,
     dismiss,
     openDownload

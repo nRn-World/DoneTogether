@@ -17,9 +17,12 @@
         "title": "Ny version finns",
         "description": "Version {{latest}} är ute. Du kör {{current}}.",
         "notes_label": "Vad är nytt",
-        "button": "Ladda ner uppdatering",
+        "button": "Ladda ner & installera",
+        "downloading": "Laddar ner…",
         "later": "Senare",
-        "hint": "Öppna den nedladdade APK:n och installera. Behåll samma app — du behöver inte avinstallera.",
+        "hint": "Android öppnar installationsguiden när filen är klar. Tillåt installation från DoneTogether om telefonen frågar.",
+        "permission_hint": "Tillåt installation från den här källan i inställningarna, gå sedan tillbaka och tryck igen.",
+        "download_failed": "Nerladdningen misslyckades. Kontrollera nätet och försök igen.",
         "version_label": "Appversion {{version}}"
     },
     "friends": {

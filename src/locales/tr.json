@@ -17,9 +17,12 @@
         "title": "Yeni sürüm var",
         "description": "{{latest}} sürümü çıktı. Sizde {{current}} yüklü.",
         "notes_label": "Yenilikler",
-        "button": "Güncellemeyi indir",
+        "button": "İndir ve kur",
+        "downloading": "İndiriliyor…",
         "later": "Sonra",
-        "hint": "İndirilen APK'yı açıp kurun. Aynı uygulamayı tutun — kaldırmanız gerekmez.",
+        "hint": "Dosya hazır olunca Android kurulum ekranını açar. DoneTogether'dan kuruluma izin verin.",
+        "permission_hint": "Ayarlardan bu kaynaktan kuruluma izin verin, sonra tekrar deneyin.",
+        "download_failed": "İndirme başarısız. Ağı kontrol edip tekrar deneyin.",
         "version_label": "Uygulama sürümü {{version}}"
     },
     "friends": {

@@ -58,7 +58,7 @@ function App() {
   const { user, userProfile, loading: authLoading, error: authError, signInWithGoogle, signOut, isAuthenticated } = useAuth();
   const { plans } = usePlans(user?.uid);
   const { friends } = useFriends(user?.uid);
-  const { update: appUpdate, dismiss: dismissAppUpdate, openDownload: openAppUpdate } = useAppUpdate();
+  const { update: appUpdate, dismiss: dismissAppUpdate, openDownload: openAppUpdate, downloading: appUpdateDownloading, downloadError: appUpdateDownloadError } = useAppUpdate();
 
   // Initialize location tracking
   const { permissionStatus, isTracking, getCurrentLocation, requestPermissions } = useLocation(user?.uid);
@@ -414,6 +414,8 @@ function App() {
             update={appUpdate}
             onUpdate={openAppUpdate}
             onLater={dismissAppUpdate}
+            downloading={appUpdateDownloading}
+            downloadError={appUpdateDownloadError}
           />
         )}
         <div className="text-center">
@@ -1502,6 +1504,8 @@ function App() {
             update={appUpdate}
             onUpdate={openAppUpdate}
             onLater={dismissAppUpdate}
+            downloading={appUpdateDownloading}
+            downloadError={appUpdateDownloadError}
           />
         )}
 

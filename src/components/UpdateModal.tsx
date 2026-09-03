@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Download, X, Sparkles } from 'lucide-react';
+import { Download, X, Sparkles, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { AppUpdateInfo } from '../lib/appUpdate';
 
@@ -7,9 +7,17 @@ interface UpdateModalProps {
   update: AppUpdateInfo;
   onUpdate: () => void;
   onLater: () => void;
+  downloading?: boolean;
+  downloadError?: string | null;
 }
 
-export function UpdateModal({ update, onUpdate, onLater }: UpdateModalProps) {
+export function UpdateModal({
+  update,
+  onUpdate,
+  onLater,
+  downloading = false,
+  downloadError = null
+}: UpdateModalProps) {
   const { t } = useTranslation();
   const notes = update.releaseNotes
     ? update.releaseNotes.slice(0, 280)
@@ -26,7 +34,8 @@ export function UpdateModal({ update, onUpdate, onLater }: UpdateModalProps) {
         <button
           type="button"
           onClick={onLater}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
+          disabled={downloading}
+          className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition disabled:opacity-40"
           aria-label={t('common.cancel')}
         >
           <X className="w-5 h-5" />
@@ -64,19 +73,41 @@ export function UpdateModal({ update, onUpdate, onLater }: UpdateModalProps) {
           </div>
         )}
 
+        {downloadError === 'permission' && (
+          <p className="mb-3 text-xs text-amber-600 dark:text-amber-400 leading-snug">
+            {t('update.permission_hint')}
+          </p>
+        )}
+        {downloadError === 'failed' && (
+          <p className="mb-3 text-xs text-red-500 leading-snug">
+            {t('update.download_failed')}
+          </p>
+        )}
+
         <div className="flex flex-col gap-2">
           <button
             type="button"
             onClick={onUpdate}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-emerald-500 text-black text-sm font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20"
+            disabled={downloading}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-emerald-500 text-black text-sm font-black uppercase tracking-widest hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 disabled:opacity-70"
           >
-            <Download className="w-4 h-4" />
-            {t('update.button')}
+            {downloading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {t('update.downloading')}
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                {t('update.button')}
+              </>
+            )}
           </button>
           <button
             type="button"
             onClick={onLater}
-            className="w-full py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition"
+            disabled={downloading}
+            className="w-full py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition disabled:opacity-40"
           >
             {t('update.later')}
           </button>
