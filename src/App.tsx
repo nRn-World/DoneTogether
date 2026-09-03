@@ -409,6 +409,13 @@ function App() {
   if (authLoading) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'dark bg-zinc-950 text-white' : 'bg-zinc-50 text-zinc-900'} flex items-center justify-center`}>
+        {appUpdate && (
+          <UpdateModal
+            update={appUpdate}
+            onUpdate={openAppUpdate}
+            onLater={dismissAppUpdate}
+          />
+        )}
         <div className="text-center">
           <div className="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-3xl">
             <img src="pwa-icon.png" className="w-full h-full object-cover scale-[1.6]" alt="DoneTogether" />

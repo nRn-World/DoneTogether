@@ -15,25 +15,30 @@ export function useAppUpdate() {
   const [checking, setChecking] = useState(false);
 
   useEffect(() => {
-    // Sideload APK updates matter on native; skip noisy checks on plain web/PWA.
-    if (!Capacitor.isNativePlatform()) return;
+    const platform = Capacitor.getPlatform();
+    const isNative = Capacitor.isNativePlatform() || platform === 'android' || platform === 'ios';
+    if (!isNative) return;
 
     let cancelled = false;
 
-    const run = async () => {
+    const run = async (attempt = 0) => {
       setChecking(true);
       try {
         const info = await checkForAppUpdate(APP_VERSION);
         if (!cancelled) setUpdate(info);
       } catch (err) {
         console.warn('[useAppUpdate] check failed', err);
+        // Network race on cold start — retry a couple of times.
+        if (!cancelled && attempt < 2) {
+          window.setTimeout(() => { void run(attempt + 1); }, 5000 * (attempt + 1));
+        }
       } finally {
         if (!cancelled) setChecking(false);
       }
     };
 
-    run();
-    const id = window.setInterval(run, CHECK_INTERVAL_MS);
+    void run(0);
+    const id = window.setInterval(() => { void run(0); }, CHECK_INTERVAL_MS);
     return () => {
       cancelled = true;
       window.clearInterval(id);

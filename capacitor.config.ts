@@ -11,6 +11,9 @@ const config: CapacitorConfig = {
     hostname: 'nrnworld.one'
   },
   plugins: {
+    CapacitorHttp: {
+      enabled: true
+    },
     GoogleAuth: {
       scopes: ['profile', 'email'],
       serverClientId: '677287957451-6vja60qu97qvobgr61li4b3dlrj1pslq.apps.googleusercontent.com',
