@@ -1,5 +1,5 @@
 ﻿{
-  "version": "1.1.9",
-  "apkUrl": "https://github.com/nRn-World/DoneTogether/releases/download/v1.1.9/DoneTogether-1.1.9.apk",
-  "notes": "Native nerladdning och installation — ingen fastnad GitHub-download."
+  "version": "1.2.0",
+  "apkUrl": "https://github.com/nRn-World/DoneTogether/releases/download/v1.2.0/DoneTogether-1.2.0.apk",
+  "notes": "Test av native install from 1.1.9."
 }
