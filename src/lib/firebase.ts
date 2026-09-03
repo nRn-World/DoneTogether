@@ -1,5 +1,10 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import {
+    getAuth,
+    initializeAuth,
+    indexedDBLocalPersistence,
+    GoogleAuthProvider
+} from 'firebase/auth';
 import { initializeFirestore } from 'firebase/firestore';
 import { getMessaging } from 'firebase/messaging';
 import { Capacitor } from '@capacitor/core';
@@ -22,11 +27,22 @@ const firebaseConfig = {
     measurementId
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize Firebase services
-export const auth = getAuth(app);
+function createAuth() {
+    if (!Capacitor.isNativePlatform()) {
+        return getAuth(app);
+    }
+    try {
+        return initializeAuth(app, { persistence: indexedDBLocalPersistence });
+    } catch {
+        // Already initialized (e.g. HMR) — reuse existing Auth instance
+        return getAuth(app);
+    }
+}
+
+export const auth = createAuth();
+
 export const db = initializeFirestore(app, {
     ignoreUndefinedProperties: true
 });

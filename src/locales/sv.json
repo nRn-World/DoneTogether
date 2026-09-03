@@ -12,6 +12,16 @@
         "home": "HEM",
         "friends": "VÄNNER"
     },
+    "update": {
+        "badge": "Uppdatering",
+        "title": "Ny version finns",
+        "description": "Version {{latest}} är ute. Du kör {{current}}.",
+        "notes_label": "Vad är nytt",
+        "button": "Ladda ner uppdatering",
+        "later": "Senare",
+        "hint": "Öppna den nedladdade APK:n och installera. Behåll samma app — du behöver inte avinstallera.",
+        "version_label": "Appversion {{version}}"
+    },
     "friends": {
         "title": "Vänner",
         "subtitle": "Hitta dina utförare",
@@ -172,8 +182,8 @@
         "resolving_address": "Hämtar adress...",
         "wall_of_fame": {
             "title": "The Wall of Fame",
-            "description": "Stöd utvecklingen av DoneTogether genom att bjuda mig på en kaffe. Ditt bidrag hjälper till att hålla appen gratis och i ständig utveckling!",
-            "button": "Klicka här för att bjuda på en kaffe"
+            "description": "Bjud på en kaffe — håll appen gratis och i utveckling.",
+            "button": "Bjud på en kaffe"
         }
     }
 }

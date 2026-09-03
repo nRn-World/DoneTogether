@@ -12,6 +12,16 @@
         "home": "EVİM",
         "friends": "ARKADAŞLAR"
     },
+    "update": {
+        "badge": "Güncelleme",
+        "title": "Yeni sürüm var",
+        "description": "{{latest}} sürümü çıktı. Sizde {{current}} yüklü.",
+        "notes_label": "Yenilikler",
+        "button": "Güncellemeyi indir",
+        "later": "Sonra",
+        "hint": "İndirilen APK'yı açıp kurun. Aynı uygulamayı tutun — kaldırmanız gerekmez.",
+        "version_label": "Uygulama sürümü {{version}}"
+    },
     "friends": {
         "title": "Arkadaşlar",
         "subtitle": "Yol arkadaşlarınızı bulun",
@@ -164,8 +174,8 @@
         "resolving_address": "Adres alınıyor...",
         "wall_of_fame": {
             "title": "The Wall of Fame",
-            "description": "DoneTogether geliştirmesini bir kahve ısmarlayarak destekleyin. Katkınız uygulamanın ücretsiz kalmasına ve sürekli gelişmesine yardımcı olur!",
-            "button": "Kahve ısmarlamak için tıklayın"
+            "description": "Bir kahve ısmarlayın — uygulama ücretsiz ve güncel kalsın.",
+            "button": "Kahve ısmarla"
         }
     }
 }

@@ -4,13 +4,17 @@ const config: CapacitorConfig = {
   appId: 'nrn.DoneTogether.com',
   appName: 'DoneTogether',
   webDir: 'dist',
+  // Capacitor WebView defaults to https://localhost — Firebase Browser API keys
+  // block that referer. Use the live domain already allowed on the key.
+  server: {
+    androidScheme: 'https',
+    hostname: 'nrnworld.one'
+  },
   plugins: {
     GoogleAuth: {
       scopes: ['profile', 'email'],
       serverClientId: '677287957451-6vja60qu97qvobgr61li4b3dlrj1pslq.apps.googleusercontent.com',
-      clientId: '677287957451-6vja60qu97qvobgr61li4b3dlrj1pslq.apps.googleusercontent.com',
-      androidClientId: '677287957451-k6loi2bddfol9cpei4ctd5ka8up7cck9.apps.googleusercontent.com',
-      forceCodeForRefreshToken: true
+      forceCodeForRefreshToken: false
     },
     GeofencePlugin: {}
   },

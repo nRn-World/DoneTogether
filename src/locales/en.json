@@ -12,6 +12,16 @@
         "home": "HOME",
         "friends": "FRIENDS"
     },
+    "update": {
+        "badge": "Update",
+        "title": "New version available",
+        "description": "Version {{latest}} is out. You are on {{current}}.",
+        "notes_label": "What's new",
+        "button": "Download update",
+        "later": "Later",
+        "hint": "Open the downloaded APK and install. Keep the same app — no need to uninstall.",
+        "version_label": "App version {{version}}"
+    },
     "friends": {
         "title": "Friends",
         "subtitle": "Find your doers",
@@ -172,8 +182,8 @@
         "resolving_address": "Fetching address...",
         "wall_of_fame": {
             "title": "The Wall of Fame",
-            "description": "Support the development of DoneTogether by buying me a coffee. Your contribution helps keep this app free and continuously improving!",
-            "button": "Click here to buy me a coffee"
+            "description": "Buy me a coffee — keep the app free and improving.",
+            "button": "Buy me a coffee"
         }
     }
 }

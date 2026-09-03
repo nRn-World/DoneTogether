@@ -1,13 +1,14 @@
 package nrn.DoneTogether.com;
 
 import android.os.Bundle;
+import com.codetrixstudio.capacitor.GoogleAuth.GoogleAuth;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // Must register custom plugins before BridgeActivity initializes the bridge
         registerPlugin(GeofencePlugin.class);
+        registerPlugin(GoogleAuth.class);
         super.onCreate(savedInstanceState);
     }
 }

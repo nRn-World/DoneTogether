@@ -1,31 +1,64 @@
-// Import the functions you need from the SDKs you need
-importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js');
+/* eslint-disable no-undef */
+// Firebase Messaging service worker for DoneTogether PWA (GitHub Pages /DoneTogether/)
+importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js');
 
-// Initialize the Firebase app in the service worker by passing in
-// your app's Firebase config object.
-// https://firebase.google.com/docs/web/setup#config-object
-// Firebase config is injected via index.html into self.__firebaseConfig
-// This avoids hardcoding credentials in the service worker
-if (!self.__firebaseConfig) {
-    console.error('Firebase config not injected. See .env.example for setup.');
-} else {
-    firebase.initializeApp(self.__firebaseConfig);
-}
+firebase.initializeApp({
+  apiKey: 'AIzaSyCA_1UxB7z86TvyIEpgqnTwnUgqOWTEf_4',
+  authDomain: 'donetogether-v1.firebaseapp.com',
+  projectId: 'donetogether-v1',
+  storageBucket: 'donetogether-v1.firebasestorage.app',
+  messagingSenderId: '677287957451',
+  appId: '1:677287957451:web:812a897c8f906a63b8dc4e',
+  measurementId: 'G-8L45T1C49B'
+});
 
-// Retrieve an instance of Firebase Messaging so that it can handle background
-// messages.
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-    // Customize notification here
-    const notification = payload && payload.notification ? payload.notification : {};
-    const notificationTitle = notification.title || 'DoneTogether';
-    const notificationOptions = {
-        body: notification.body || '',
-        icon: '/pwa-icon.png'
-    };
+function iconUrl() {
+  try {
+    return new URL('pwa-icon.png', self.registration.scope).href;
+  } catch (e) {
+    return 'pwa-icon.png';
+  }
+}
 
-    self.registration.showNotification(notificationTitle,
-        notificationOptions);
+messaging.onBackgroundMessage(function (payload) {
+  const notification = (payload && payload.notification) || {};
+  const title = notification.title || 'DoneTogether';
+  const options = {
+    body: notification.body || '',
+    icon: iconUrl(),
+    badge: iconUrl(),
+    data: {
+      url: self.registration.scope
+    }
+  };
+  return self.registration.showNotification(title, options);
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  var target = (event.notification.data && event.notification.data.url) || self.registration.scope;
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+      for (var i = 0; i < clientList.length; i++) {
+        var client = clientList[i];
+        if ('focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(target);
+      }
+    })
+  );
+});
+
+self.addEventListener('install', function () {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function (event) {
+  event.waitUntil(self.clients.claim());
 });

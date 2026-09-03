@@ -26,6 +26,9 @@ import { FriendsModal } from './components/FriendsModal';
 import { ShareModal } from './components/ShareModal';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { UpdateModal } from './components/UpdateModal';
+import { useAppUpdate } from './hooks/useAppUpdate';
+import { APP_VERSION } from './config/appVersion';
 import type { Plan, Item } from './types';
 
 import { useLocation } from './hooks/useLocation';
@@ -55,6 +58,7 @@ function App() {
   const { user, userProfile, loading: authLoading, error: authError, signInWithGoogle, signOut, isAuthenticated } = useAuth();
   const { plans } = usePlans(user?.uid);
   const { friends } = useFriends(user?.uid);
+  const { update: appUpdate, dismiss: dismissAppUpdate, openDownload: openAppUpdate } = useAppUpdate();
 
   // Initialize location tracking
   const { permissionStatus, isTracking, getCurrentLocation, requestPermissions } = useLocation(user?.uid);
@@ -1299,32 +1303,31 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Buy Me A Coffee Section */}
-                  <div className="w-full mb-6">
+                  {/* Buy Me A Coffee — compact on mobile */}
+                  <div className="w-full mb-4">
                     <a
                       href="https://ko-fi.com/nrnworld"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-6 rounded-[28px] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-900/30 hover:border-amber-300 dark:hover:border-amber-800/50 transition-all hover:shadow-lg hover:-translate-y-1 group"
+                      className="block p-3.5 sm:p-5 rounded-2xl sm:rounded-[28px] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-900/40 hover:border-amber-300 dark:hover:border-amber-800/50 transition-all hover:shadow-md sm:hover:shadow-lg sm:hover:-translate-y-1 group"
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <img src="coffee-icon.png" alt="Coffee" className="w-full h-full object-contain" />
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center group-hover:scale-105 transition-transform">
+                          <img src="coffee-icon.png" alt="" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
-                          <h4 className="text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight flex items-center gap-2">
-                            <span aria-hidden>☕</span>
+                          <h4 className="text-xs sm:text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight">
                             {t('profile.wall_of_fame.title')}
                           </h4>
-                          <p className="text-xs text-zinc-700 dark:text-zinc-300 mt-2 leading-relaxed">
+                          <p className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-snug line-clamp-2">
                             {t('profile.wall_of_fame.description')}
                           </p>
-                          <span className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white text-xs font-bold group-hover:bg-amber-400 transition-colors">
-                            <span aria-hidden>☕</span>
-                            {t('profile.wall_of_fame.button')}
-                          </span>
                         </div>
                       </div>
+                      <span className="mt-2.5 sm:mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl bg-amber-500 text-white text-[11px] sm:text-xs font-bold group-hover:bg-amber-400 transition-colors">
+                        <span aria-hidden>☕</span>
+                        {t('profile.wall_of_fame.button')}
+                      </span>
                     </a>
                   </div>
 
@@ -1339,6 +1342,9 @@ function App() {
                   <div className="w-full text-center py-6 mt-4">
                     <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
                       Created 2026 by © nRn World
+                    </p>
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide mt-1">
+                      {t('update.version_label', { version: APP_VERSION })}
                     </p>
                     <div className="flex items-center justify-center gap-1 mt-1">
                       <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium">
@@ -1483,6 +1489,15 @@ function App() {
 
       {/* Modals */}
       <AnimatePresence>
+        {appUpdate && (
+          <UpdateModal
+            key="update-modal"
+            update={appUpdate}
+            onUpdate={openAppUpdate}
+            onLater={dismissAppUpdate}
+          />
+        )}
+
         {showAuthModal && (
           <AuthModal
             key="auth-modal"

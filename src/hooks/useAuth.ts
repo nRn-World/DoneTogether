@@ -28,13 +28,18 @@ export function useAuth() {
 
         console.log('[useAuth] Setting up onAuthStateChanged listener');
 
-        getRedirectResult(auth).catch((err: any) => {
-            console.error('[useAuth] getRedirectResult error:', err);
-            if (cancelled) return;
-            const errorCode = err?.code as string | undefined;
-            const errorMessage = err?.message || 'Something went wrong';
-            setError(`Inloggning misslyckades: ${errorCode ? `${errorCode}: ` : ''}${errorMessage}`);
-        });
+        // Web-only: native APK uses GoogleAuth + signInWithCredential, not redirects.
+        // Calling getRedirectResult on Capacitor throws auth/argument-error on first launch.
+        if (!Capacitor.isNativePlatform()) {
+            getRedirectResult(auth).catch((err: any) => {
+                console.error('[useAuth] getRedirectResult error:', err);
+                if (cancelled) return;
+                const errorCode = err?.code as string | undefined;
+                if (errorCode === 'auth/argument-error') return;
+                const errorMessage = err?.message || 'Something went wrong';
+                setError(`Inloggning misslyckades: ${errorCode ? `${errorCode}: ` : ''}${errorMessage}`);
+            });
+        }
 
         // Add a fallback timeout to prevent infinite loading screen
         const timeoutId = setTimeout(() => {

@@ -1,0 +1,9 @@
+---
+description: Svara alltid på svenska
+alwaysApply: true
+---
+
+# Språk
+
+- Skriv ALLTID på svenska i svar till användaren.
+- Använd aldrig turkiska, engelska eller andra språk i användarsvar (förutom kod, kommandon, filnamn och API-felkodstexter).

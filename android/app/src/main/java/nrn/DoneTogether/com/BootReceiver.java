@@ -17,12 +17,13 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent == null) return;
         String action = intent.getAction();
         if (!Intent.ACTION_BOOT_COMPLETED.equals(action)
+                && !Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)
                 && !"android.intent.action.QUICKBOOT_POWERON".equals(action)
                 && !"com.htc.intent.action.QUICKBOOT_POWERON".equals(action)) {
             return;
         }
 
-        Log.d(TAG, "Device booted — restoring geofence monitoring");
+        Log.d(TAG, "Restoring geofences after " + action);
         GeofenceRestorer.restoreFromPrefsAsync(context.getApplicationContext());
     }
 }
