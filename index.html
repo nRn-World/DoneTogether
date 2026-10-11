@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="sv">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
@@ -11,33 +11,140 @@
   <meta name="theme-color" content="#09090b">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, healthy-ui=true" />
   <meta name="description"
-    content="Skapa och dela planer i realtid med vänner och team. Samarbeta och slutför tillsammans." />
+    content="Create and share real-time plans with friends and team. Check off together and get things done." />
+  <!--
+    Canonical address. The app is one single URL: every view (home, plan, profile,
+    completed) is internal state, not a route, so there is exactly one canonical.
+    The GitHub Pages copy (nrn-world.github.io/DoneTogether/) 301-redirects here, and
+    the invite links (/DoneTogether/join/<code>) are served by 404.html — a copy of
+    this file — so they consolidate to the same app root instead of being indexed.
+    If the domain changes, change this one line (keep the trailing slash).
+  -->
+  <link rel="canonical" href="https://nrnworld.one/DoneTogether/" />
+  <!--
+    Structured data (schema.org / JSON-LD). The app is one URL, so one block describes
+    the whole page: the organisation behind it (nRn World), the site itself and the
+    installable web app. A JSON-LD block is data, not executed script, so it needs no
+    CSP allowance — script-src stays without 'unsafe-inline'.
+    Keep url, name and description in sync with the canonical link and meta description
+    above. 'offers.price 0' means the app is free to use; change the currency or drop
+    the offers block if you ever charge for it.
+  -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://nrnworld.one/#organization",
+          "name": "nRn World",
+          "url": "https://nrnworld.one/",
+          "sameAs": ["https://github.com/nRn-World/DoneTogether"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://nrnworld.one/DoneTogether/#website",
+          "url": "https://nrnworld.one/DoneTogether/",
+          "name": "DoneTogether",
+          "description": "Create and share real-time plans with friends and team. Check off together and get things done.",
+          "inLanguage": ["en", "sv", "tr"],
+          "publisher": { "@id": "https://nrnworld.one/#organization" }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://nrnworld.one/DoneTogether/#app",
+          "name": "DoneTogether",
+          "url": "https://nrnworld.one/DoneTogether/",
+          "description": "Create and share real-time plans with friends and team. Check off together and get things done.",
+          "applicationCategory": "ProductivityApplication",
+          "operatingSystem": "Web browser, Android",
+          "image": "https://nrnworld.one/DoneTogether/pwa-icon.png",
+          "inLanguage": ["en", "sv", "tr"],
+          "isAccessibleForFree": true,
+          "isPartOf": { "@id": "https://nrnworld.one/DoneTogether/#website" },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "SEK"
+          },
+          "publisher": { "@id": "https://nrnworld.one/#organization" }
+        }
+      ]
+    }
+  </script>
   <title>DoneTogether</title>
+  <!--
+    Social sharing (Open Graph + Twitter). Chat apps and social crawlers do not run
+    JavaScript, so these tags must be in the static HTML — a client-side rewrite would
+    never be seen. The app is one URL, so one card describes the whole site; invite
+    links (/DoneTogether/join/<code>) are served by 404.html, a copy of this file, and
+    therefore get the same preview. og:image is an absolute URL, 940x627 (≥200x200,
+    under 8 MB) and gets cropped to ~1.91:1 by the platforms — the middle of the photo
+    is what you will see. Point it at a dedicated 1200x630 card if you make one.
+  -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="DoneTogether" />
+  <meta property="og:title" content="DoneTogether – plan and do things together" />
+  <meta property="og:description"
+    content="Create and share real-time plans with friends and team. Check off together and get things done." />
+  <meta property="og:url" content="https://nrnworld.one/DoneTogether/" />
+  <meta property="og:image" content="https://nrnworld.one/DoneTogether/images/team-planning.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="940" />
+  <meta property="og:image:height" content="627" />
+  <meta property="og:image:alt" content="A team planning together in front of a whiteboard covered in sticky notes" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="sv_SE" />
+  <meta property="og:locale:alternate" content="tr_TR" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="DoneTogether – plan and do things together" />
+  <meta name="twitter:description"
+    content="Create and share real-time plans with friends and team. Check off together and get things done." />
+  <meta name="twitter:image" content="https://nrnworld.one/DoneTogether/images/team-planning.jpg" />
+  <meta name="twitter:image:alt" content="A team planning together in front of a whiteboard covered in sticky notes" />
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCA_1UxB7z86TvyIEpgqnTwnUgqOWTEf_4&libraries=places"></script>
-  <script type="module" crossorigin src="./assets/index-BEVB-Urk.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Ba7x-xsZ.css">
+  <script type="module" crossorigin src="./assets/index-CFUfzinJ.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CxOFvxWR.css">
 </head>
 
 <body>
-  <div id="root"></div>
-  <script>
-    // Endast logga — rensa ALDRIG hela sidan vid runtime-fel (t.ex. GPS).
-    // Annars mister användaren appen vid vanliga GeolocationPositionError.
-    window.onerror = function (message, source, lineno, colno, error) {
-      console.error('[Pre-React error]', message, source, lineno, colno, error);
-      return false;
-    };
-    window.onunhandledrejection = function (event) {
-      console.error('[Pre-React rejection]', event && event.reason);
-      try {
-        var r = event && event.reason;
-        var text = (r != null ? String(r) : '') + (r && r.message ? r.message : '');
-        if (/geolocation|positionerror/i.test(text) || (r && typeof r.code === 'number' && r.code >= 1 && r.code <= 3)) {
-          if (event.preventDefault) event.preventDefault();
-        }
-      } catch (e) {}
-    };
-  </script>
+  <!--
+    The landing content is generated at build time, not authored here: the
+    staticLanding() plugin in scripts/static-landing.ts reads src/locales/en.json and
+    replaces everything between the two markers below with a real landing section
+    (heading, copy and links). GitHub Pages and Firebase Hosting only serve files, so
+    without that build step the HTML would reach a crawler empty. React replaces the
+    section again when it mounts, which keeps exactly one <h1> in the rendered app.
+  -->
+  <div id="root">
+    <!-- static-landing:start -->
+    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white font-sans">
+      <main class="max-w-3xl mx-auto px-6 py-16 space-y-8">
+        <div class="bg-gradient-to-br from-emerald-500/10 to-transparent p-8 rounded-[32px] border border-emerald-500/10 dark:border-emerald-500/10">
+          <h1 class="text-3xl font-bold mb-3 tracking-tight leading-tight italic font-black">Plan &amp; Do Things Together.</h1>
+          <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 max-w-md italic">Create real-time plans with your friends. See who has checked what and celebrate your success with pictures!</p>
+          <div class="flex flex-wrap gap-3">
+            <a class="px-6 py-3.5 rounded-2xl bg-emerald-500 text-black font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-500/20" href="https://nrnworld.one/DoneTogether/">Create new plan</a>
+            <a class="px-6 py-3.5 rounded-2xl bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition-all border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 shadow-sm" href="https://nrnworld.one/DoneTogether/">Join plan</a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-zinc-600 dark:text-zinc-400 text-xs font-bold uppercase tracking-[0.2em]">Your active plans</h2>
+          <p class="text-zinc-600 dark:text-zinc-400 italic text-sm">No active plans yet. Create your first one!</p>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-2xl font-black italic uppercase tracking-tighter">Log in</h2>
+          <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 max-w-md italic">Start planning and doing things together with your friends.</p>
+          <div class="flex flex-wrap gap-3">
+            <a class="px-6 py-3.5 rounded-2xl bg-emerald-500 text-black font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-500/20" href="https://nrnworld.one/DoneTogether/">Continue with Google</a>
+          </div>
+        </div>
+      </main>
+    </div><!-- static-landing:end -->
+  </div>
+  <script src="./early-errors.js"></script>
 </body>
 
 </html>
