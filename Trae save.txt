@@ -1,0 +1,20 @@
+// Web: popup -> fallback redirect
+try {
+  await signInWithPopup(auth, provider);
+} catch (err: any) {
+  const code = err?.code;
+  const shouldFallbackToRedirect =
+    code === 'auth/popup-blocked' ||
+    code === 'auth/popup-closed-by-user' ||
+    code === 'auth/cancelled-popup-request' ||
+    code === 'auth/operation-not-supported-in-this-environment';
+
+  if (shouldFallbackToRedirect) {
+    await signInWithRedirect(auth, provider);
+    return;
+  }
+  throw err;
+}
+
+// Vid start: plocka upp redirect-resultat
+getRedirectResult(auth).catch((err) => setError(`Inloggning misslyckades: ${err?.message || 'Something went wrong'}`));

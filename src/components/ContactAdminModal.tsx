@@ -133,6 +133,7 @@ export function ContactAdminModal({
                     <motion.div
                         role="dialog"
                         aria-modal="true"
+                        aria-labelledby="contact-modal-title"
                         initial={{ opacity: 0, y: 36 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 24 }}
@@ -141,7 +142,7 @@ export function ContactAdminModal({
                     >
                         <div className="flex items-start justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/20">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                                     {isAdminMode ? (
                                         <Shield className="w-5 h-5" />
                                     ) : (
@@ -149,12 +150,12 @@ export function ContactAdminModal({
                                     )}
                                 </div>
                                 <div className="min-w-0">
-                                    <h2 className="text-lg font-black italic tracking-tight uppercase text-zinc-900 dark:text-white truncate">
+                                    <h2 id="contact-modal-title" className="text-lg font-black italic tracking-tight uppercase text-zinc-900 dark:text-white truncate">
                                         {isAdminMode
                                             ? threadUser.displayName || t('contact.admin_title')
                                             : t('contact.title')}
                                     </h2>
-                                    <p className="text-[11px] text-zinc-500 mt-0.5 truncate">
+                                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
                                         {isAdminMode
                                             ? threadUser.email || t('contact.admin_subtitle')
                                             : t('contact.subtitle')}
@@ -164,7 +165,7 @@ export function ContactAdminModal({
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="p-2 rounded-xl text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                                aria-label={t('common.close')} className="p-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -172,17 +173,17 @@ export function ContactAdminModal({
 
                         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 min-h-[240px]">
                             {loading && (
-                                <div className="flex justify-center py-10 text-zinc-400">
+                                <div className="flex justify-center py-10 text-zinc-600 dark:text-zinc-400">
                                     <Loader2 className="w-6 h-6 animate-spin" />
                                 </div>
                             )}
                             {error && (
-                                <p className="text-center text-sm text-red-500 py-6">{error}</p>
+                                <p className="text-center text-sm text-red-700 dark:text-red-400 py-6">{error}</p>
                             )}
                             {!loading && !error && messages.length === 0 && (
                                 <div className="text-center py-12 px-4">
-                                    <MessageSquare className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-                                    <p className="text-sm text-zinc-500 italic">{t('contact.empty')}</p>
+                                    <MessageSquare className="w-10 h-10 text-zinc-500 dark:text-zinc-400 mx-auto mb-3" />
+                                    <p className="text-sm text-zinc-500 dark:text-zinc-400 italic">{t('contact.empty')}</p>
                                 </div>
                             )}
                             {messages.map((m) => {
@@ -212,7 +213,7 @@ export function ContactAdminModal({
                                                 {m.text}
                                             </p>
                                             <p
-                                                className={`text-[10px] mt-1.5 ${mine ? 'text-black/50' : 'text-zinc-400'}`}
+                                                className={`text-[10px] mt-1.5 ${mine ? 'text-black/50' : 'text-zinc-600 dark:text-zinc-400'}`}
                                             >
                                                 {formatTime(m.createdAt)}
                                             </p>
@@ -225,14 +226,14 @@ export function ContactAdminModal({
 
                         <div className="border-t border-zinc-200 dark:border-zinc-800 p-4 space-y-2">
                             {!isAdminMode && blockReason && (
-                                <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium px-1">
+                                <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium px-1">
                                     {blockReason === 'awaiting_reply'
                                         ? t('contact.wait_reply_hint')
                                         : t('contact.daily_limit_hint')}
                                 </p>
                             )}
                             {sendError && (
-                                <p className="text-[11px] text-red-500 px-1">{sendError}</p>
+                                <p className="text-[11px] text-red-700 dark:text-red-400 px-1">{sendError}</p>
                             )}
                             <div className="flex items-end gap-2">
                                 <textarea
@@ -251,7 +252,7 @@ export function ContactAdminModal({
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => void onSend()}
+                                    aria-label={t('contact.send')} onClick={() => void onSend()}
                                     disabled={
                                         sending || !text.trim() || (!isAdminMode && !!blockReason)
                                     }

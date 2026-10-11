@@ -106,20 +106,23 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="friends-modal-title"
                 className="bg-white dark:bg-zinc-900 rounded-[40px] border border-zinc-200 dark:border-zinc-800 max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl"
             >
                 {/* Header */}
                 <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 rotate-3">
-                            <UsersIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                            <UsersIcon className="w-6 h-6 text-emerald-700 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">{t('friends.title')}</h2>
-                            <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest italic">{t('friends.subtitle')}</p>
+                            <h2 id="friends-modal-title" className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">{t('friends.title')}</h2>
+                            <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest italic">{t('friends.subtitle')}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+                    <button onClick={onClose} aria-label={t('common.close')} className="p-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
@@ -131,7 +134,7 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="mx-8 mt-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold text-center italic"
+                            className="mx-8 mt-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-bold text-center italic"
                         >
                             {actionMessage}
                         </motion.div>
@@ -142,19 +145,19 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                 <div className="flex-1 overflow-auto p-8 space-y-8">
                     {/* Search Section */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
+                        <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">
                             {t('friends.add_new')}
                         </h3>
                         <div className="flex gap-3">
                             <div className="flex-1 relative group">
-                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-300 dark:text-zinc-600 group-focus-within:text-emerald-500 transition-colors" />
+                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 dark:text-zinc-400 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
                                     type="email"
                                     value={searchEmail}
                                     onChange={(e) => setSearchEmail(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                     placeholder={t('friends.search_placeholder')}
-                                    className="w-full h-14 pl-14 pr-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all font-bold italic text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700 shadow-inner"
+                                    className="w-full h-14 pl-14 pr-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all font-bold italic text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-700 shadow-inner"
                                 />
                             </div>
                             <button
@@ -168,7 +171,7 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                         </div>
 
                         {searchError && (
-                            <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-500 text-sm font-bold text-center italic">
+                            <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-700 dark:text-red-400 text-sm font-bold text-center italic">
                                 {searchError}
                             </div>
                         )}
@@ -183,20 +186,20 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                                     {searchResult.photoURL ? (
                                         <img src={searchResult.photoURL} alt="" className="w-12 h-12 rounded-2xl object-cover border border-white dark:border-zinc-700 shadow-sm" />
                                     ) : (
-                                        <div className="w-12 h-12 rounded-2xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-xl font-black text-zinc-500 dark:text-zinc-400">
+                                        <div className="w-12 h-12 rounded-2xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-xl font-black text-zinc-600 dark:text-zinc-400">
                                             {searchResult.displayName[0].toUpperCase()}
                                         </div>
                                     )}
                                     <div>
                                         <div className="font-black italic text-zinc-900 dark:text-white">{searchResult.displayName}</div>
-                                        <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">{searchResult.email}</div>
+                                        <div className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase">{searchResult.email}</div>
                                     </div>
                                 </div>
 
                                 {isAlreadyFriend(searchResult.uid) ? (
-                                    <div className="text-[10px] font-black uppercase text-zinc-300 dark:text-zinc-600 tracking-widest bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg">{t('friends.already_friends')}</div>
+                                    <div className="text-[10px] font-black uppercase text-zinc-600 dark:text-zinc-400 tracking-widest bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg">{t('friends.already_friends')}</div>
                                 ) : hasPendingRequest(searchResult.uid) ? (
-                                    <div className="text-[10px] font-black uppercase text-amber-600 dark:text-amber-500 tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-lg">{t('friends.pending')}</div>
+                                    <div className="text-[10px] font-black uppercase text-amber-800 dark:text-amber-400 tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-lg">{t('friends.pending')}</div>
                                 ) : (
                                     <button
                                         onClick={() => handleSendRequest(searchResult)}
@@ -212,12 +215,13 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                     {/* Incoming Requests */}
                     {incomingRequests.length > 0 && (
                         <div className="space-y-4">
-                            <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
+                            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">
                                 {t('friends.incoming_requests', { count: incomingRequests.length })}
                             </h3>
-                            <div className="grid grid-cols-1 gap-2">
+                            <div role="list" className="grid grid-cols-1 gap-2">
                                 {incomingRequests.map((request) => (
                                     <motion.div
+                                        role="listitem"
                                         key={request.id}
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -227,13 +231,13 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                                             {request.fromPhoto ? (
                                                 <img src={request.fromPhoto} alt="" className="w-12 h-12 rounded-2xl object-cover border border-white dark:border-zinc-800 shadow-sm" />
                                             ) : (
-                                                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl font-black text-emerald-600">
+                                                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl font-black text-emerald-700 dark:text-emerald-400">
                                                     {request.fromName[0].toUpperCase()}
                                                 </div>
                                             )}
                                             <div className="min-w-0">
                                                 <div className="font-black italic text-zinc-900 dark:text-white uppercase tracking-tight truncate">{request.fromName}</div>
-                                                <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase truncate">{request.fromEmail}</div>
+                                                <div className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase truncate">{request.fromEmail}</div>
                                             </div>
                                         </div>
 
@@ -249,7 +253,7 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                                             <button
                                                 type="button"
                                                 onClick={() => handleDeclineRequest(request.id)}
-                                                className="px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-red-500 hover:border-red-500/30 transition-all shadow-sm flex items-center gap-1.5"
+                                                className="px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-red-500 hover:border-red-500/30 transition-all shadow-sm flex items-center gap-1.5"
                                             >
                                                 <XCircle className="w-4 h-4 stroke-[2.5px]" />
                                                 {t('friends.decline')}
@@ -263,19 +267,20 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
 
                     {/* Friends List */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
+                        <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">
                             {t('friends.my_friends', { count: friends.length })}
                         </h3>
                         {friendsLoading ? (
-                            <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-950 rounded-[32px] border-2 border-dashed border-zinc-100 dark:border-zinc-900 italic font-bold text-zinc-300 dark:text-zinc-700 uppercase tracking-widest text-[10px]">{t('friends.loading')}</div>
+                            <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-950 rounded-[32px] border-2 border-dashed border-zinc-100 dark:border-zinc-900 italic font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-[10px]">{t('friends.loading')}</div>
                         ) : friends.length === 0 ? (
-                            <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-950 rounded-[32px] border-2 border-dashed border-zinc-100 dark:border-zinc-900 font-black italic text-zinc-400 dark:text-zinc-600 uppercase tracking-widest text-[10px] px-8">
+                            <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-950 rounded-[32px] border-2 border-dashed border-zinc-100 dark:border-zinc-900 font-black italic text-zinc-600 dark:text-zinc-400 uppercase tracking-widest text-[10px] px-8">
                                 {t('friends.no_friends')}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 gap-2">
+                            <div role="list" className="grid grid-cols-1 gap-2">
                                 {friends.map((friend) => (
                                     <div
+                                        role="listitem"
                                         key={friend.uid}
                                         className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-3 group hover:border-zinc-300 dark:hover:border-zinc-700 transition-all"
                                     >
@@ -283,20 +288,20 @@ export function FriendsModal({ onClose, currentUser }: FriendsModalProps) {
                                             {friend.photoURL ? (
                                                 <img src={friend.photoURL} alt="" className="w-12 h-12 rounded-2xl object-cover border border-white dark:border-zinc-800 shadow-sm transition-transform group-hover:scale-110" />
                                             ) : (
-                                                <div className="w-12 h-12 rounded-2xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xl font-black text-zinc-500 dark:text-zinc-500">
+                                                <div className="w-12 h-12 rounded-2xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-xl font-black text-zinc-600 dark:text-zinc-400">
                                                     {friend.displayName[0].toUpperCase()}
                                                 </div>
                                             )}
                                             <div className="min-w-0">
                                                 <div className="font-black italic text-zinc-900 dark:text-white uppercase tracking-tight truncate">{friend.displayName}</div>
-                                                <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase truncate">{friend.email}</div>
+                                                <div className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase truncate">{friend.email}</div>
                                             </div>
                                         </div>
 
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveFriend(friend.uid)}
-                                            className="shrink-0 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/5 border border-transparent hover:border-red-500/20 transition-all"
+                                            className="shrink-0 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/5 border border-transparent hover:border-red-500/20 transition-all"
                                         >
                                             {t('friends.remove')}
                                         </button>

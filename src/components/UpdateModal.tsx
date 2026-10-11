@@ -29,13 +29,16 @@ export function UpdateModal({
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 40 }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="update-modal-title"
         className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-[28px] border border-zinc-200 dark:border-zinc-800 p-6 shadow-2xl relative"
       >
         <button
           type="button"
           onClick={onLater}
           disabled={downloading}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition disabled:opacity-40"
+          className="absolute top-4 right-4 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition disabled:opacity-40"
           aria-label={t('common.cancel')}
         >
           <X className="w-5 h-5" />
@@ -46,10 +49,10 @@ export function UpdateModal({
             <Sparkles className="w-6 h-6 text-black" />
           </div>
           <div className="text-left min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
               {t('update.badge')}
             </p>
-            <h2 className="text-xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">
+            <h2 id="update-modal-title" className="text-xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">
               {t('update.title')}
             </h2>
           </div>
@@ -64,7 +67,7 @@ export function UpdateModal({
 
         {notes && (
           <div className="mb-4 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-left">
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 mb-1">
               {t('update.notes_label')}
             </p>
             <p className="text-xs text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed">
@@ -74,12 +77,12 @@ export function UpdateModal({
         )}
 
         {downloadError === 'permission' && (
-          <p className="mb-3 text-xs text-amber-600 dark:text-amber-400 leading-snug">
+          <p className="mb-3 text-xs text-amber-700 dark:text-amber-400 leading-snug">
             {t('update.permission_hint')}
           </p>
         )}
         {downloadError === 'failed' && (
-          <p className="mb-3 text-xs text-red-500 leading-snug">
+          <p className="mb-3 text-xs text-red-700 dark:text-red-400 leading-snug">
             {t('update.download_failed')}
           </p>
         )}
@@ -107,13 +110,13 @@ export function UpdateModal({
             type="button"
             onClick={onLater}
             disabled={downloading}
-            className="w-full py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition disabled:opacity-40"
+            className="w-full py-3 rounded-2xl text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition disabled:opacity-40"
           >
             {t('update.later')}
           </button>
         </div>
 
-        <p className="mt-3 text-[10px] text-zinc-400 dark:text-zinc-600 text-center leading-snug">
+        <p className="mt-3 text-[10px] text-zinc-600 dark:text-zinc-400 text-center leading-snug">
           {t('update.hint')}
         </p>
       </motion.div>

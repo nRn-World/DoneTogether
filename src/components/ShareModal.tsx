@@ -63,15 +63,18 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="share-modal-title"
                 className="bg-white dark:bg-zinc-900 rounded-[32px] border border-zinc-200 dark:border-zinc-800 max-w-lg w-full shadow-2xl overflow-hidden"
             >
                 {/* Header */}
                 <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                     <div>
-                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">{t('plans.share_title')}</h2>
-                        <p className="text-xs font-bold text-emerald-600 dark:text-emerald-500 uppercase mt-1 italic">{plan.name}</p>
+                        <h2 id="share-modal-title" className="text-2xl font-black italic uppercase tracking-tighter text-zinc-900 dark:text-white">{t('plans.share_title')}</h2>
+                        <p className="text-xs font-bold text-emerald-700 dark:text-emerald-500 uppercase mt-1 italic">{plan.name}</p>
                     </div>
-                    <button onClick={onClose} className="p-2 rounded-xl text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+                    <button onClick={onClose} aria-label={t('common.close')} className="p-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
@@ -82,7 +85,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-bold text-center italic"
+                            className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-bold text-center italic"
                         >
                             {shareMessage}
                         </motion.div>
@@ -90,7 +93,7 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
 
                     {/* Generate Link */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
+                        <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">
                             {t('plans.share_invite_link')}
                         </h3>
                         {!inviteLink ? (
@@ -126,12 +129,13 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                     {/* Share with Friends */}
                     {friends.length > 0 && (
                         <div className="space-y-4">
-                            <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">
+                            <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">
                                 {t('plans.share_with_friends')}
                             </h3>
-                            <div className="space-y-2">
+                            <div role="list" className="space-y-2">
                                 {friends.map((friend) => (
                                     <div
+                                        role="listitem"
                                         key={friend.uid}
                                         className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-100 dark:border-zinc-700/50 flex items-center justify-between hover:border-emerald-500/30 transition-all"
                                     >
@@ -139,18 +143,18 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                             {friend.photoURL ? (
                                                 <img src={friend.photoURL} alt="" className="w-10 h-10 rounded-xl object-cover border border-white dark:border-zinc-700" />
                                             ) : (
-                                                <div className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-sm font-black text-zinc-500 dark:text-zinc-400">
+                                                <div className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-sm font-black text-zinc-600 dark:text-zinc-400">
                                                     {friend.displayName[0].toUpperCase()}
                                                 </div>
                                             )}
                                             <div>
                                                 <div className="font-bold text-sm text-zinc-900 dark:text-white">{friend.displayName}</div>
-                                                <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">{friend.email}</div>
+                                                <div className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase">{friend.email}</div>
                                             </div>
                                         </div>
 
                                         {isMember(friend.uid) ? (
-                                            <div className="text-[10px] font-black uppercase text-zinc-300 dark:text-zinc-600 tracking-widest">{t('plans.member')}</div>
+                                            <div className="text-[10px] font-black uppercase text-zinc-500 dark:text-zinc-400 tracking-widest">{t('plans.member')}</div>
                                         ) : (
                                             <button
                                                 onClick={() => handleShareWithFriend(friend.uid, friend.email, friend.displayName, friend.photoURL)}
@@ -167,13 +171,14 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
 
                     {/* Current Members */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                        <h3 className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1 flex items-center gap-2">
                             <UsersIcon className="w-4 h-4" />
                             {t('plans.members', { count: Object.keys(plan.members).length })}
                         </h3>
-                        <div className="grid grid-cols-1 gap-2">
+                        <div role="list" className="grid grid-cols-1 gap-2">
                             {Object.values(plan.members).map((member) => (
                                 <div
+                                    role="listitem"
                                     key={member.uid}
                                     className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between transition-all"
                                 >
@@ -181,16 +186,16 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                         {member.photoURL ? (
                                             <img src={member.photoURL} alt="" className="w-10 h-10 rounded-xl object-cover border border-white dark:border-zinc-800" />
                                         ) : (
-                                            <div className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-sm font-black text-zinc-500 dark:text-zinc-500">
+                                            <div className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-sm font-black text-zinc-600 dark:text-zinc-400">
                                                 {member.displayName[0].toUpperCase()}
                                             </div>
                                         )}
                                         <div>
                                             <div className="font-bold text-sm text-zinc-900 dark:text-white">{member.displayName}</div>
-                                            <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">{member.email}</div>
+                                            <div className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase">{member.email}</div>
                                         </div>
                                     </div>
-                                    <div className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-lg tracking-widest ${member.role === 'owner' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-500' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500'}`}>
+                                    <div className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-lg tracking-widest ${member.role === 'owner' ? 'bg-amber-500/10 text-amber-800 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-500'}`}>
                                         {member.role === 'owner' ? t('plans.owner') : t('plans.helper')}
                                     </div>
                                 </div>

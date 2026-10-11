@@ -10,7 +10,8 @@
         "unknown": "Okänd",
         "or": "ELLER",
         "home": "HEM",
-        "friends": "VÄNNER"
+        "friends": "VÄNNER",
+        "close": "Stäng"
     },
     "update": {
         "badge": "Uppdatering",
@@ -158,7 +159,14 @@
         "notifications_off": "Aviseringar av",
         "notifications_hint": "När på: nya punkter och avklarat skickas till övriga i planen.",
         "notifications_enabled_toast": "Planaviseringar på",
-        "notifications_disabled_toast": "Planaviseringar av"
+        "notifications_disabled_toast": "Planaviseringar av",
+        "mark_done": "Markera som klar",
+        "mark_undone": "Ångra klar",
+        "add_item": "Lägg till punkt",
+        "add_reaction": "Lägg till reaktion",
+        "react_with": "Reagera med {{emoji}}",
+        "remove_image": "Ta bort bild",
+        "delete_plan": "Radera plan"
     },
     "profile": {
         "title": "Profil",
@@ -218,6 +226,7 @@
         "send_error_rules": "Firebase blockerar. Publicera firestore.rules i Firebase Console först.",
         "alert_title": "Svar från admin",
         "alert_body": "Du har fått ett nytt meddelande",
-        "alert_open": "Öppna"
+        "alert_open": "Öppna",
+        "send": "Skicka meddelande"
     }
 }

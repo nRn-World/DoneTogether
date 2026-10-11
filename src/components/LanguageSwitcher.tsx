@@ -35,10 +35,10 @@ export function LanguageSwitcher() {
                 {languages.map((lang) => (
                     <button
                         key={lang.code}
-                        onClick={() => handleLanguageChange(lang.code)}
+                        aria-label={lang.label} aria-pressed={currentLanguage.startsWith(lang.code)} onClick={() => handleLanguageChange(lang.code)}
                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${currentLanguage.startsWith(lang.code)
                             ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm'
-                            : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
                             }`}
                     >
                         <span>{lang.flag}</span>

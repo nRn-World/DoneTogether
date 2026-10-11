@@ -55,11 +55,14 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="join-modal-title"
                 className="bg-white dark:bg-zinc-900 rounded-[32px] border border-zinc-200 dark:border-zinc-800 max-w-md w-full p-10 relative shadow-2xl"
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
+                    aria-label={t('common.close')} className="absolute top-8 right-8 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
                 >
                     <X className="w-6 h-6" />
                 </button>
@@ -68,7 +71,7 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                     <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 border border-purple-500/20 rotate-3">
                         <LinkIcon className="w-7 h-7 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-zinc-900 dark:text-white">DoneTogether</h2>
+                    <h2 id="join-modal-title" className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-zinc-900 dark:text-white">DoneTogether</h2>
                     <p className="text-zinc-500 dark:text-zinc-400 font-medium italic">
                         {t('plans.join_plan_subtitle')}
                     </p>
@@ -81,13 +84,13 @@ export function JoinModal({ onClose, onJoin, user, userProfile }: JoinModalProps
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder={t('plans.join_placeholder')}
-                            className="w-full h-16 px-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none font-bold italic text-lg text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700 shadow-inner"
+                            className="w-full h-16 px-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all outline-none font-bold italic text-lg text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-700 shadow-inner"
                             autoFocus
                         />
                     </div>
 
                     {error && (
-                        <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-500 text-sm font-bold text-center italic">
+                        <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-700 dark:text-red-400 text-sm font-bold text-center italic">
                             {error}
                         </div>
                     )}

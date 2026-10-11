@@ -10,7 +10,8 @@
         "unknown": "Bilinmiyor",
         "or": "VEYA",
         "home": "EVİM",
-        "friends": "ARKADAŞLAR"
+        "friends": "ARKADAŞLAR",
+        "close": "Kapat"
     },
     "update": {
         "badge": "Güncelleme",
@@ -155,7 +156,14 @@
         "notifications_off": "Bildirimler kapalı",
         "notifications_hint": "Açıkken: yeni maddeler ve tamamlamalar diğer üyelere gider.",
         "notifications_enabled_toast": "Plan bildirimleri açık",
-        "notifications_disabled_toast": "Plan bildirimleri kapalı"
+        "notifications_disabled_toast": "Plan bildirimleri kapalı",
+        "mark_done": "Tamamlandı olarak işaretle",
+        "mark_undone": "Tamamlandı işaretini kaldır",
+        "add_item": "Öğe ekle",
+        "add_reaction": "Tepki ekle",
+        "react_with": "{{emoji}} ile tepki ver",
+        "remove_image": "Resmi kaldır",
+        "delete_plan": "Planı sil"
     },
     "profile": {
         "title": "Profil",
@@ -215,6 +223,7 @@
         "send_error_rules": "Firebase engelledi. Önce Firebase Console'da firestore.rules yayınlayın.",
         "alert_title": "Adminden cevap",
         "alert_body": "Yeni bir mesajınız var",
-        "alert_open": "Aç"
+        "alert_open": "Aç",
+        "send": "Mesaj gönder"
     }
 }

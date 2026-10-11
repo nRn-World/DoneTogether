@@ -83,7 +83,7 @@ export function AddressAutocomplete({ onSelect, placeholder = "Search address...
                     placeholder={placeholder}
                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500/20 text-zinc-900 dark:text-white"
                 />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                 {isSearching && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                 )}
@@ -102,12 +102,12 @@ export function AddressAutocomplete({ onSelect, placeholder = "Search address...
                             className="w-full text-left p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-800 last:border-0 transition-colors group disabled:opacity-50"
                         >
                             <div className="flex items-start gap-3">
-                                <MapPin className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 mt-0.5 flex-shrink-0" />
+                                <MapPin className="w-4 h-4 text-zinc-600 dark:text-zinc-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 mt-0.5 flex-shrink-0" />
                                 <div className="min-w-0 flex-1">
                                     <div className="text-xs font-bold text-zinc-900 dark:text-white truncate">
                                         {result.main_text || result.description.split(',')[0]}
                                     </div>
-                                    <div className="text-[10px] text-zinc-400 line-clamp-2 leading-tight">
+                                    <div className="text-[10px] text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-tight">
                                         {result.description}
                                     </div>
                                 </div>
@@ -119,7 +119,7 @@ export function AddressAutocomplete({ onSelect, placeholder = "Search address...
 
             {isOpen && query.trim().length >= 2 && !isSearching && results.length === 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 p-3 text-center">
-                    <p className="text-[10px] text-zinc-400 italic">Inga platser hittades</p>
+                    <p className="text-[10px] text-zinc-600 dark:text-zinc-400 italic">Inga platser hittades</p>
                 </div>
             )}
         </div>

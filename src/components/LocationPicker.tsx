@@ -224,7 +224,7 @@ export function LocationPicker({
             <div className="rounded-2xl overflow-hidden border border-zinc-800 bg-[#121214]">
                 <div ref={mapRef} className="w-full h-52 bg-zinc-900" />
                 {mapError && (
-                    <div className="p-4 text-[10px] text-zinc-500 text-center">
+                    <div className="p-4 text-[10px] text-zinc-400 text-center">
                         {t('profile.map_unavailable')}
                     </div>
                 )}
@@ -235,12 +235,12 @@ export function LocationPicker({
                             <p className="text-[11px] font-bold text-zinc-200 leading-snug break-words">
                                 {resolvingAddress ? t('profile.resolving_address') : displayAddress}
                             </p>
-                            <p className="text-[9px] text-zinc-500 mt-0.5 font-mono">
+                            <p className="text-[9px] text-zinc-400 mt-0.5 font-mono">
                                 {latitude.toFixed(5)}, {longitude.toFixed(5)}
                             </p>
                         </div>
                     </div>
-                    <p className="text-[9px] text-zinc-600 italic pl-5">{t('profile.map_pin_hint')}</p>
+                    <p className="text-[9px] text-zinc-400 italic pl-5">{t('profile.map_pin_hint')}</p>
                 </div>
             </div>
 
@@ -267,7 +267,7 @@ export function LocationPicker({
                                 className={`px-2.5 py-1.5 rounded-lg text-[10px] font-black tracking-wide transition-all border ${
                                     active
                                         ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-                                        : 'bg-[#18181b] border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300'
+                                        : 'bg-[#18181b] border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
                                 }`}
                             >
                                 {preset.label}
@@ -275,7 +275,7 @@ export function LocationPicker({
                         );
                     })}
                 </div>
-                <p className="text-[9px] text-zinc-600 mt-2 ml-1 italic">
+                <p className="text-[9px] text-zinc-400 mt-2 ml-1 italic">
                     {t('profile.gps_radius_hint', { radius: formatRadius(radius) })}
                 </p>
             </div>

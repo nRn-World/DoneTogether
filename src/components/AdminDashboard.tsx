@@ -87,7 +87,7 @@ function MetricCard({
                     <p className="mt-2 text-3xl font-semibold tracking-tight text-white tabular-nums sm:text-4xl">
                         {value}
                     </p>
-                    <p className="mt-1.5 text-xs text-zinc-500">{hint}</p>
+                    <p className="mt-1.5 text-xs text-zinc-400">{hint}</p>
                 </div>
                 <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-200">
                     {icon}
@@ -117,7 +117,7 @@ function PlatformBars({
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
             <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400">{title}</p>
             {entries.length === 0 ? (
-                <p className="text-sm text-zinc-500">Ingen data ännu</p>
+                <p className="text-sm text-zinc-400">Ingen data ännu</p>
             ) : (
                 <div className="space-y-3">
                     {entries.map(([platform, count]) => (
@@ -211,7 +211,7 @@ export function AdminDashboard({ open, onClose, email, currentUser }: AdminDashb
                                         >
                                             Adminpanel
                                         </h2>
-                                        <p className="mt-1 text-xs text-zinc-500 sm:text-sm">
+                                        <p className="mt-1 text-xs text-zinc-400 sm:text-sm">
                                             Statistik och meddelanden från användare
                                         </p>
                                     </div>
@@ -231,7 +231,7 @@ export function AdminDashboard({ open, onClose, email, currentUser }: AdminDashb
                                     <button
                                         type="button"
                                         onClick={onClose}
-                                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition hover:bg-white/10"
+                                        aria-label="Stäng" className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition hover:bg-white/10"
                                     >
                                         <X className="h-4 w-4" />
                                     </button>
@@ -347,7 +347,7 @@ export function AdminDashboard({ open, onClose, email, currentUser }: AdminDashb
                                                 </p>
                                                 <div className="space-y-2">
                                                     {metrics.recentUsers.length === 0 ? (
-                                                        <p className="text-sm text-zinc-500">Inga användare ännu</p>
+                                                        <p className="text-sm text-zinc-400">Inga användare ännu</p>
                                                     ) : (
                                                         metrics.recentUsers.map((u) => (
                                                             <div
@@ -358,13 +358,13 @@ export function AdminDashboard({ open, onClose, email, currentUser }: AdminDashb
                                                                     <p className="truncate text-sm font-medium text-zinc-100">
                                                                         {u.displayName}
                                                                     </p>
-                                                                    <p className="truncate text-[11px] text-zinc-500">{u.email}</p>
+                                                                    <p className="truncate text-[11px] text-zinc-400">{u.email}</p>
                                                                 </div>
                                                                 <div className="shrink-0 text-right">
                                                                     <p className="text-[11px] font-medium text-zinc-300">
                                                                         {formatRelative(u.lastActiveAt)}
                                                                     </p>
-                                                                    <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-zinc-500">
+                                                                    <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-zinc-400">
                                                                         <PlatformIcon platform={u.clientPlatform || 'web'} />
                                                                         {platformLabel(u.clientPlatform)}
                                                                     </p>
@@ -393,8 +393,8 @@ export function AdminDashboard({ open, onClose, email, currentUser }: AdminDashb
                                         </div>
                                     ) : threads.length === 0 ? (
                                         <div className="text-center py-16">
-                                            <MessageSquare className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-                                            <p className="text-sm text-zinc-500">Inga meddelanden ännu</p>
+                                            <MessageSquare className="w-10 h-10 text-zinc-400 mx-auto mb-3" />
+                                            <p className="text-sm text-zinc-400">Inga meddelanden ännu</p>
                                         </div>
                                     ) : (
                                         threads.map((thread) => (
@@ -414,14 +414,14 @@ export function AdminDashboard({ open, onClose, email, currentUser }: AdminDashb
                                                                 <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
                                                             )}
                                                         </div>
-                                                        <p className="truncate text-[11px] text-zinc-500 mt-0.5">
+                                                        <p className="truncate text-[11px] text-zinc-400 mt-0.5">
                                                             {thread.userEmail}
                                                         </p>
                                                         <p className="truncate text-xs text-zinc-400 mt-2">
                                                             {thread.lastMessage}
                                                         </p>
                                                     </div>
-                                                    <p className="shrink-0 text-[10px] text-zinc-500 tabular-nums">
+                                                    <p className="shrink-0 text-[10px] text-zinc-400 tabular-nums">
                                                         {formatRelative(
                                                             thread.lastMessageAt?.toMillis?.() ?? null
                                                         )}

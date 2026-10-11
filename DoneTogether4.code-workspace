@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"java.project.sourcePaths": [],
+		"java.import.exclusions": [
+			"**/node_modules/**",
+			"**/dist/**"
+		],
+		"gradle.nestedProjects": false,
+		"java.configuration.updateBuildConfiguration": "disabled"
+	}
+}

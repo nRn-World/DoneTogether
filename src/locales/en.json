@@ -10,7 +10,8 @@
         "unknown": "Unknown",
         "or": "OR",
         "home": "HOME",
-        "friends": "FRIENDS"
+        "friends": "FRIENDS",
+        "close": "Close"
     },
     "update": {
         "badge": "Update",
@@ -158,7 +159,14 @@
         "notifications_off": "Notifications off",
         "notifications_hint": "When on: new items and completions notify other members.",
         "notifications_enabled_toast": "Plan notifications on",
-        "notifications_disabled_toast": "Plan notifications off"
+        "notifications_disabled_toast": "Plan notifications off",
+        "mark_done": "Mark as done",
+        "mark_undone": "Undo done",
+        "add_item": "Add item",
+        "add_reaction": "Add reaction",
+        "react_with": "React with {{emoji}}",
+        "remove_image": "Remove image",
+        "delete_plan": "Delete plan"
     },
     "profile": {
         "title": "Profile",
@@ -218,6 +226,7 @@
         "send_error_rules": "Firebase blocked this. Publish firestore.rules in Firebase Console first.",
         "alert_title": "Reply from admin",
         "alert_body": "You have a new message",
-        "alert_open": "Open"
+        "alert_open": "Open",
+        "send": "Send message"
     }
 }

@@ -32,4 +32,14 @@ if (!localStorage.getItem('i18nextLng')) {
   i18n.changeLanguage('en');
 }
 
+// WCAG 3.1.1 (Language of Page): keep <html lang> in sync with the language the
+// UI actually renders, otherwise assistive tech keeps reading Swedish pronunciation
+// after the user switches to English or Turkish.
+const syncDocumentLanguage = (lng?: string) => {
+  document.documentElement.lang = (lng || 'en').split('-')[0];
+};
+
+syncDocumentLanguage(i18n.language);
+i18n.on('languageChanged', syncDocumentLanguage);
+
 export default i18n;

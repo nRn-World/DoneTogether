@@ -1,0 +1,1154 @@
+[
+  {
+    "id": "TC001",
+    "title": "Sign in and reach the authenticated home state",
+    "description": "A guest can sign in with email and password and land in the authenticated home or plan list view.",
+    "category": "Join plan via invite",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated home or plan list is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Sign in with email and password",
+    "description": "A visitor can sign in with email and password and reach the authenticated home state.",
+    "category": "User authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated home state is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is signed in"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Create a new shared plan",
+    "description": "A signed-in user can create a new collaborative plan and see it appear in the active plans list.",
+    "category": "Create and manage plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Create a new plan"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the plan name with a unique value"
+      },
+      {
+        "type": "action",
+        "description": "Add an optional checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Save the plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new plan appears in the active plans list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the plan can be opened from the home state"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Update and complete a plan item",
+    "description": "A signed-in user can edit, delete, and complete a checklist item in a plan while progress updates remain visible.",
+    "category": "Create and manage plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open a plan detail"
+      },
+      {
+        "type": "action",
+        "description": "Add a checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Edit the checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Delete the checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Mark a checklist item complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify progress updates are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the completed state is reflected in the plan"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Join a plan with a valid invite code",
+    "description": "A signed-in user can enter a valid invite code and join the shared plan successfully.",
+    "category": "Join plan via invite",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the join plan flow"
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid invite code"
+      },
+      {
+        "type": "action",
+        "description": "Confirm joining the plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the joined plan is added and opened successfully"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Create and share a plan invite link",
+    "description": "A signed-in plan owner can open share controls for a plan and copy an invite link successfully.",
+    "category": "Share plan",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open a plan"
+      },
+      {
+        "type": "action",
+        "description": "Open the share flow"
+      },
+      {
+        "type": "action",
+        "description": "Copy the invite link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the invite link is available to share"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Join a plan from a shared invite link",
+    "description": "A signed-in user can open a shared invite link and join the plan from the invitation view.",
+    "category": "Join plan via invite",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the shared invite link from the plan invitation"
+      },
+      {
+        "type": "action",
+        "description": "Confirm joining the plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the plan opens in the app after joining"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Sign out of the app",
+    "description": "A signed-in user can sign out and return to the unauthenticated state.",
+    "category": "User authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the account menu"
+      },
+      {
+        "type": "action",
+        "description": "Sign out"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the unauthenticated state is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is no longer signed in"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Create and share a plan invite code",
+    "description": "A signed-in plan owner can open share controls for a plan and copy an invite code successfully.",
+    "category": "Share plan",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open a plan"
+      },
+      {
+        "type": "action",
+        "description": "Open the share flow"
+      },
+      {
+        "type": "action",
+        "description": "Copy the invite code"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the invite code is available to share"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Send a friend request by email",
+    "description": "A signed-in user can search for a person by email and send a friend request successfully.",
+    "category": "Friends",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Friends area"
+      },
+      {
+        "type": "action",
+        "description": "Search for a person by email"
+      },
+      {
+        "type": "action",
+        "description": "Send the friend request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the friend request is recorded"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Accept an incoming friend request",
+    "description": "A signed-in user can review an incoming request and accept it so the person appears in the friend list.",
+    "category": "Friends",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Friends area"
+      },
+      {
+        "type": "action",
+        "description": "Review an incoming friend request"
+      },
+      {
+        "type": "action",
+        "description": "Accept the request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the person is added to the friend list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Reopen a completed plan",
+    "description": "A signed-in user can reopen a completed plan and return it to active planning state.",
+    "category": "Create and manage plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open a completed plan"
+      },
+      {
+        "type": "action",
+        "description": "Reopen the plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the plan returns to active planning state"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the completed status is no longer shown"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Add a location-based reminder to an item using an address search",
+    "description": "This verifies that a signed-in planner can grant location access, search for an address, and save a geofence reminder on a checklist item.",
+    "category": "Location and geofence on items",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the login modal"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Grant location permission"
+      },
+      {
+        "type": "action",
+        "description": "Open the location picker for a checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Search for a valid address"
+      },
+      {
+        "type": "action",
+        "description": "Select the suggested location"
+      },
+      {
+        "type": "action",
+        "description": "Set a valid radius"
+      },
+      {
+        "type": "action",
+        "description": "Choose the enter trigger type"
+      },
+      {
+        "type": "action",
+        "description": "Save the location settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item shows a saved location reminder"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Add media and reaction to a completed item",
+    "description": "A signed-in user can attach a photo and emoji reaction to a completed checklist item and see the item update.",
+    "category": "Create and manage plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open a plan detail"
+      },
+      {
+        "type": "action",
+        "description": "Mark a checklist item complete"
+      },
+      {
+        "type": "action",
+        "description": "Attach a photo to the completed item"
+      },
+      {
+        "type": "action",
+        "description": "Add an emoji reaction to the completed item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item shows attached media"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the emoji reaction is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Add a location-based reminder to an item using a saved place",
+    "description": "This verifies that a signed-in planner can choose a saved location, set an exit trigger, and save it on a checklist item.",
+    "category": "Location and geofence on items",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the login modal"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the location picker for a checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Choose a saved location"
+      },
+      {
+        "type": "action",
+        "description": "Set a valid radius"
+      },
+      {
+        "type": "action",
+        "description": "Choose the exit trigger type"
+      },
+      {
+        "type": "action",
+        "description": "Save the location settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item shows a saved location reminder"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Decline an incoming friend request",
+    "description": "A signed-in user can decline an incoming friend request and the request is removed.",
+    "category": "Friends",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Friends area"
+      },
+      {
+        "type": "action",
+        "description": "Review an incoming friend request"
+      },
+      {
+        "type": "action",
+        "description": "Decline the request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the request is removed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Remove a friend from the friend list",
+    "description": "A signed-in user can remove an existing friend and see that person disappear from the friend list.",
+    "category": "Friends",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Friends area"
+      },
+      {
+        "type": "action",
+        "description": "View the friend list"
+      },
+      {
+        "type": "action",
+        "description": "Remove a friend"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the friend is removed from the list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Switch the app to Swedish",
+    "description": "A guest can change the interface language to Swedish and continue using the app with updated visible text.",
+    "category": "Language switching",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the language switcher"
+      },
+      {
+        "type": "action",
+        "description": "Select Svenska"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface language updates to Swedish"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app remains usable after the language change"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Switch the app to Turkish",
+    "description": "A guest can change the interface language to Turkish and continue using the app with updated visible text.",
+    "category": "Language switching",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the language switcher"
+      },
+      {
+        "type": "action",
+        "description": "Select Turkish"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface language updates to Turkish"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app remains usable after the language change"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Keep the item unchanged after cancelling location setup",
+    "description": "This verifies that a signed-in planner can exit the location picker without saving and the checklist item remains unchanged.",
+    "category": "Location and geofence on items",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the login modal"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the location picker for a checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the location picker"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item has no saved location reminder"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Switch the app to dark mode",
+    "description": "This verifies that a guest can toggle the app appearance to dark mode without disrupting the home experience.",
+    "category": "Theme toggle",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the theme toggle"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app is in dark mode"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC022",
+    "title": "Switch the app back to light mode",
+    "description": "This verifies that a guest can toggle the app appearance back to light mode after enabling dark mode.",
+    "category": "Theme toggle",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the theme toggle"
+      },
+      {
+        "type": "action",
+        "description": "Click the theme toggle again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app is in light mode"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC023",
+    "title": "Reject invalid email login",
+    "description": "A visitor sees an authentication error when submitting invalid email and password credentials.",
+    "category": "User authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in entry"
+      },
+      {
+        "type": "action",
+        "description": "Choose email login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with invalid@example.com"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with invalid-password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an authentication error message is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains signed out"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC024",
+    "title": "Reject an invalid invite code",
+    "description": "A signed-in user sees an invite code validation error when entering an invalid code and the plan is not joined.",
+    "category": "Join plan via invite",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the sign-in flow"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "action",
+        "description": "Open the join plan flow"
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid invite code"
+      },
+      {
+        "type": "action",
+        "description": "Confirm joining the plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invite code validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the plan is not joined"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "Show the update prompt when a newer app version is available",
+    "description": "This verifies that an Android user sees the update prompt when a newer version is available and can continue using the app flow.",
+    "category": "App update prompt",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an app update prompt is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC026",
+    "title": "Dismiss the app update prompt and continue",
+    "description": "This verifies that an Android user can dismiss the update prompt and return to the app without blocking interaction.",
+    "category": "App update prompt",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Dismiss the app update prompt"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the update prompt is no longer displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC027",
+    "title": "Show a validation message for an invalid location search",
+    "description": "This verifies that a signed-in planner sees a validation error when entering an unusable location search and cannot save the reminder.",
+    "category": "Location and geofence on items",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the login modal"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the location picker for a checklist item"
+      },
+      {
+        "type": "action",
+        "description": "Search for an invalid address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a location search validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC028",
+    "title": "Start the app update from the prompt",
+    "description": "This verifies that an Android user can start the update flow from the update prompt and remain in a visible update state.",
+    "category": "App update prompt",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Start the app update from the prompt"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the update flow is shown"
+      }
+    ],
+    "priority": "Low"
+  }
+]

@@ -437,7 +437,7 @@ function App() {
           <div className="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-3xl">
             <img src="pwa-icon.png" className="w-full h-full object-cover scale-[1.6]" alt="DoneTogether" />
           </div>
-          <p className="text-zinc-500 font-bold italic uppercase tracking-widest text-xs">{t('common.loading')}</p>
+          <h1 className="text-zinc-500 dark:text-zinc-400 font-bold italic uppercase tracking-widest text-xs">{t('common.loading')}</h1>
         </div>
       </div>
     );
@@ -452,12 +452,12 @@ function App() {
             type="button"
             onClick={() => setActiveTab('home')}
             className="flex items-center gap-3 cursor-pointer"
-            aria-label={t('common.home')}
+            aria-label={`${t('common.home')}: DoneTogether`}
           >
             <div className="w-10 h-10 overflow-hidden rounded-xl rotate-3 hover:rotate-6 transition-transform shadow-lg shadow-black/5 dark:shadow-none">
               <img src="pwa-icon.png" className="w-full h-full object-cover scale-[1.5]" alt="Logo" />
             </div>
-            <h1 className="text-xl font-black italic tracking-tighter">Done<span className="text-emerald-500">Together</span></h1>
+            <span className="text-xl font-black italic tracking-tighter">Done<span className="text-emerald-700 dark:text-emerald-400">Together</span></span>
           </button>
 
           <div className="flex items-center gap-4">
@@ -465,8 +465,8 @@ function App() {
               <button
                 type="button"
                 onClick={() => setShowContactAdmin(true)}
-                className="relative p-2 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
-                title={t('contact.alert_title')}
+                className="relative p-2 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                aria-label={`${t('contact.alert_title')} 1`} title={t('contact.alert_title')}
               >
                 <MessageSquare className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950">
@@ -478,8 +478,8 @@ function App() {
             {incomingRequests && incomingRequests.length > 0 && (
               <button
                 onClick={() => setShowFriendsModal(true)}
-                className="relative p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-                title={t('common.friends_requests') || 'Friends Requests'}
+                className="relative p-2 rounded-xl bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-500/20 transition-colors"
+                aria-label={`${t('plans.friends_requests')} ${incomingRequests.length}`} title={t('plans.friends_requests')}
               >
                 <Users className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950">
@@ -491,12 +491,12 @@ function App() {
             {isAuthenticated && userProfile ? (
               <button
                 onClick={() => setActiveTab('profile')}
-                className="flex items-center gap-3 p-1 pr-3 rounded-2xl bg-zinc-100 dark:bg-transparent hover:bg-zinc-200 dark:hover:bg-zinc-900 transition-colors border border-zinc-200 dark:border-transparent dark:hover:border-zinc-800"
+                aria-label={`${t('profile.title')}: ${userProfile.displayName}`} className="flex items-center gap-3 p-1 pr-3 rounded-2xl bg-zinc-100 dark:bg-transparent hover:bg-zinc-200 dark:hover:bg-zinc-900 transition-colors border border-zinc-200 dark:border-transparent dark:hover:border-zinc-800"
               >
                 {userProfile.photoURL ? (
                   <img src={userProfile.photoURL} className="w-8 h-8 rounded-xl object-cover border border-zinc-200 dark:border-zinc-800" alt="" />
                 ) : (
-                  <div className="w-8 h-8 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700">
+                  <div className="w-8 h-8 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-700">
                     <User className="w-4 h-4" />
                   </div>
                 )}
@@ -523,18 +523,18 @@ function App() {
               onClick={() => setShowContactAdmin(true)}
               className="w-full flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl px-4 py-3 shadow-lg shadow-emerald-500/10 text-left hover:border-emerald-500/50 transition-all"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">
                   {t('contact.alert_title')}
                 </p>
                 <p className="text-sm font-semibold text-zinc-900 dark:text-white truncate mt-0.5">
                   {adminReplyPreview || t('contact.alert_body')}
                 </p>
               </div>
-              <span className="shrink-0 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="shrink-0 text-xs font-bold text-emerald-700 dark:text-emerald-400">
                 {t('contact.alert_open')}
               </span>
             </button>
@@ -555,7 +555,8 @@ function App() {
             >
               {/* Hero Section */}
               <div className="bg-gradient-to-br from-emerald-500/10 to-transparent p-8 rounded-[32px] border border-emerald-500/10 dark:border-emerald-500/10">
-                <h2 className="text-3xl font-bold mb-3 tracking-tight leading-tight italic font-black">{t('home.hero_title')}</h2>
+                {/* Page heading for this view: describes what the app does, with the keywords the page ranks for */}
+                <h1 className="text-3xl font-bold mb-3 tracking-tight leading-tight italic font-black">{t('home.hero_title')}</h1>
                 <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6 max-w-md italic">
                   {t('home.hero_subtitle')}
                 </p>
@@ -586,21 +587,22 @@ function App() {
               {/* Active Plans List */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-2">
-                  <h3 className="text-zinc-400 dark:text-zinc-500 text-xs font-bold uppercase tracking-[0.2em]">{t('home.active_plans')}</h3>
-                  <span className="text-zinc-400 dark:text-zinc-600 text-xs font-medium">{t('home.plans_count', { count: activePlans.length })}</span>
+                  <h2 className="text-zinc-600 dark:text-zinc-400 text-xs font-bold uppercase tracking-[0.2em]">{t('home.active_plans')}</h2>
+                  <span className="text-zinc-600 dark:text-zinc-400 text-xs font-medium">{t('home.plans_count', { count: activePlans.length })}</span>
                 </div>
 
                 {activePlans.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4">
                     {activePlans.map((plan) => (
-                      <motion.div
+                      <motion.button
+                        type="button"
                         key={plan.id}
                         layoutId={plan.id}
                         onClick={() => {
                           setCurrentPlanId(plan.id);
                           setActiveTab('plans');
                         }}
-                        className="group bg-white dark:bg-zinc-900/40 p-5 rounded-3xl border border-zinc-200 dark:border-zinc-800/50 hover:border-emerald-500/30 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all cursor-pointer overflow-hidden relative shadow-sm hover:shadow-md"
+                        className="group block w-full text-left bg-white dark:bg-zinc-900/40 p-5 rounded-3xl border border-zinc-200 dark:border-zinc-800/50 hover:border-emerald-500/30 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition-all cursor-pointer overflow-hidden relative shadow-sm hover:shadow-md"
                       >
                         {plan.imageUrl && (
                           <div className="absolute top-0 right-0 w-32 h-full opacity-5 dark:opacity-10 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity">
@@ -609,8 +611,8 @@ function App() {
                           </div>
                         )}
                         <div className="flex items-center justify-between mb-4 relative z-10">
-                          <h4 className="font-bold text-lg text-zinc-900 dark:text-white group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors uppercase italic tracking-tight">{plan.name}</h4>
-                          <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 text-[10px] font-bold tracking-widest uppercase">
+                          <h3 className="font-bold text-lg text-zinc-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors uppercase italic tracking-tight">{plan.name}</h3>
+                          <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-500 text-[10px] font-bold tracking-widest uppercase">
                             {getProgress(plan)}% {t('plans.completed')}
                           </span>
                         </div>
@@ -621,7 +623,7 @@ function App() {
                             className="h-full bg-emerald-500 rounded-full"
                           />
                         </div>
-                        <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-500 italic relative z-10">
+                        <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 italic relative z-10">
                           <span>{t('plans.step_of', { current: plan.items?.filter(i => i.checked).length || 0, total: plan.items?.length || 0 })}</span>
                           <div className="flex -space-x-2">
                             {plan.members && Object.values(plan.members).slice(0, 3).map((m: any, i) => (
@@ -633,18 +635,18 @@ function App() {
                               />
                             ))}
                             {plan.members && Object.keys(plan.members).length > 3 && (
-                              <div className="w-6 h-6 rounded-lg border-2 border-white dark:border-zinc-900 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[8px] font-bold text-zinc-500 dark:text-zinc-400">
+                              <div className="w-6 h-6 rounded-lg border-2 border-white dark:border-zinc-900 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[8px] font-bold text-zinc-600 dark:text-zinc-400">
                                 +{Object.keys(plan.members).length - 3}
                               </div>
                             )}
                           </div>
                         </div>
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-white dark:bg-zinc-900/20 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
-                    <p className="text-zinc-400 dark:text-zinc-500 italic text-sm">{t('home.no_active_plans')}</p>
+                    <p className="text-zinc-600 dark:text-zinc-400 italic text-sm">{t('home.no_active_plans')}</p>
                   </div>
                 )}
               </div>
@@ -662,43 +664,47 @@ function App() {
               {!currentPlanId ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 mb-6">
-                    <button onClick={() => setActiveTab('home')} className="p-2 -ml-2 rounded-xl bg-white dark:bg-transparent border border-zinc-200 dark:border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 transition-colors">
+                    <button aria-label={t('common.back')} onClick={() => setActiveTab('home')} className="p-2 -ml-2 rounded-xl bg-white dark:bg-transparent border border-zinc-200 dark:border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition-colors">
                       <ArrowLeft className="w-5 h-5" />
                     </button>
-                    <h2 className="text-2xl font-black italic tracking-tight uppercase text-zinc-900 dark:text-white">{t('plans.all_plans')}</h2>
+                    <h1 className="text-2xl font-black italic tracking-tight uppercase text-zinc-900 dark:text-white">{t('plans.all_plans')}</h1>
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="text-zinc-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] px-2">{t('home.active_plans')}</h3>
+                    <h2 className="text-zinc-600 dark:text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em] px-2">{t('home.active_plans')}</h2>
                     {activePlans.length > 0 ? activePlans.map(plan => (
                       <div
                         key={plan.id}
                         onClick={() => setCurrentPlanId(plan.id)}
                         className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/20 transition-all cursor-pointer group shadow-sm hover:shadow-md"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 dark:text-zinc-500 group-hover:bg-emerald-500 group-hover:text-black transition-all overflow-hidden border border-zinc-100 dark:border-zinc-700">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPlanId(plan.id)}
+                          className="flex items-center gap-4 text-left"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-400 group-hover:bg-emerald-500 group-hover:text-black transition-all overflow-hidden border border-zinc-100 dark:border-zinc-700">
                             {plan.imageUrl ? <img src={plan.imageUrl} className="w-full h-full object-cover" alt={plan.name} /> : <Plus className="w-5 h-5" />}
                           </div>
                           <div>
                             <div className="font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white uppercase italic tracking-tight transition-colors">{plan.name}</div>
-                            <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">{t('plans.step_of', { current: plan.items?.filter(i => i.checked).length || 0, total: plan.items?.length || 0 })}</div>
+                            <div className="text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase">{t('plans.step_of', { current: plan.items?.filter(i => i.checked).length || 0, total: plan.items?.length || 0 })}</div>
                           </div>
-                        </div>
+                        </button>
                         {plan.ownerId === user?.uid && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeletePlan(plan.id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 p-2 text-zinc-300 dark:text-zinc-600 hover:text-red-500 transition-all"
+                            aria-label={t('plans.delete_plan')} className="opacity-0 group-hover:opacity-100 p-2 text-zinc-500 dark:text-zinc-400 hover:text-red-500 transition-all"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
                       </div>
                     )) : (
-                      <p className="text-zinc-400 dark:text-zinc-600 text-sm italic px-2">{t('plans.no_active_plans_text')}</p>
+                      <p className="text-zinc-600 dark:text-zinc-400 text-sm italic px-2">{t('plans.no_active_plans_text')}</p>
                     )}
                   </div>
                 </div>
@@ -708,7 +714,7 @@ function App() {
                   <div className="space-y-4">
                     <button
                       onClick={() => setCurrentPlanId(null)}
-                      className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 text-xs font-black uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+                      className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 text-xs font-black uppercase tracking-widest hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       {t('common.back')}
@@ -727,9 +733,9 @@ function App() {
                           )}
                         </div>
                         <div>
-                          <h2 className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-1 text-zinc-900 dark:text-white">{currentPlan.name}</h2>
+                          <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-1 text-zinc-900 dark:text-white">{currentPlan.name}</h1>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-lg">
+                            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-lg">
                               {t('common.by') || 'BY'} {currentPlan.members?.[currentPlan.ownerId]?.displayName || t('common.unknown')}
                             </span>
                           </div>
@@ -737,15 +743,15 @@ function App() {
                       </div>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => setShowShareModal(true)}
+                          aria-label={t('plans.share_title')} onClick={() => setShowShareModal(true)}
                           className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm"
                         >
                           <Share2 className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
                         </button>
                         {(currentPlan.ownerId === user?.uid || currentPlan.completed) && (
                           <button
-                            onClick={() => handleDeletePlan(currentPlan.id)}
-                            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-400 hover:text-red-500 transition-all shadow-sm"
+                            aria-label={t('plans.delete_plan')} onClick={() => handleDeletePlan(currentPlan.id)}
+                            className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-500/10 text-zinc-600 dark:text-zinc-400 hover:text-red-500 transition-all shadow-sm"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
@@ -755,8 +761,8 @@ function App() {
 
                     <div className="p-5 bg-white dark:bg-zinc-900/40 rounded-[24px] border border-zinc-200 dark:border-zinc-800/50 shadow-sm">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">{t('plans.progress')}</span>
-                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 italic">{getProgress(currentPlan)}% {t('plans.completed')}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400">{t('plans.progress')}</span>
+                        <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 italic">{getProgress(currentPlan)}% {t('plans.completed')}</span>
                       </div>
                       <div className="h-3 bg-zinc-100 dark:bg-zinc-950 rounded-full overflow-hidden border border-zinc-100 dark:border-zinc-800">
                         <motion.div
@@ -771,11 +777,11 @@ function App() {
                     {currentPlan.ownerId === user?.uid && (
                       <div className="flex items-center justify-between gap-4 p-4 sm:p-5 rounded-[24px] bg-white dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/50 shadow-sm">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${currentPlan.notificationsEnabled ? 'bg-emerald-500/15 border-emerald-500/25 text-emerald-500' : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400'}`}>
+                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${currentPlan.notificationsEnabled ? 'bg-emerald-500/15 border-emerald-500/25 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'}`}>
                             {currentPlan.notificationsEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
                           </div>
                           <div className="min-w-0 text-left">
-                            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500 mb-1">
+                            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-600 dark:text-zinc-400 mb-1">
                               {t('plans.notifications_label')}
                             </p>
                             <p className="text-sm font-bold text-zinc-900 dark:text-white leading-snug">
@@ -783,14 +789,14 @@ function App() {
                                 ? t('plans.notifications_on')
                                 : t('plans.notifications_off')}
                             </p>
-                            <p className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-snug">
                               {t('plans.notifications_hint')}
                             </p>
                           </div>
                         </div>
                         <button
                           type="button"
-                          aria-pressed={!!currentPlan.notificationsEnabled}
+                          aria-label={t('plans.notifications_label')} aria-pressed={!!currentPlan.notificationsEnabled}
                           onClick={async () => {
                             const next = !currentPlan.notificationsEnabled;
                             try {
@@ -822,7 +828,7 @@ function App() {
                     >
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                          <label className="cursor-pointer text-zinc-500 dark:text-zinc-600 hover:text-emerald-500 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                          <label className="cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
                             <Camera className="w-5 h-5" />
                             <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                               const file = e.target.files?.[0];
@@ -832,7 +838,7 @@ function App() {
                           {itemFile && (
                              <div className="relative ml-1">
                                <img src={itemFilePreview!} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
-                              <button type="button" onClick={() => setItemFile(null)} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
+                              <button type="button" onClick={() => setItemFile(null)} aria-label={t('plans.remove_image')} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
                                 <X className="w-2.5 h-2.5" />
                               </button>
                             </div>
@@ -848,12 +854,12 @@ function App() {
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => setShowGpsAdd(!showGpsAdd)}
-                            className={`p-2 rounded-xl border transition-all ${selectedAddLocation || showGpsAdd ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'text-zinc-500 dark:text-zinc-600 hover:text-emerald-500 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800'}`}
+                            aria-label={t('profile.gps_reminder')} aria-expanded={showGpsAdd} onClick={() => setShowGpsAdd(!showGpsAdd)}
+                            className={`p-2 rounded-xl border transition-all ${selectedAddLocation || showGpsAdd ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800'}`}
                           >
                             <MapPin className="w-5 h-5" />
                           </button>
-                          <button type="submit" disabled={!addInput.trim()} className="p-2.5 bg-emerald-500 text-black rounded-xl disabled:opacity-20 shadow-lg shadow-emerald-500/20 transition-all hover:scale-110 active:scale-95">
+                          <button type="submit" aria-label={t('plans.add_item')} disabled={!addInput.trim()} className="p-2.5 bg-emerald-500 text-black rounded-xl disabled:opacity-20 shadow-lg shadow-emerald-500/20 transition-all hover:scale-110 active:scale-95">
                             <Plus className="w-5 h-5 stroke-[4px]" />
                           </button>
                         </div>
@@ -869,7 +875,7 @@ function App() {
                           >
                             <div className="p-6 rounded-[32px] bg-[#0c0c0e] border border-zinc-800/50 space-y-6 shadow-2xl relative">
                               <div className="flex items-center gap-2 mb-2 ml-1">
-                                <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+                                <MapPin className="w-3.5 h-3.5 text-zinc-400" />
                                 <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
                                   {t('profile.gps_reminder')}
                                 </label>
@@ -971,7 +977,7 @@ function App() {
                                             });
                                             showToast(t('profile.location_selected_toast', { type: customName || place.label }));
                                           }}
-                                          className={`py-4 px-4 bg-[#18181b]/50 border rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/fav ${loc ? 'border-zinc-800/50 text-zinc-500 hover:border-emerald-500/20 hover:text-emerald-500' : 'border-zinc-800/20 text-zinc-700/50 opacity-50 cursor-not-allowed'}`}
+                                          className={`py-4 px-4 bg-[#18181b]/50 border rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/fav ${loc ? 'border-zinc-800/50 text-zinc-400 hover:border-emerald-500/20 hover:text-emerald-500' : 'border-zinc-800/20 text-zinc-400/80 cursor-not-allowed'}`}
                                         >
                                           <span className="text-sm opacity-50 group-hover/fav:opacity-100 transition-opacity">{place.icon}</span>
                                           <span className="truncate">{customName || place.label}</span>
@@ -1011,7 +1017,7 @@ function App() {
                                       className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
                                         (selectedAddLocation.trigger || 'enter') === 'enter'
                                           ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                                          : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                          : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-400'
                                       }`}
                                     >
                                       {t('profile.gps_trigger_enter')}
@@ -1022,7 +1028,7 @@ function App() {
                                       className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
                                         selectedAddLocation.trigger === 'exit'
                                           ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                                          : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                          : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-400'
                                       }`}
                                     >
                                       {t('profile.gps_trigger_exit')}
@@ -1030,7 +1036,7 @@ function App() {
                                   </div>
                                 )}
 
-                                <p className="text-[10px] text-zinc-600 italic font-medium ml-1">
+                                <p className="text-[10px] text-zinc-400 italic font-medium ml-1">
                                   {selectedAddLocation?.trigger === 'exit'
                                     ? t('profile.gps_radius_text_exit')
                                     : t('profile.gps_radius_text')}
@@ -1048,7 +1054,7 @@ function App() {
                                       <button
                                         type="button"
                                         onClick={() => setSelectedAddLocation(null)}
-                                        className="text-[9px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-[0.2em] transition-colors shrink-0"
+                                        className="text-[9px] font-black text-red-400 hover:text-red-500 uppercase tracking-[0.2em] transition-colors shrink-0"
                                       >
                                         {t('profile.remove_location')}
                                       </button>
@@ -1058,7 +1064,7 @@ function App() {
                                         {selectedAddLocation.address}
                                       </p>
                                     )}
-                                    <p className="text-[9px] text-zinc-500 pl-3.5">
+                                    <p className="text-[9px] text-zinc-400 pl-3.5">
                                       {t('profile.gps_radius_hint', { radius: formatRadius(selectedAddLocation.radius || 100) })}
                                     </p>
                                   </div>
@@ -1071,16 +1077,20 @@ function App() {
                     </form>
                   )}
 
-                  <div className="space-y-3">
+                  <div
+                    role={currentPlan.items && currentPlan.items.length > 0 ? 'list' : undefined}
+                    className="space-y-3"
+                  >
                     {currentPlan.items && currentPlan.items.length > 0 ? (
                       [...currentPlan.items].sort((a, b) => (a.checked === b.checked ? 0 : a.checked ? 1 : -1)).map((item) => (
                         <motion.div
+                          role="listitem"
                           key={item.id}
                           layout
-                          className={`flex items-start gap-4 p-5 rounded-3xl border transition-all group ${item.checked ? 'bg-zinc-50 dark:bg-zinc-950 border-emerald-500/10 dark:border-emerald-500/10 opacity-70' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-md dark:shadow-xl dark:shadow-black/20'}`}
+                          className={`flex items-start gap-4 p-5 rounded-3xl border transition-all group ${item.checked ? 'bg-zinc-50 dark:bg-zinc-950 border-emerald-500/10 dark:border-emerald-500/10' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-md dark:shadow-xl dark:shadow-black/20'}`}
                         >
                           <button
-                            onClick={() => handleToggleItem(currentPlan.id, item.id)}
+                            aria-label={item.checked ? t('plans.mark_undone') : t('plans.mark_done')} aria-pressed={!!item.checked} onClick={() => handleToggleItem(currentPlan.id, item.id)}
                             className={`mt-1 w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all ${item.checked ? 'bg-emerald-500 border-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'border-zinc-700 hover:border-emerald-500'}`}
                           >
                             {item.checked && <Check className="w-4 h-4 stroke-[4px]" />}
@@ -1089,22 +1099,22 @@ function App() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between">
                               <div className="space-y-1">
-                                <p className={`text-lg font-black italic tracking-tighter transition-all leading-tight ${item.checked ? 'line-through text-zinc-400 dark:text-zinc-600' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                                <p className={`text-lg font-black italic tracking-tighter transition-all leading-tight ${item.checked ? 'line-through text-zinc-600 dark:text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
                                   {item.text}
                                 </p>
                                 {item.checked && item.checkedBy && (
-                                  <div className="text-[10px] font-black uppercase tracking-[0.1em] text-emerald-600 dark:text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded inline-block">
+                                  <div className="text-[10px] font-black uppercase tracking-[0.1em] text-emerald-700 dark:text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded inline-block">
                                     {t('plans.fixed_by', { name: item.checkedBy })}
                                   </div>
                                 )}
                               </div>
                               <div className="flex items-center gap-1">
                                 {!item.checked && (
-                                  <button onClick={() => openEditModal(currentPlan.id, item)} className="p-2 text-zinc-600 hover:text-white rounded-lg hover:bg-zinc-800">
+                                  <button aria-label={t('common.edit')} onClick={() => openEditModal(currentPlan.id, item)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800">
                                     <Pencil className="w-4 h-4" />
                                   </button>
                                 )}
-                                <button onClick={() => handleDeleteItem(currentPlan.id, item.id)} className="p-2 text-zinc-600 hover:text-red-500 rounded-lg hover:bg-zinc-800">
+                                <button aria-label={t('common.delete')} onClick={() => handleDeleteItem(currentPlan.id, item.id)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-red-500 rounded-lg hover:bg-zinc-800">
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
@@ -1123,7 +1133,7 @@ function App() {
                             {item.location && item.location.active && (
                               <div className="mt-3 flex flex-col gap-1 bg-emerald-500/5 dark:bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/10 w-fit max-w-full">
                                 <div className="flex items-center gap-2">
-                                  <MapPin className="w-3 h-3 text-emerald-500 shrink-0" />
+                                  <MapPin className="w-3 h-3 text-emerald-700 dark:text-emerald-400 shrink-0" />
                                   <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
                                     GPS: {item.location.name}
                                     {item.location.trigger === 'exit' ? ` · ${t('profile.gps_trigger_exit')}` : ` · ${t('profile.gps_trigger_enter')}`}
@@ -1146,7 +1156,7 @@ function App() {
                                       trigger: item.location!.trigger === 'exit' ? 'exit' : 'enter'
                                     });
                                   }}
-                                  className="mt-1 ml-5 text-[9px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 hover:underline text-left"
+                                  className="mt-1 ml-5 text-[9px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 hover:underline text-left"
                                 >
                                   {t('plans.gps_sim_button')}
                                 </button>
@@ -1165,8 +1175,8 @@ function App() {
                                   ).map(([emoji, count]) => (
                                     <button
                                       key={emoji}
-                                      onClick={() => handleToggleReaction(currentPlan.id, item.id, emoji)}
-                                      className={`px-2 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1 ${item.reactions?.some(r => r.userId === user?.uid && r.emoji === emoji) ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400' : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-700/50 text-zinc-500 dark:text-zinc-400'}`}
+                                      aria-label={`${t('plans.react_with', { emoji })} ${count}`} onClick={() => handleToggleReaction(currentPlan.id, item.id, emoji)}
+                                      className={`px-2 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1 ${item.reactions?.some(r => r.userId === user?.uid && r.emoji === emoji) ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-700/50 text-zinc-500 dark:text-zinc-400'}`}
                                     >
                                       <span>{emoji}</span>
                                       <span>{count}</span>
@@ -1177,8 +1187,8 @@ function App() {
 
                               <div className="relative">
                                 <button
-                                  onClick={() => setActiveReactionPicker(activeReactionPicker === item.id ? null : item.id)}
-                                  className={`p-2 rounded-xl border transition-all ${activeReactionPicker === item.id ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-800 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors'}`}
+                                  aria-label={t('plans.add_reaction')} aria-expanded={activeReactionPicker === item.id} onClick={() => setActiveReactionPicker(activeReactionPicker === item.id ? null : item.id)}
+                                  className={`p-2 rounded-xl border transition-all ${activeReactionPicker === item.id ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors'}`}
                                 >
                                   <Smile className="w-4 h-4" />
                                 </button>
@@ -1193,7 +1203,7 @@ function App() {
                                     >
                                       {EMOJIS.map(emoji => (
                                         <button
-                                          key={emoji}
+                                          aria-label={t('plans.react_with', { emoji })} key={emoji}
                                           onClick={() => {
                                             handleToggleReaction(currentPlan.id, item.id, emoji);
                                             setActiveReactionPicker(null);
@@ -1213,7 +1223,7 @@ function App() {
                       ))
                     ) : (
                       <div className="text-center py-20 bg-white dark:bg-zinc-950/40 rounded-3xl border-2 border-dashed border-zinc-100 dark:border-zinc-900">
-                        <p className="text-zinc-400 dark:text-zinc-600 font-bold italic">{t('plans.empty_plan')}</p>
+                        <p className="text-zinc-600 dark:text-zinc-400 font-bold italic">{t('plans.empty_plan')}</p>
                       </div>
                     )}
                   </div>
@@ -1227,7 +1237,7 @@ function App() {
                   )}
                 </div>
               ) : (
-                <div className="text-center py-20">{t('plans.plan_not_found')}</div>
+                <h1 className="text-center py-20">{t('plans.plan_not_found')}</h1>
               )}
             </motion.div>
           )}
@@ -1248,24 +1258,24 @@ function App() {
                     {userProfile.photoURL ? (
                       <img src={userProfile.photoURL} alt="" className="w-32 h-32 rounded-[40px] border-4 border-emerald-500/20 p-1 group-hover:scale-105 transition-transform duration-500 shadow-xl" />
                     ) : (
-                      <div className="w-32 h-32 rounded-[40px] bg-zinc-100 dark:bg-zinc-800 border-4 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-5xl text-zinc-400 font-bold">
+                      <div className="w-32 h-32 rounded-[40px] bg-zinc-100 dark:bg-zinc-800 border-4 border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-5xl text-zinc-600 dark:text-zinc-400 font-bold">
                         {userProfile.displayName?.[0]?.toUpperCase()}
                       </div>
                     )}
                   </div>
-                  <h3 className="text-3xl font-black italic uppercase tracking-tighter mb-1 text-zinc-900 dark:text-white">{userProfile.displayName}</h3>
+                  <h1 className="text-3xl font-black italic uppercase tracking-tighter mb-1 text-zinc-900 dark:text-white">{userProfile.displayName}</h1>
                   <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium tracking-tight mb-10">{userProfile.email}</p>
 
                   <div className="grid grid-cols-2 gap-4 w-full mb-8">
                     <button onClick={() => setActiveTab('completed')} className="bg-zinc-50 dark:bg-zinc-800/40 p-6 rounded-[28px] text-center border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/20 dark:hover:border-emerald-500/30 transition-all hover:-translate-y-1">
-                      <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">{completedPlans.length}</div>
-                      <div className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex items-center justify-center gap-2">
+                      <div className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mb-1">{completedPlans.length}</div>
+                      <div className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest flex items-center justify-center gap-2">
                         <Check className="w-3 h-3" /> {t('plans.completed')}
                       </div>
                     </button>
                     <button onClick={() => setShowFriendsModal(true)} className="bg-zinc-50 dark:bg-zinc-800/40 p-6 rounded-[28px] text-center border border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/20 dark:hover:border-emerald-500/30 transition-all hover:-translate-y-1">
-                      <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">{friends.length}</div>
-                      <div className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex items-center justify-center gap-2">
+                      <div className="text-3xl font-black text-emerald-700 dark:text-emerald-400 mb-1">{friends.length}</div>
+                      <div className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest flex items-center justify-center gap-2">
                         <Users className="w-3 h-3" /> {t('common.friends') || 'Friends'}
                       </div>
                     </button>
@@ -1274,7 +1284,7 @@ function App() {
                   {/* Language Selection */}
                   <div className="w-full mb-4">
                     <div className="flex flex-col items-center justify-between p-6 rounded-[28px] bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50">
-                      <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest leading-none mb-4">{t('profile.language')}</p>
+                      <p className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest leading-none mb-4">{t('profile.language')}</p>
                       <LanguageSwitcher />
                     </div>
                   </div>
@@ -1282,7 +1292,7 @@ function App() {
                   {/* Saved Locations */}
                   <div className="w-full mb-4 space-y-3">
                     <div className="p-6 rounded-[28px] bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50">
-                      <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest leading-none mb-4 text-left">{t('profile.saved_places')}</p>
+                      <p className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest leading-none mb-4 text-left">{t('profile.saved_places')}</p>
 
                       <div className="space-y-3">
                         {([
@@ -1296,12 +1306,12 @@ function App() {
                               <div className="flex items-center gap-3">
                                    <div className={`p-2 rounded-lg ${
                                      place.color === 'indigo'
-                                       ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500'
+                                       ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
                                        : place.color === 'amber'
-                                         ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500'
+                                         ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
                                          : place.color === 'emerald'
-                                           ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500'
-                                           : 'bg-rose-50 dark:bg-rose-900/20 text-rose-500'
+                                           ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                                           : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'
                                    }`}>
                                   <MapPin className="w-4 h-4" />
                                 </div>
@@ -1346,14 +1356,14 @@ function App() {
                                             setEditingLabelId(place.id);
                                             setTempLabel((userProfile.savedLocations as any)?.customLabels?.[place.id] || place.label);
                                           }}
-                                          className="p-1 text-zinc-400 hover:text-emerald-500 transition-all"
+                                          aria-label={t('common.edit')} className="p-1 text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-all"
                                         >
                                           <Pencil className="w-2.5 h-2.5" />
                                         </button>
                                       )}
                                     </div>
                                   )}
-                                  <p className="text-[10px] text-zinc-400 truncate max-w-[150px]">
+                                  <p className="text-[10px] text-zinc-600 dark:text-zinc-400 truncate max-w-[150px]">
                                     {(userProfile.savedLocations as any)?.[place.id]?.name || (userProfile.savedLocations as any)?.[place.id]?.address || t('profile.no_place_saved')}
                                   </p>
                                 </div>
@@ -1368,7 +1378,7 @@ function App() {
                                       });
                                     }
                                   }}
-                                  className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                                  aria-label={t('profile.remove_location')} className="p-1.5 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
                                 >
                                   <X className="w-3 h-3" />
                                 </button>
@@ -1402,12 +1412,12 @@ function App() {
                           {theme === 'light' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                         </div>
                         <div className="text-left">
-                          <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest leading-none mb-1">{t('profile.theme')}</p>
+                          <p className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest leading-none mb-1">{t('profile.theme')}</p>
                           <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase italic">{theme === 'light' ? t('profile.light') : t('profile.dark')}</p>
                         </div>
                       </div>
                       <button
-                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        aria-label={t('profile.theme')} aria-pressed={theme === 'dark'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                         className={`w-12 h-6 rounded-full transition-all relative border-2 ${theme === 'light' ? 'bg-emerald-500 border-emerald-600' : 'bg-zinc-700 border-zinc-600'}`}
                       >
                         <motion.div
@@ -1427,7 +1437,7 @@ function App() {
                         className="w-full group relative overflow-hidden p-5 rounded-[28px] text-left border border-zinc-200 dark:border-zinc-700/50 bg-zinc-50 dark:bg-zinc-800/50 hover:border-emerald-500/30 transition-all"
                       >
                         <div className="relative flex items-center gap-4">
-                          <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-500">
+                          <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
                             <MessageSquare className="w-5 h-5" />
                             {hasAdminReply && (
                               <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -1436,19 +1446,19 @@ function App() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500 mb-1">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 dark:text-zinc-400 mb-1">
                               {t('contact.badge')}
                             </p>
                             <p className="text-sm font-bold tracking-tight text-zinc-900 dark:text-white">
                               {hasAdminReply ? t('contact.alert_title') : t('contact.title')}
                             </p>
-                            <p className="text-[11px] text-zinc-500 mt-0.5 truncate">
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
                               {hasAdminReply
                                 ? (adminReplyPreview || t('contact.alert_body'))
                                 : t('contact.card_hint')}
                             </p>
                           </div>
-                          <span className="text-emerald-500/80 text-xs font-semibold group-hover:translate-x-0.5 transition-transform">
+                          <span className="text-emerald-700 dark:text-emerald-400 text-xs font-semibold group-hover:translate-x-0.5 transition-transform">
                             {hasAdminReply ? t('contact.alert_open') : t('contact.open')}
                           </span>
                         </div>
@@ -1493,15 +1503,15 @@ function App() {
                           <img src="coffee-icon.png" alt="" className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
-                          <h4 className="text-xs sm:text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight">
+                          <h2 className="text-xs sm:text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight">
                             {t('profile.wall_of_fame.title')}
-                          </h4>
+                          </h2>
                           <p className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-snug line-clamp-2">
                             {t('profile.wall_of_fame.description')}
                           </p>
                         </div>
                       </div>
-                      <span className="mt-2.5 sm:mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl bg-amber-500 text-white text-[11px] sm:text-xs font-bold group-hover:bg-amber-400 transition-colors">
+                      <span className="mt-2.5 sm:mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl bg-amber-500 text-zinc-950 text-[11px] sm:text-xs font-bold group-hover:bg-amber-400 transition-colors">
                         <span aria-hidden>☕</span>
                         {t('profile.wall_of_fame.button')}
                       </span>
@@ -1510,21 +1520,21 @@ function App() {
 
                   <button
                     onClick={signOut}
-                    className="w-full flex items-center justify-center gap-3 p-6 rounded-[28px] bg-red-500/5 border border-red-500/10 text-red-500 font-black italic uppercase tracking-widest hover:bg-red-500/10 transition-all"
+                    className="w-full flex items-center justify-center gap-3 p-6 rounded-[28px] bg-red-500/5 border border-red-500/10 text-red-700 dark:text-red-400 font-black italic uppercase tracking-widest hover:bg-red-500/10 transition-all"
                   >
                     {t('auth.logout')}
                   </button>
 
                   {/* Copyright Footer */}
                   <div className="w-full text-center py-6 mt-4">
-                    <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide">
+                    <p className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium tracking-wide">
                       Created 2026 by © nRn World
                     </p>
-                    <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium tracking-wide mt-1">
+                    <p className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium tracking-wide mt-1">
                       {t('update.version_label', { version: APP_VERSION })}
                     </p>
                     <div className="flex items-center justify-center gap-1 mt-1">
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-600 font-medium">
+                      <span className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
                         bynrnworld@gmail.com
                       </span>
                       <button 
@@ -1535,7 +1545,7 @@ function App() {
                         className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         title="Copy email"
                       >
-                        <Copy className="w-3 h-3 text-zinc-400 dark:text-zinc-600" />
+                        <Copy className="w-3 h-3 text-zinc-600 dark:text-zinc-400" />
                       </button>
                     </div>
                   </div>
@@ -1553,10 +1563,10 @@ function App() {
               className="space-y-6 pb-12"
             >
               <div className="flex items-center gap-4 mb-4">
-                <button onClick={() => setActiveTab('profile')} className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-400 transition-colors">
+                <button aria-label={t('common.back')} onClick={() => setActiveTab('profile')} className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 transition-colors">
                   <ArrowLeft className="w-5 h-5" />
                 </button>
-                <h2 className="text-3xl font-black italic tracking-tighter uppercase">{t('plans.completed')}</h2>
+                <h1 className="text-3xl font-black italic tracking-tighter uppercase">{t('plans.completed')}</h1>
               </div>
 
               <div className="space-y-4">
@@ -1574,29 +1584,29 @@ function App() {
 
                       <div className="flex items-start justify-between relative z-10 mb-6">
                         <div className="flex items-center gap-5">
-                          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-500 border border-emerald-500/20">
+                          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-700 dark:text-emerald-500 border border-emerald-500/20">
                             <Check className="w-6 h-6 stroke-[3px]" />
                           </div>
                           <div>
-                            <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic uppercase tracking-tight">{plan.name}</h4>
+                            <h2 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic uppercase tracking-tight">{plan.name}</h2>
                             <div className="flex flex-col gap-0.5 mt-1">
-                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-black uppercase tracking-widest">
+                <p className="text-[10px] text-zinc-600 dark:text-zinc-400 font-black uppercase tracking-widest">
                                 {plan.completedAt ? `${t('plans.clear_done')} ${plan.completedAt.toDate().toLocaleDateString('sv-SE')}` : t('plans.completed_label')}
                               </p>
-                              <p className="text-[9px] font-bold text-red-500/80 uppercase tracking-tight">
+                              <p className="text-[9px] font-bold text-red-700 dark:text-red-400 uppercase tracking-tight">
                                 {t('plans.auto_delete', { days: daysLeft })}
                               </p>
                             </div>
                           </div>
                         </div>
-                        <button onClick={() => handleDeletePlan(plan.id)} className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 transition-all">
+                        <button aria-label={t('plans.delete_plan')} onClick={() => handleDeletePlan(plan.id)} className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-red-500/10 hover:text-red-500 transition-all">
                           <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.1em] text-zinc-400 dark:text-zinc-500 relative z-10 border-t border-zinc-100 dark:border-zinc-800/50 pt-5">
+                      <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.1em] text-zinc-600 dark:text-zinc-400 relative z-10 border-t border-zinc-100 dark:border-zinc-800/50 pt-5">
                         <span>{plan.items?.length || 0} {t('plans.items_completed_label')}</span>
-                        <button onClick={() => handleReopenPlan(plan.id)} className="text-emerald-600 dark:text-emerald-500 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
+                        <button onClick={() => handleReopenPlan(plan.id)} className="text-emerald-700 dark:text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
                           {t('plans.resume_btn')}
                         </button>
                       </div>
@@ -1605,7 +1615,7 @@ function App() {
                 }) : (
                   <div className="text-center py-20 bg-white dark:bg-zinc-950/20 rounded-[40px] border-2 border-dashed border-zinc-200 dark:border-zinc-900">
                     <History className="w-16 h-16 text-zinc-200 dark:text-zinc-900 mx-auto mb-6" />
-                    <p className="text-zinc-400 dark:text-zinc-600 font-black italic uppercase tracking-widest text-xs">{t('plans.no_completed_plans_text')}</p>
+                    <p className="text-zinc-600 dark:text-zinc-400 font-black italic uppercase tracking-widest text-xs">{t('plans.no_completed_plans_text')}</p>
                   </div>
                 )}
               </div>
@@ -1619,7 +1629,7 @@ function App() {
         <div className="max-w-3xl mx-auto px-10 h-20 flex items-center justify-between">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'home' ? 'text-emerald-500 scale-110' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'home' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <Home className="w-6 h-6 stroke-[2.5px]" />
             <span className="text-[9px] font-black uppercase tracking-widest">{t('common.home')}</span>
@@ -1630,7 +1640,7 @@ function App() {
               if (isAuthenticated) setShowCreateModal(true);
               else setShowAuthModal(true);
             }}
-            className="w-16 h-16 bg-emerald-500 text-black rounded-3xl flex items-center justify-center -mt-12 shadow-[0_20px_40px_rgba(16,185,129,0.3)] hover:scale-110 active:scale-90 transition-all border-4 border-zinc-50 dark:border-zinc-950 rotate-3"
+            aria-label={t('home.create_plan')} className="w-16 h-16 bg-emerald-500 text-black rounded-3xl flex items-center justify-center -mt-12 shadow-[0_20px_40px_rgba(16,185,129,0.3)] hover:scale-110 active:scale-90 transition-all border-4 border-zinc-50 dark:border-zinc-950 rotate-3"
           >
             <Plus className="w-8 h-8 stroke-[4px]" />
           </button>
@@ -1640,7 +1650,7 @@ function App() {
               setCurrentPlanId(null);
               setActiveTab('plans');
             }}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'plans' ? 'text-emerald-500 scale-110' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'plans' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <Check className="w-6 h-6 stroke-[2.5px]" />
             <span className="text-[9px] font-black uppercase tracking-widest">{t('plans.all_plans')}</span>
@@ -1648,7 +1658,7 @@ function App() {
 
           <button
             onClick={() => setActiveTab('completed')}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'completed' ? 'text-emerald-500 scale-110' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'completed' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <History className="w-6 h-6 stroke-[2.5px]" />
             <span className="text-[9px] font-black uppercase tracking-widest">{t('plans.completed')}</span>
@@ -1656,7 +1666,7 @@ function App() {
 
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'profile' ? 'text-emerald-500 scale-110' : 'text-zinc-400 dark:text-zinc-600 hover:text-emerald-500 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'profile' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <User className="w-6 h-6 stroke-[2.5px]" />
             <span className="text-[9px] font-black uppercase tracking-widest">{t('profile.title')}</span>
@@ -1689,13 +1699,13 @@ function App() {
         {showCreateModal && (
           <div key="create-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCreateModal(false)} className="absolute inset-0 bg-white/60 dark:bg-zinc-950/95 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[40px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl overflow-hidden">
+            <motion.div role="dialog" aria-modal="true" aria-labelledby="create-plan-title" initial={{ opacity: 0, scale: 0.9, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 40 }} className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[40px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500" />
-              <button onClick={() => setShowCreateModal(false)} className="absolute top-8 right-8 text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors">
+              <button aria-label={t('common.close')} onClick={() => setShowCreateModal(false)} className="absolute top-8 right-8 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors">
                 <X className="w-6 h-6" />
               </button>
 
-              <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-8 text-zinc-900 dark:text-white">{t('home.create_plan')}</h2>
+              <h2 id="create-plan-title" className="text-3xl font-black italic uppercase tracking-tighter mb-8 text-zinc-900 dark:text-white">{t('home.create_plan')}</h2>
 
               <form
                 className="space-y-6"
@@ -1705,35 +1715,35 @@ function App() {
                 }}
               >
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">{t('plans.plan_name_label')}</label>
+                  <label className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t('plans.plan_name_label')}</label>
                   <input
                     type="text"
                     name="planName"
                     value={newPlanName}
                     onChange={(e) => setNewPlanName(e.target.value)}
                     placeholder={t('plans.plan_name_placeholder')}
-                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-5 px-6 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic text-lg text-zinc-900 dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700 shadow-inner"
+                    className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-5 px-6 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic text-lg text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-700 shadow-inner"
                     autoFocus
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">{t('plans.cover_image_label')}</label>
+                  <label htmlFor="create-plan-cover-image" className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t('plans.cover_image_label')}</label>
                   <div className="relative group overflow-hidden rounded-[24px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/40 transition-all aspect-video flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 cursor-pointer">
                     {imagePreview ? (
                       <>
                         <img src={imagePreview} className="w-full h-full object-cover" alt="" />
-                        <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setImagePreview(null); }} className="absolute top-3 right-3 p-2 bg-black/80 rounded-full text-white hover:bg-black border border-white/10 transition-colors">
+                        <button type="button" aria-label={t('plans.remove_image')} onClick={(e) => { e.stopPropagation(); setSelectedFile(null); setImagePreview(null); }} className="absolute top-3 right-3 p-2 bg-black/80 rounded-full text-white hover:bg-black border border-white/10 transition-colors">
                           <X className="w-5 h-5" />
                         </button>
                       </>
                     ) : (
                       <div className="flex flex-col items-center">
-                        <Camera className="w-10 h-10 text-zinc-200 dark:text-zinc-800 group-hover:text-emerald-500 transition-colors mb-4" />
-                        <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-600 group-hover:text-emerald-500 transition-colors tracking-widest uppercase">{t('plans.cover_image_placeholder')}</span>
+                        <Camera className="w-10 h-10 text-zinc-200 dark:text-zinc-800 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors mb-4" />
+                        <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors tracking-widest uppercase">{t('plans.cover_image_placeholder')}</span>
                       </div>
                     )}
-                    <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
+                    <input id="create-plan-cover-image" type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
                         setSelectedFile(file);
@@ -1799,13 +1809,13 @@ function App() {
         {showEditModal && editingItem && (
           <div key="edit-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-0">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setShowEditModal(false); setEditingItem(null); }} className="absolute inset-0 bg-white/60 dark:bg-zinc-950/95 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[32px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl overflow-hidden">
+            <motion.div role="dialog" aria-modal="true" aria-labelledby="edit-item-title" initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[32px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl overflow-hidden">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest ml-1">{t('common.edit')}</label>
+                  <label id="edit-item-title" htmlFor="edit-item-input" className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t('common.edit')}</label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                      <label className="cursor-pointer text-zinc-500 dark:text-zinc-600 hover:text-emerald-500 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                      <label className="cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
                         <Camera className="w-5 h-5" />
                         <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                           const file = e.target.files?.[0];
@@ -1815,7 +1825,7 @@ function App() {
                       {itemFile ? (
                          <div className="relative ml-1">
                            <img src={itemFilePreview!} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
-                          <button type="button" onClick={() => setItemFile(null)} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
+                          <button type="button" onClick={() => setItemFile(null)} aria-label={t('plans.remove_image')} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
                             <X className="w-2.5 h-2.5" />
                           </button>
                         </div>
@@ -1828,7 +1838,7 @@ function App() {
                               ...editingItem,
                               item: { ...editingItem.item, imageUrl: undefined }
                             });
-                          }} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
+                          }} aria-label={t('plans.remove_image')} className="absolute -top-1 -right-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white rounded-full border border-zinc-200 dark:border-zinc-800">
                             <X className="w-2.5 h-2.5" />
                           </button>
                         </div>
@@ -1844,8 +1854,8 @@ function App() {
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => setShowEditGps(!showEditGps)}
-                        className={`p-2 rounded-xl border transition-all ${editingItem.item.location || showEditGps ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'text-zinc-500 dark:text-zinc-600 hover:text-emerald-500 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800'}`}
+                        aria-label={t('profile.gps_reminder')} aria-expanded={showEditGps} onClick={() => setShowEditGps(!showEditGps)}
+                        className={`p-2 rounded-xl border transition-all ${editingItem.item.location || showEditGps ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800'}`}
                       >
                         <MapPin className="w-5 h-5" />
                       </button>
@@ -1867,7 +1877,7 @@ function App() {
                             showToast(t('plans.item_updated'));
                           }
                         }}
-                        className="p-2.5 bg-emerald-500 text-black rounded-xl transition-all hover:scale-110 active:scale-95 shadow-lg shadow-emerald-500/20"
+                        aria-label={t('common.save')} className="p-2.5 bg-emerald-500 text-black rounded-xl transition-all hover:scale-110 active:scale-95 shadow-lg shadow-emerald-500/20"
                       >
                         <Plus className="w-5 h-5 stroke-[4px]" />
                       </button>
@@ -1885,7 +1895,7 @@ function App() {
                     >
                       <div className="p-6 rounded-[28px] bg-[#0c0c0e] border border-zinc-800/50 space-y-6 shadow-2xl relative">
                         <div className="flex items-center gap-2 mb-2 ml-1">
-                          <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+                          <MapPin className="w-3.5 h-3.5 text-zinc-400" />
                           <label className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
                             {t('profile.gps_reminder')}
                           </label>
@@ -1998,7 +2008,7 @@ function App() {
                                       });
                                       showToast(t('profile.location_selected_toast', { type: customName || place.label }));
                                     }}
-                                    className={`py-4 px-4 bg-[#18181b]/50 border rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/fav ${loc ? 'border-zinc-800/50 text-zinc-500 hover:border-emerald-500/20 hover:text-emerald-500' : 'border-zinc-800/20 text-zinc-700/50 opacity-50 cursor-not-allowed'}`}
+                                    className={`py-4 px-4 bg-[#18181b]/50 border rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/fav ${loc ? 'border-zinc-800/50 text-zinc-400 hover:border-emerald-500/20 hover:text-emerald-500' : 'border-zinc-800/20 text-zinc-400/80 cursor-not-allowed'}`}
                                   >
                                     <span className="text-sm opacity-50 group-hover/fav:opacity-100 transition-opacity">{place.icon}</span>
                                     <span className="truncate">{customName || place.label}</span>
@@ -2050,7 +2060,7 @@ function App() {
                                 className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
                                   (editingItem.item.location.trigger || 'enter') === 'enter'
                                     ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                                    : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                    : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-400'
                                 }`}
                               >
                                 {t('profile.gps_trigger_enter')}
@@ -2068,7 +2078,7 @@ function App() {
                                 className={`py-3 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
                                   editingItem.item.location.trigger === 'exit'
                                     ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
-                                    : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-500'
+                                    : 'bg-[#18181b]/50 border-zinc-800/50 text-zinc-400'
                                 }`}
                               >
                                 {t('profile.gps_trigger_exit')}
@@ -2076,7 +2086,7 @@ function App() {
                             </div>
                           )}
 
-                          <p className="text-[10px] text-zinc-600 italic font-medium ml-1">
+                          <p className="text-[10px] text-zinc-400 italic font-medium ml-1">
                             {editingItem.item.location?.trigger === 'exit'
                               ? t('profile.gps_radius_text_exit')
                               : t('profile.gps_radius_text')}
@@ -2101,7 +2111,7 @@ function App() {
                                     });
                                     showToast(t('profile.remove_location'));
                                   }}
-                                  className="text-[9px] font-black text-red-500/60 hover:text-red-500 uppercase tracking-[0.2em] transition-colors shrink-0"
+                                  className="text-[9px] font-black text-red-400 hover:text-red-500 uppercase tracking-[0.2em] transition-colors shrink-0"
                                 >
                                   {t('profile.remove_location')}
                                 </button>
@@ -2111,7 +2121,7 @@ function App() {
                                   {editingItem.item.location.address}
                                 </p>
                               )}
-                              <p className="text-[9px] text-zinc-500 pl-3.5">
+                              <p className="text-[9px] text-zinc-400 pl-3.5">
                                 {t('profile.gps_radius_hint', { radius: formatRadius(editingItem.item.location.radius || 100) })}
                               </p>
                             </div>
@@ -2158,7 +2168,7 @@ function App() {
               />
               <button
                 onClick={() => setFullscreenImage(null)}
-                className="absolute -top-2 -right-2 w-12 h-12 bg-zinc-950 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center border border-white/10 dark:border-zinc-800 hover:scale-110 active:scale-90 transition-all shadow-xl z-10"
+                aria-label={t('common.close')} className="absolute -top-2 -right-2 w-12 h-12 bg-zinc-950 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center border border-white/10 dark:border-zinc-800 hover:scale-110 active:scale-90 transition-all shadow-xl z-10"
               >
                 <X className="w-6 h-6 stroke-[3px]" />
               </button>
@@ -2179,15 +2189,15 @@ function App() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="relative w-full max-w-sm rounded-3xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl space-y-5"
+              role="dialog" aria-modal="true" aria-labelledby="gps-permission-title" className="relative w-full max-w-sm rounded-3xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl space-y-5"
             >
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 flex items-center justify-center">
                   <MapPin className="w-6 h-6 text-emerald-500" />
                 </div>
-                <h3 className="text-lg font-black italic tracking-tight text-white">
+                <h2 id="gps-permission-title" className="text-lg font-black italic tracking-tight text-white">
                   {t('plans.gps_permission_title')}
-                </h3>
+                </h2>
               </div>
               <p className="text-sm text-zinc-400 leading-relaxed">
                 {permissionStatus === 'denied'
@@ -2223,7 +2233,7 @@ function App() {
                     sessionStorage.setItem('dt_gps_perm_dismissed', '1');
                     setShowGpsPermissionModal(false);
                   }}
-                  className="w-full py-3 rounded-2xl text-zinc-500 text-[10px] font-black uppercase tracking-widest hover:text-zinc-300 transition-colors"
+                  className="w-full py-3 rounded-2xl text-zinc-400 text-[10px] font-black uppercase tracking-widest hover:text-zinc-300 transition-colors"
                 >
                   {t('plans.gps_permission_later')}
                 </button>
@@ -2237,6 +2247,8 @@ function App() {
           {toast && (
             <motion.div
               key="toast"
+              role="status"
+              aria-live="polite"
               initial={{ opacity: 0, y: 60, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}

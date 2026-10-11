@@ -17,11 +17,14 @@ export function AuthModal({ onSignIn, onClose, error }: AuthModalProps) {
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="auth-modal-title"
                 className="bg-white dark:bg-zinc-900 rounded-[32px] border border-zinc-200 dark:border-zinc-800 max-w-md w-full p-10 relative shadow-2xl"
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-8 right-8 text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
+                    aria-label={t('common.close')} className="absolute top-8 right-8 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition"
                 >
                     <X className="w-6 h-6" />
                 </button>
@@ -30,7 +33,7 @@ export function AuthModal({ onSignIn, onClose, error }: AuthModalProps) {
                     <div className="w-20 h-20 rounded-3xl bg-emerald-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/20 rotate-3">
                         <LogIn className="w-10 h-10 text-black stroke-[2.5px]" />
                     </div>
-                    <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-zinc-900 dark:text-white">{t('auth.login')}</h2>
+                    <h2 id="auth-modal-title" className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-zinc-900 dark:text-white">{t('auth.login')}</h2>
                     <p className="text-zinc-500 dark:text-zinc-400 font-medium italic mb-6">
                         {t('auth.login_subtitle')}
                     </p>
@@ -41,7 +44,7 @@ export function AuthModal({ onSignIn, onClose, error }: AuthModalProps) {
                 </div>
 
                 {error && (
-                    <div className="mb-6 p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-500 text-sm font-bold text-center italic">
+                    <div className="mb-6 p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-700 dark:text-red-400 text-sm font-bold text-center italic">
                         {error}
                     </div>
                 )}
