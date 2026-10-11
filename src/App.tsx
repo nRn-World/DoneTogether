@@ -1099,7 +1099,7 @@ function App() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between">
                               <div className="space-y-1">
-                                <p className={`text-lg font-black italic tracking-tighter transition-all leading-tight ${item.checked ? 'line-through text-zinc-600 dark:text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                                <p className={`text-lg font-black italic tracking-tighter transition-all leading-tight ${item.checked ? 'line-through decoration-red-500 text-zinc-600 dark:text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
                                   {item.text}
                                 </p>
                                 {item.checked && item.checkedBy && (
