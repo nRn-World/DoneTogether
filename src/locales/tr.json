@@ -61,7 +61,11 @@
         "password": "Şifre",
         "email_placeholder": "eposta@ornek.com",
         "password_placeholder": "Şifreniz",
-        "logout": "Çıkış Yap"
+        "logout": "Çıkış Yap",
+        "delete_account": "Hesabı sil",
+        "delete_account_confirm": "Bu işlem hesabınızı, profilinizi, arkadaşlıklarınızı ve yalnızca sizin olduğunuz planları kalıcı olarak siler. Başkalarıyla paylaştığınız planlar onlarda kalır. Bu işlem geri alınamaz. Devam edilsin mi?",
+        "delete_account_failed": "Hesabınız silinemedi. Lütfen tekrar deneyin.",
+        "privacy_policy": "Gizlilik politikası"
     },
     "home": {
         "hero_title": "Birlikte Planla & Yap.",
@@ -126,6 +130,8 @@
         "gps_required_toast": "Hatırlatmalarınız için GPS gerekli!",
         "gps_denied_toast": "Konum engellendi. Adres çubuğundaki kilit simgesine tıklayın → Konum → İzin ver, sonra sayfayı yenileyin.",
         "gps_unavailable_toast": "Konumunuz şu an alınamadı. Biraz sonra tekrar deneyin.",
+        "gps_background_disclosure": "Konumunuzu, uygulama kapalıyken bile arka planda yalnızca listenize kaydettiğiniz yerlere vardığınızda veya ayrıldığınızda size hatırlatmak için kullanırız. Konumunuz saklanmaz veya paylaşılmaz. Sonraki ekranda \"Her zaman izin ver\"i seçin.",
+        "gps_background_failed": "Konum hatırlatıcıları arka planda çalışamıyor. Ayarlar → Uygulamalar → DoneTogether → Konum'u açın ve \"Her zaman izin ver\"i seçin.",
         "gps_permission_title": "Konum ve bildirimlere izin ver",
         "gps_permission_body": "DoneTogether, evden çıkınca veya bir mağazaya yaklaşınca hatırlatmak için konumunuza ve bildirimlere ihtiyaç duyar.",
         "gps_permission_allow": "İzin ver",
@@ -196,9 +202,9 @@
         "map_unavailable": "Harita yüklenemedi. Arama ve favorileri hâlâ kullanabilirsiniz.",
         "resolving_address": "Adres alınıyor...",
         "wall_of_fame": {
-            "title": "The Wall of Fame",
-            "description": "Bir kahve ısmarlayın — uygulama ücretsiz ve güncel kalsın.",
-            "button": "Kahve ısmarla"
+            "title": "☕ THE WALL OF FAME",
+            "description": "DoneTogether geliştirmesini desteklemek için bana bir kahve ısmarlayın. Katkınız bu uygulamanın ücretsiz kalmasına ve sürekli gelişmesine yardımcı olur!",
+            "button": "Bana kahve ısmarlamak için tıklayın"
         }
     },
     "contact": {

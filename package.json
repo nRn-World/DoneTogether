@@ -1,7 +1,7 @@
 {
   "name": "donetogether",
   "private": true,
-  "version": "1.2.2",
+  "version": "1.2.4",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "scripts": {

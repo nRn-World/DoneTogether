@@ -26,11 +26,10 @@ import { FriendsModal } from './components/FriendsModal';
 import { ShareModal } from './components/ShareModal';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { UpdateModal } from './components/UpdateModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ContactAdminModal } from './components/ContactAdminModal';
-import { useAppUpdate } from './hooks/useAppUpdate';
 import { APP_VERSION } from './config/appVersion';
+import { deleteAccount } from './lib/deleteAccount';
 import type { Plan, Item } from './types';
 
 import { useLocation } from './hooks/useLocation';
@@ -41,7 +40,6 @@ import { reverseGeocodeDetailed } from './lib/geocoding';
 import { doc, updateDoc, deleteField } from 'firebase/firestore';
 import { db } from './lib/firebase';
 import { isAdminEmail } from './lib/admin';
-import { usePresence } from './hooks/usePresence';
 import { useMyAdminChatAlert } from './hooks/useAdminChat';
 
 const EMOJIS = ['❤️', '🔥', '💪', '🙏', '😂', '💯']; // Reactions supported by the app
@@ -63,10 +61,7 @@ function App() {
   const { user, userProfile, loading: authLoading, error: authError, signInWithGoogle, signOut, isAuthenticated } = useAuth();
   const { plans } = usePlans(user?.uid);
   const { friends } = useFriends(user?.uid);
-  const { update: appUpdate, dismiss: dismissAppUpdate, openDownload: openAppUpdate, downloading: appUpdateDownloading, downloadError: appUpdateDownloadError } = useAppUpdate();
 
-  // Silent background presence + install tracking (no UI impact)
-  usePresence(user?.uid);
 
   // Initialize location tracking
   const { permissionStatus, isTracking, getCurrentLocation, requestPermissions } = useLocation(user?.uid);
@@ -424,15 +419,6 @@ function App() {
   if (authLoading) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'dark bg-zinc-950 text-white' : 'bg-zinc-50 text-zinc-900'} flex items-center justify-center`}>
-        {appUpdate && (
-          <UpdateModal
-            update={appUpdate}
-            onUpdate={openAppUpdate}
-            onLater={dismissAppUpdate}
-            downloading={appUpdateDownloading}
-            downloadError={appUpdateDownloadError}
-          />
-        )}
         <div className="text-center">
           <div className="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-3xl">
             <img src="pwa-icon.png" className="w-full h-full object-cover scale-[1.6]" alt="DoneTogether" />
@@ -1466,7 +1452,7 @@ function App() {
                     </div>
                   )}
 
-                  {/* Admin insights — only for bynrnworld@gmail.com */}
+                  {/* Admin inbox — only for bynrnworld@gmail.com */}
                   {isAdmin && (
                     <div className="w-full mb-4">
                       <button
@@ -1481,8 +1467,8 @@ function App() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400/90 mb-1">Admin</p>
-                            <p className="text-sm font-bold tracking-tight">Användarinsikter</p>
-                            <p className="text-[11px] text-zinc-400 mt-0.5">Online · aktiva · installs</p>
+                            <p className="text-sm font-bold tracking-tight">Meddelanden</p>
+                            <p className="text-[11px] text-zinc-400 mt-0.5">Feedback från användare</p>
                           </div>
                           <span className="text-emerald-400/80 text-xs font-semibold group-hover:translate-x-0.5 transition-transform">Öppna →</span>
                         </div>
@@ -1490,32 +1476,22 @@ function App() {
                     </div>
                   )}
 
-                  {/* Buy Me A Coffee — compact on mobile */}
-                  <div className="w-full mb-4">
-                    <a
-                      href="https://ko-fi.com/nrnworld"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block p-3.5 sm:p-5 rounded-2xl sm:rounded-[28px] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-900/40 hover:border-amber-300 dark:hover:border-amber-800/50 transition-all hover:shadow-md sm:hover:shadow-lg sm:hover:-translate-y-1 group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <img src="coffee-icon.png" alt="" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="flex-1 min-w-0 text-left">
-                          <h2 className="text-xs sm:text-sm font-black text-zinc-900 dark:text-white uppercase tracking-tight">
-                            {t('profile.wall_of_fame.title')}
-                          </h2>
-                          <p className="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-snug line-clamp-2">
-                            {t('profile.wall_of_fame.description')}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="mt-2.5 sm:mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-xl bg-amber-500 text-zinc-950 text-[11px] sm:text-xs font-bold group-hover:bg-amber-400 transition-colors">
-                        <span aria-hidden>☕</span>
+                  {/* Wall of Fame */}
+                  <div className="w-full mb-4 flex gap-4 items-start p-4 rounded-2xl border border-blue-500/55 bg-gradient-to-br from-slate-900 to-[#1c2742] shadow-lg shadow-black/25">
+                    <img src="kofi-coffee.png" alt="" width={72} height={72} className="shrink-0 w-[72px] h-[72px] rounded-full object-cover shadow-lg shadow-amber-500/35" />
+                    <div className="flex-1 min-w-0 flex flex-col gap-2">
+                      <h2 className="text-sm font-extrabold tracking-wide text-sky-400">{t('profile.wall_of_fame.title')}</h2>
+                      <p className="text-xs leading-relaxed text-slate-300">{t('profile.wall_of_fame.description')}</p>
+                      <a
+                        href="https://ko-fi.com/nrnworld"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 text-white text-xs font-bold shadow-md shadow-sky-500/35 hover:opacity-90 transition"
+                      >
+                        <img src="kofi-coffee.png" alt="" width={18} height={18} className="w-[18px] h-[18px] rounded-full object-cover" />
                         {t('profile.wall_of_fame.button')}
-                      </span>
-                    </a>
+                      </a>
+                    </div>
                   </div>
 
                   <button
@@ -1523,6 +1499,21 @@ function App() {
                     className="w-full flex items-center justify-center gap-3 p-6 rounded-[28px] bg-red-500/5 border border-red-500/10 text-red-700 dark:text-red-400 font-black italic uppercase tracking-widest hover:bg-red-500/10 transition-all"
                   >
                     {t('auth.logout')}
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm(t('auth.delete_account_confirm'))) return;
+                      try {
+                        await deleteAccount();
+                      } catch (err) {
+                        console.error('[deleteAccount]', err);
+                        showToast(t('auth.delete_account_failed'));
+                      }
+                    }}
+                    className="w-full p-3 text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 underline transition-colors"
+                  >
+                    {t('auth.delete_account')}
                   </button>
 
                   {/* Copyright Footer */}
@@ -1533,6 +1524,14 @@ function App() {
                     <p className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium tracking-wide mt-1">
                       {t('update.version_label', { version: APP_VERSION })}
                     </p>
+                    <a
+                      href="https://nrnworld.one/DoneTogether/privacy.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium underline mt-1 inline-block"
+                    >
+                      {t('auth.privacy_policy')}
+                    </a>
                     <div className="flex items-center justify-center gap-1 mt-1">
                       <span className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium">
                         bynrnworld@gmail.com
@@ -1676,17 +1675,6 @@ function App() {
 
       {/* Modals */}
       <AnimatePresence>
-        {appUpdate && (
-          <UpdateModal
-            key="update-modal"
-            update={appUpdate}
-            onUpdate={openAppUpdate}
-            onLater={dismissAppUpdate}
-            downloading={appUpdateDownloading}
-            downloadError={appUpdateDownloadError}
-          />
-        )}
-
         {showAuthModal && (
           <AuthModal
             key="auth-modal"

@@ -12,6 +12,7 @@ import {
     addDoc,
     deleteDoc,
     deleteField,
+    runTransaction,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { Plan, PlanMember, Item } from '../types';
@@ -252,6 +253,33 @@ export async function addItemToPlan(planId: string, text: string, userId: string
     }
 }
 
+/**
+ * Read-modify-write of plan.items inside a transaction, so two members editing at once
+ * don't overwrite each other. `compute` returns the new items, or null to abort.
+ */
+async function mutatePlanItems(
+    planId: string,
+    compute: (plan: Plan) => Item[] | null,
+    updateCompletion = true
+): Promise<{ plan: Plan; items: Item[]; allChecked: boolean } | null> {
+    const planRef = doc(db, 'plans', planId);
+    return runTransaction(db, async (tx) => {
+        const snap = await tx.get(planRef);
+        if (!snap.exists()) return null;
+        const plan = snap.data() as Plan;
+        const items = compute(plan);
+        if (!items) return null;
+        const allChecked = items.length > 0 && items.every((i) => i.checked);
+        const update: Record<string, unknown> = { items, lastModified: Timestamp.now() };
+        if (updateCompletion) {
+            update.completed = allChecked;
+            update.completedAt = allChecked ? Timestamp.now() : null;
+        }
+        tx.update(planRef, update);
+        return { plan, items, allChecked };
+    });
+}
+
 export async function updateItem(planId: string, itemId: string, updates: Partial<Item>): Promise<void> {
     if (isDemoMode()) {
         const plan = getDemoPlan(planId);
@@ -264,25 +292,11 @@ export async function updateItem(planId: string, itemId: string, updates: Partia
         return;
     }
 
-    const planRef = doc(db, 'plans', planId);
-    const planSnap = await getDoc(planRef);
-
-    if (!planSnap.exists()) return;
-
-    const plan = planSnap.data() as Plan;
-    const updatedItems = plan.items.map((item) =>
-        item.id === itemId ? { ...item, ...updates } : item
+    const result = await mutatePlanItems(planId, (plan) =>
+        plan.items.map((item) => (item.id === itemId ? { ...item, ...updates } : item))
     );
-
-    // Check if all items are completed
-    const allChecked = updatedItems.length > 0 && updatedItems.every((i) => i.checked);
-
-    await updateDoc(planRef, {
-        items: updatedItems,
-        completed: allChecked,
-        completedAt: allChecked ? Timestamp.now() : null,
-        lastModified: Timestamp.now(),
-    });
+    if (!result) return;
+    const { plan, allChecked } = result;
 
     if (allChecked && plan.notificationsEnabled === true) {
         Object.keys(plan.members).forEach(uid => {
@@ -301,21 +315,11 @@ export async function deleteItem(planId: string, itemId: string): Promise<void> 
         return;
     }
 
-    const planRef = doc(db, 'plans', planId);
-    const planSnap = await getDoc(planRef);
-
-    if (!planSnap.exists()) return;
-
-    const plan = planSnap.data() as Plan;
-    const updatedItems = plan.items.filter((item) => item.id !== itemId);
-    const allChecked = updatedItems.length > 0 && updatedItems.every((i) => i.checked);
-
-    await updateDoc(planRef, {
-        items: updatedItems,
-        completed: allChecked,
-        completedAt: allChecked ? Timestamp.now() : null,
-        lastModified: Timestamp.now(),
-    });
+    const result = await mutatePlanItems(planId, (plan) =>
+        plan.items.filter((item) => item.id !== itemId)
+    );
+    if (!result) return;
+    const { plan, allChecked } = result;
 
     if (allChecked && plan.notificationsEnabled === true) {
         Object.keys(plan.members).forEach(uid => {
@@ -352,17 +356,12 @@ export async function toggleItemChecked(
         return;
     }
 
-    const planRef = doc(db, 'plans', planId);
-    const planSnap = await getDoc(planRef);
-
-    if (!planSnap.exists()) return;
-
-    const plan = planSnap.data() as Plan;
-    const item = plan.items.find(i => i.id === itemId);
-    if (!item) return;
-
-    const updatedItems = plan.items.map((i) => {
-        if (i.id === itemId) {
+    let item: Item | undefined;
+    const result = await mutatePlanItems(planId, (plan) => {
+        item = plan.items.find((i) => i.id === itemId);
+        if (!item) return null;
+        return plan.items.map((i) => {
+            if (i.id !== itemId) return i;
             const newChecked = !i.checked;
             return {
                 ...i,
@@ -370,19 +369,12 @@ export async function toggleItemChecked(
                 checkedBy: newChecked ? displayName : undefined,
                 checkedByUid: newChecked ? userId : undefined,
             };
-        }
-        return i;
+        });
     });
-
-    const allChecked = updatedItems.length > 0 && updatedItems.every((i) => i.checked);
+    if (!result || !item) return;
+    const { plan, allChecked } = result;
     const isNowChecked = !item.checked;
-
-    await updateDoc(planRef, {
-        items: updatedItems,
-        completed: allChecked,
-        completedAt: allChecked ? Timestamp.now() : null,
-        lastModified: Timestamp.now(),
-    });
+    const itemText = item.text;
 
     if (plan.notificationsEnabled === true) {
         Object.keys(plan.members).forEach(uid => {
@@ -390,7 +382,7 @@ export async function toggleItemChecked(
                 if (allChecked && isNowChecked) {
                     sendAppNotification(uid, 'Plan slutförd! 🎉', `Planen "${plan.name}" är nu helt klar!`, 'plan_complete', planId);
                 } else if (isNowChecked) {
-                    sendAppNotification(uid, 'Punkt avklarad! ✅', `${displayName} fixade "${item.text}" i ${plan.name}`, 'plan_update', planId);
+                    sendAppNotification(uid, 'Punkt avklarad! ✅', `${displayName} fixade "${itemText}" i ${plan.name}`, 'plan_update', planId);
                 }
             }
         });
@@ -493,26 +485,28 @@ export async function toggleReaction(
         return;
     }
 
-    const planRef = doc(db, 'plans', planId);
-    const planSnap = await getDoc(planRef);
+    let added = false;
+    let target: Item | undefined;
+    const result = await mutatePlanItems(
+        planId,
+        (plan) => {
+            target = plan.items.find((i) => i.id === itemId);
+            if (!target) return null;
+            const reactions = target.reactions || [];
+            const existingIndex = reactions.findIndex((r) => r.userId === userId && r.emoji === emoji);
+            added = existingIndex === -1;
+            const updatedReactions = added
+                ? [...reactions, { userId, userName, emoji }]
+                : reactions.filter((_, i) => i !== existingIndex);
+            return plan.items.map((i) => (i.id === itemId ? { ...i, reactions: updatedReactions } : i));
+        },
+        false
+    );
+    if (!result || !target) return;
+    const { plan } = result;
+    const item = target as Item;
 
-    if (!planSnap.exists()) return;
-
-    const plan = planSnap.data() as Plan;
-    const item = plan.items.find(i => i.id === itemId);
-    if (!item) return;
-
-    const reactions = item.reactions || [];
-    const existingIndex = reactions.findIndex(r => r.userId === userId && r.emoji === emoji);
-
-    let updatedReactions;
-    if (existingIndex > -1) {
-        // Remove reaction
-        updatedReactions = reactions.filter((_, i) => i !== existingIndex);
-    } else {
-        // Add reaction
-        updatedReactions = [...reactions, { userId, userName, emoji }];
-
+    if (added) {
         // Notify the person who checked/uploaded the item (if it's not the same person)
         const recipientId = item.checkedByUid || plan.ownerId;
         if (recipientId !== userId) {
@@ -525,13 +519,4 @@ export async function toggleReaction(
             );
         }
     }
-
-    const updatedItems = plan.items.map(i =>
-        i.id === itemId ? { ...i, reactions: updatedReactions } : i
-    );
-
-    await updateDoc(planRef, {
-        items: updatedItems,
-        lastModified: Timestamp.now()
-    });
 }

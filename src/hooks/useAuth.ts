@@ -17,6 +17,7 @@ import { doc, setDoc, Timestamp, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import type { UserProfile } from '../types';
 import { Capacitor } from '@capacitor/core';
+import { deletingAccount } from '../lib/deleteAccount';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import {
     DEMO_AUTH_KEY,
@@ -134,6 +135,8 @@ export function useAuth() {
                             if (profile.language && profile.language !== i18n.language) {
                                 i18n.changeLanguage(profile.language);
                             }
+                        } else if (deletingAccount) {
+                            return;
                         } else {
                             const newProfile: UserProfile = {
                                 uid: firebaseUser.uid,

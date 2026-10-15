@@ -44,3 +44,6 @@ FireBase/
 "DoneTogether3.code-workspace" 
 testsprite_tests/tmp/
 testsprite_tests/tmp/config.json
+
+# Release bundles
+dist-aab/

@@ -64,7 +64,11 @@
         "password_placeholder": "Ditt lösenord",
         "no_account": "Har inget konto?",
         "sign_up": "Registrera dig",
-        "logout": "Logga ut"
+        "logout": "Logga ut",
+        "delete_account": "Radera konto",
+        "delete_account_confirm": "Detta raderar permanent ditt konto, din profil, dina vänskaper och planer som bara du är med i. Planer du delar med andra finns kvar hos dem. Det går inte att ångra. Fortsätta?",
+        "delete_account_failed": "Kunde inte radera kontot. Försök igen.",
+        "privacy_policy": "Integritetspolicy"
     },
     "home": {
         "hero_title": "Planera & Gör Saker Tillsammans.",
@@ -129,6 +133,8 @@
         "gps_required_toast": "GPS krävs för dina påminnelser!",
         "gps_denied_toast": "Plats blockerad. Klicka på lås-ikonen i adressfältet → Platstjänster → Tillåt, och ladda om sidan.",
         "gps_unavailable_toast": "Kunde inte hämta din plats just nu. Försök igen om en stund.",
+        "gps_background_disclosure": "Vi använder din plats i bakgrunden, även när appen är stängd, enbart för att påminna dig när du kommer fram till eller lämnar platser du sparat på dina listpunkter. Din plats sparas eller delas inte. Välj \"Tillåt hela tiden\" på nästa skärm.",
+        "gps_background_failed": "Platspåminnelser kan inte köras i bakgrunden. Öppna Inställningar → Appar → DoneTogether → Plats och välj \"Tillåt hela tiden\".",
         "gps_permission_title": "Tillåt plats & aviseringar",
         "gps_permission_body": "DoneTogether behöver din plats och aviseringar för att påminna dig när du går hemifrån eller är nära en butik.",
         "gps_permission_allow": "Tillåt",
@@ -199,9 +205,9 @@
         "map_unavailable": "Kartan kunde inte laddas. Du kan fortfarande använda sök och favoriter.",
         "resolving_address": "Hämtar adress...",
         "wall_of_fame": {
-            "title": "The Wall of Fame",
-            "description": "Bjud på en kaffe — håll appen gratis och i utveckling.",
-            "button": "Bjud på en kaffe"
+            "title": "☕ THE WALL OF FAME",
+            "description": "Stöd utvecklingen av DoneTogether genom att bjuda mig på en kaffe. Ditt bidrag hjälper till att hålla appen gratis och ständigt förbättrad!",
+            "button": "Klicka här för att bjuda mig på en kaffe"
         }
     },
     "contact": {

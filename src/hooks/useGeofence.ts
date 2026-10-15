@@ -4,10 +4,12 @@ import { usePlans } from './useFirestore';
 import GeofencePlugin, { type GeofenceData } from '../lib/geofence';
 import { showLocalNotification } from '../lib/notify';
 import { evaluateGeofenceSample } from '../lib/geofenceLogic';
+import i18n from '../i18n';
 
 export const GEOFENCE_EVENT = 'donetogether:geofence';
 /** Dispatch to inject a fake GPS fix (for testing without moving). */
 export const FAKE_LOCATION_EVENT = 'donetogether:fake-location';
+const DISCLOSURE_KEY = 'dt_bg_location_disclosure';
 
 export type GeofenceEventDetail = { title: string; body: string };
 export type FakeLocationDetail = { latitude: number; longitude: number; accuracy?: number };
@@ -105,12 +107,14 @@ export function useGeofence(userId: string | undefined) {
     const { plans } = usePlans(userId);
     const firedRef = useRef<Set<string>>(new Set());
     const insideRef = useRef<Map<string, boolean>>(new Map());
-    const lastNativeSig = useRef<string>('');
     const fencesRef = useRef<GeofenceData[]>([]);
 
     const activeGeofences = useMemo(() => collectActiveGeofences(plans), [plans]);
     const signature = useMemo(() => signatureOf(activeGeofences), [activeGeofences]);
-    fencesRef.current = activeGeofences;
+    // Keep the latest fences readable from effects/callbacks (declared before the effects that use it)
+    useEffect(() => {
+        fencesRef.current = activeGeofences;
+    }, [activeGeofences]);
 
     const runCheck = (lat: number, lon: number, accuracy: number) => {
         for (const fence of fencesRef.current) {
@@ -142,15 +146,39 @@ export function useGeofence(userId: string | undefined) {
         }
     };
 
-    // Native Android: sync to Play Services only when fence set actually changes
+    // Native Android: sync to Play Services only when the fence set actually changes.
+    // Deps exclude activeGeofences so Firestore snapshots with the same fences don't cancel/re-prompt.
     useEffect(() => {
         if (!userId || !Capacitor.isNativePlatform()) return;
-        if (signature === lastNativeSig.current && signature !== '') return;
 
         let cancelled = false;
+        const fences = fencesRef.current;
 
         const setupGeofences = async () => {
             try {
+                // No fences: just clear stale ones; never ask for location for nothing
+                if (fences.length === 0) {
+                    await GeofencePlugin.removeGeofences();
+                    console.info('[GPS] No active geofences to register');
+                    return;
+                }
+
+                // Play policy: prominent disclosure before asking for background location
+                let accepted = false;
+                try {
+                    accepted = localStorage.getItem(DISCLOSURE_KEY) === '1';
+                } catch {
+                    /* ignore */
+                }
+                if (!accepted) {
+                    if (!window.confirm(i18n.t('plans.gps_background_disclosure'))) return;
+                    try {
+                        localStorage.setItem(DISCLOSURE_KEY, '1');
+                    } catch {
+                        /* ignore */
+                    }
+                }
+
                 const perm = await GeofencePlugin.requestPermission();
                 if (cancelled) return;
                 if (!perm?.granted) {
@@ -161,16 +189,12 @@ export function useGeofence(userId: string | undefined) {
                 await GeofencePlugin.removeGeofences();
                 if (cancelled) return;
 
-                if (activeGeofences.length > 0) {
-                    const result = await GeofencePlugin.addGeofences({ geofences: activeGeofences });
-                    console.info('[GPS] Native geofences registered:', result);
-                } else {
-                    console.info('[GPS] No active geofences to register');
-                }
-
-                if (!cancelled) lastNativeSig.current = signature;
+                const result = await GeofencePlugin.addGeofences({ geofences: fences });
+                console.info('[GPS] Native geofences registered:', result);
             } catch (error) {
+                // Android 10+ rejects without "Allow all the time" — tell the user instead of failing silently
                 console.error('Failed to set up geofences:', error);
+                if (!cancelled) notifyGeofence('DoneTogether', i18n.t('plans.gps_background_failed'), 'setup-error');
             }
         };
 
@@ -178,7 +202,7 @@ export function useGeofence(userId: string | undefined) {
         return () => {
             cancelled = true;
         };
-    }, [userId, signature, activeGeofences]);
+    }, [userId, signature]);
 
     // Foreground proximity + fake GPS for testing
     useEffect(() => {

@@ -64,7 +64,11 @@
         "password_placeholder": "Your password",
         "no_account": "Don't have an account?",
         "sign_up": "Sign up",
-        "logout": "Log out"
+        "logout": "Log out",
+        "delete_account": "Delete account",
+        "delete_account_confirm": "This permanently deletes your account, your profile, your friendships and plans only you are in. Plans shared with others stay with them. This cannot be undone. Continue?",
+        "delete_account_failed": "Could not delete your account. Please try again.",
+        "privacy_policy": "Privacy policy"
     },
     "home": {
         "hero_title": "Plan & Do Things Together.",
@@ -129,6 +133,8 @@
         "gps_required_toast": "GPS required for your reminders!",
         "gps_denied_toast": "Location blocked. Click the lock icon in the address bar → Location → Allow, then reload.",
         "gps_unavailable_toast": "Could not get your location right now. Try again in a moment.",
+        "gps_background_disclosure": "We use your location in the background, even when the app is closed, only to remind you when you arrive at or leave places you saved on your list items. Your location is not stored or shared. On the next screen, choose \"Allow all the time\".",
+        "gps_background_failed": "Location reminders can't run in the background. Open Settings → Apps → DoneTogether → Location and choose \"Allow all the time\".",
         "gps_permission_title": "Allow location & notifications",
         "gps_permission_body": "DoneTogether needs your location and notifications to remind you when you leave home or are near a store.",
         "gps_permission_allow": "Allow",
@@ -199,9 +205,9 @@
         "map_unavailable": "Map could not load. You can still use search and favorites.",
         "resolving_address": "Fetching address...",
         "wall_of_fame": {
-            "title": "The Wall of Fame",
-            "description": "Buy me a coffee — keep the app free and improving.",
-            "button": "Buy me a coffee"
+            "title": "☕ THE WALL OF FAME",
+            "description": "Support the development of DoneTogether by buying me a coffee. Your contribution helps keep this app free and continuously improving!",
+            "button": "Click here to buy me a coffee"
         }
     },
     "contact": {
