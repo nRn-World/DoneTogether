@@ -6,9 +6,9 @@ export function LanguageSwitcher() {
     const { i18n } = useTranslation();
 
     const languages = [
-        { code: 'en', label: 'English', flag: '🇬🇧' },
-        { code: 'sv', label: 'Svenska', flag: '🇸🇪' },
-        { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
+        { code: 'en', label: 'English', flag: 'flags/gb.svg' },
+        { code: 'sv', label: 'Svenska', flag: 'flags/se.svg' },
+        { code: 'tr', label: 'Türkçe', flag: 'flags/tr.svg' },
     ];
 
     const currentLanguage = i18n.language || 'en';
@@ -41,7 +41,7 @@ export function LanguageSwitcher() {
                             : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
                             }`}
                     >
-                        <span>{lang.flag}</span>
+                        <img src={lang.flag} alt="" width={24} height={16} className="w-6 h-4 rounded-[3px] object-cover shadow-sm ring-1 ring-black/10" />
                         <span className="hidden sm:inline">{lang.label}</span>
                     </button>
                 ))}
