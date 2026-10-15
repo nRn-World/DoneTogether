@@ -1625,13 +1625,13 @@ function App() {
 
       {/* Navigation Bar */}
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-zinc-950/80 border-t border-zinc-200 dark:border-zinc-800/50 backdrop-blur-xl pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-none">
-        <div className="max-w-3xl mx-auto px-10 h-20 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-1 h-20 grid grid-cols-5 items-center">
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'home' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center justify-self-center w-full gap-1.5 transition-all ${activeTab === 'home' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <Home className="w-6 h-6 stroke-[2.5px]" />
-            <span className="text-[9px] font-black uppercase tracking-widest">{t('common.home')}</span>
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wide text-center leading-tight">{t('common.home')}</span>
           </button>
 
           <button
@@ -1639,7 +1639,7 @@ function App() {
               if (isAuthenticated) setShowCreateModal(true);
               else setShowAuthModal(true);
             }}
-            aria-label={t('home.create_plan')} className="w-16 h-16 bg-emerald-500 text-black rounded-3xl flex items-center justify-center -mt-12 shadow-[0_20px_40px_rgba(16,185,129,0.3)] hover:scale-110 active:scale-90 transition-all border-4 border-zinc-50 dark:border-zinc-950 rotate-3"
+            aria-label={t('home.create_plan')} className="justify-self-center w-16 h-16 bg-emerald-500 text-black rounded-3xl flex items-center justify-center -mt-12 shadow-[0_20px_40px_rgba(16,185,129,0.3)] hover:scale-110 active:scale-90 transition-all border-4 border-zinc-50 dark:border-zinc-950 rotate-3"
           >
             <Plus className="w-8 h-8 stroke-[4px]" />
           </button>
@@ -1649,26 +1649,26 @@ function App() {
               setCurrentPlanId(null);
               setActiveTab('plans');
             }}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'plans' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center justify-self-center w-full gap-1.5 transition-all ${activeTab === 'plans' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <Check className="w-6 h-6 stroke-[2.5px]" />
-            <span className="text-[9px] font-black uppercase tracking-widest">{t('plans.all_plans')}</span>
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wide text-center leading-tight">{t('plans.all_plans')}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('completed')}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'completed' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center justify-self-center w-full gap-1.5 transition-all ${activeTab === 'completed' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <History className="w-6 h-6 stroke-[2.5px]" />
-            <span className="text-[9px] font-black uppercase tracking-widest">{t('plans.completed')}</span>
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wide text-center leading-tight">{t('plans.completed')}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === 'profile' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
+            className={`flex flex-col items-center justify-self-center w-full gap-1.5 transition-all ${activeTab === 'profile' ? 'text-emerald-700 dark:text-emerald-400 scale-110' : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 dark:hover:text-zinc-400'}`}
           >
             <User className="w-6 h-6 stroke-[2.5px]" />
-            <span className="text-[9px] font-black uppercase tracking-widest">{t('profile.title')}</span>
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wide text-center leading-tight">{t('profile.title')}</span>
           </button>
         </div>
       </footer>
