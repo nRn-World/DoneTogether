@@ -8,10 +8,6 @@ import {
     signInWithRedirect,
     getRedirectResult,
     signInWithCredential,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signInAnonymously,
-    updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc, Timestamp, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
@@ -58,16 +54,6 @@ export function useAuth() {
     const [error, setError] = useState<string | null>(null);
     const { i18n } = useTranslation();
     const demoModeRef = useRef(false);
-
-    const enterDemoSession = () => {
-        demoModeRef.current = true;
-        sessionStorage.setItem(DEMO_AUTH_KEY, '1');
-        seedDemoSocialGraph();
-        setUser(createDemoUser());
-        setUserProfile(createDemoUserProfile(i18n.language || 'en'));
-        setError(null);
-        setLoading(false);
-    };
 
     useEffect(() => {
         let profileUnsubscribe: (() => void) | null = null;
@@ -233,94 +219,6 @@ export function useAuth() {
         }
     };
 
-    const signInWithEmail = async (email: string, password: string) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const trimmed = email.trim();
-            try {
-                await signInWithEmailAndPassword(auth, trimmed, password);
-            } catch (err: any) {
-                const code = err?.code as string | undefined;
-                if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
-                    try {
-                        const cred = await createUserWithEmailAndPassword(auth, trimmed, password);
-                        if (!cred.user.displayName) {
-                            await updateProfile(cred.user, { displayName: 'Test User' });
-                        }
-                        return;
-                    } catch (createErr: any) {
-                        if (createErr?.code === 'auth/email-already-in-use' || createErr?.code === 'auth/operation-not-allowed') {
-                            throw err;
-                        }
-                        throw createErr;
-                    }
-                }
-                throw err;
-            }
-        } catch (err: any) {
-            console.error('Email sign in error:', err);
-            const errorCode = err?.code as string | undefined;
-            let errorMessage = err?.message || 'Something went wrong';
-            if (
-                errorCode === 'auth/invalid-credential' ||
-                errorCode === 'auth/wrong-password' ||
-                errorCode === 'auth/user-not-found' ||
-                errorCode === 'auth/invalid-email'
-            ) {
-                errorMessage = 'Invalid email or password';
-            } else if (errorCode === 'auth/operation-not-allowed') {
-                errorMessage = 'Invalid email or password';
-            }
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /** Temporary one-click login for TestSprite automation. */
-    const signInAsTestUser = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const testEmail = DEMO_EMAIL;
-            const testPassword = 'TestSprite123!';
-            try {
-                try {
-                    await signInWithEmailAndPassword(auth, testEmail, testPassword);
-                    return;
-                } catch (err: any) {
-                    const code = err?.code as string | undefined;
-                    if (code === 'auth/user-not-found' || code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
-                        const cred = await createUserWithEmailAndPassword(auth, testEmail, testPassword);
-                        await updateProfile(cred.user, { displayName: DEMO_NAME });
-                        return;
-                    }
-                    if (code === 'auth/operation-not-allowed' || code === 'auth/invalid-email') {
-                        await signInAnonymously(auth);
-                        return;
-                    }
-                    throw err;
-                }
-            } catch {
-                try {
-                    await signInAnonymously(auth);
-                    return;
-                } catch {
-                    // Firebase Email/Password + Anonymous are disabled — use local demo session
-                    enterDemoSession();
-                }
-            }
-        } catch (err: any) {
-            console.error('Test sign in error:', err);
-            enterDemoSession();
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const signOut = async () => {
         try {
             setError(null);
@@ -345,8 +243,6 @@ export function useAuth() {
         loading,
         error,
         signInWithGoogle,
-        signInWithEmail,
-        signInAsTestUser,
         signOut,
         isAuthenticated: !!user
     };

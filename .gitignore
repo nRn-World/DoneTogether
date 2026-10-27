@@ -47,3 +47,10 @@ testsprite_tests/tmp/config.json
 
 # Release bundles
 dist-aab/
+store-assets/
+
+# Video pipeline scratch (frames, raw recordings, renders)
+video/frames/
+video/scenes/
+video/out/
+video/video/

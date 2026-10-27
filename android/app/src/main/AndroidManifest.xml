@@ -46,6 +46,11 @@
 
         </activity>
 
+        <!-- AdMob app ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2518752253653498~3150953032" />
+
         <!-- Geofence Broadcast Receiver -->
         <receiver
             android:name=".GeofenceBroadcastReceiver"

@@ -4,6 +4,9 @@ import './index.css'
 import './i18n'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { initAds } from './lib/ads'
+
+void initAds()
 
 function isGeolocationRejection(reason: unknown): boolean {
   if (reason == null) return false

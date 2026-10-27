@@ -446,17 +446,8 @@ export async function addMemberToPlan(
 }
 
 export async function removeMemberFromPlan(planId: string, userId: string): Promise<void> {
-    const planRef = doc(db, 'plans', planId);
-    const planSnap = await getDoc(planRef);
-
-    if (!planSnap.exists()) return;
-
-    const plan = planSnap.data() as Plan;
-    const updatedMembers = { ...plan.members };
-    delete updatedMembers[userId];
-
-    await updateDoc(planRef, {
-        members: updatedMembers,
+    await updateDoc(doc(db, 'plans', planId), {
+        [`members.${userId}`]: deleteField(),
         lastModified: Timestamp.now(),
     });
 }

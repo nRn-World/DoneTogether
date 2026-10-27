@@ -33,7 +33,30 @@ service cloud.firestore {
         && request.auth.uid in request.resource.data.members
         && request.resource.data.members[request.auth.uid].uid == request.auth.uid
         && request.resource.data.ownerId == resource.data.ownerId
-        && request.resource.data.name == resource.data.name;
+        && request.resource.data.name == resource.data.name
+        // Only add your own member entry (never as owner); nothing else in the plan may change.
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'lastModified'])
+        && request.resource.data.members.diff(resource.data.members).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.members[request.auth.uid].role in ['editor', 'viewer'];
+    }
+
+    // Members edit items etc. Only the owner may change ownerId or other members;
+    // anyone may remove/edit just their own member entry (leave plan, delete account).
+    function canMemberUpdatePlan() {
+      return isPlanMember(resource.data)
+        && (
+          resource.data.ownerId == request.auth.uid
+          || (
+            request.resource.data.ownerId == resource.data.ownerId
+            && request.resource.data.members.diff(resource.data.members).affectedKeys().hasOnly([request.auth.uid])
+          )
+        );
+    }
+
+    function isMemberOfPlanId(planId) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/plans/$(planId))
+        && get(/databases/$(database)/documents/plans/$(planId)).data.members[request.auth.uid] != null;
     }
 
     match /users/{userId} {
@@ -46,7 +69,7 @@ service cloud.firestore {
       allow read: if isPlanMember(resource.data);
       allow create: if canCreatePlan();
       // Members can update their plans; non-members may only self-join
-      allow update: if isPlanMember(resource.data) || canSelfJoinPlan();
+      allow update: if canMemberUpdatePlan() || canSelfJoinPlan();
       allow delete: if isPlanMember(resource.data)
         && (resource.data.ownerId == request.auth.uid || resource.data.completed == true);
     }
@@ -90,7 +113,9 @@ service cloud.firestore {
         && request.resource.data.to is string
         && request.resource.data.to != request.auth.uid
         && request.resource.data.title is string
+        && request.resource.data.title.size() <= 120
         && request.resource.data.body is string
+        && request.resource.data.body.size() <= 500
         && request.resource.data.type is string
         && request.resource.data.status == 'pending';
       allow read: if isSignedIn() && resource.data.to == request.auth.uid;
@@ -103,7 +128,10 @@ service cloud.firestore {
     }
 
     match /planInvites/{inviteCode} {
-      allow read: if isSignedIn();
+      // Fetching one invite by its code is open (that is how joining works), but listing
+      // invites is limited to members of the plan, so nobody can harvest planIds.
+      allow get: if isSignedIn();
+      allow list: if isSignedIn() && isMemberOfPlanId(resource.data.planId);
       allow create: if isSignedIn()
         && request.resource.data.createdBy == request.auth.uid
         && exists(/databases/$(database)/documents/plans/$(request.resource.data.planId))

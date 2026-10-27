@@ -16,14 +16,12 @@ import { addMemberToPlan } from './useFirestore';
 
 function generateInviteCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
+    const bytes = crypto.getRandomValues(new Uint8Array(8));
+    // 256 % 36 != 0 gives a tiny bias, irrelevant for a 36^8 code space
+    return Array.from(bytes, (b) => chars[b % chars.length]).join('');
 }
 
-/** Normalize pasted invite input → 6-char code */
+/** Normalize pasted invite input → invite code (6 chars for old invites, 8 for new) */
 export function extractInviteCode(raw: string): string {
     let code = raw.trim();
     try {
