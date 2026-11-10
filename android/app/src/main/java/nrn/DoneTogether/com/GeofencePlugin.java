@@ -2,8 +2,15 @@ package nrn.DoneTogether.com;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
+
+import androidx.activity.result.ActivityResult;
+import androidx.core.location.LocationManagerCompat;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -11,6 +18,7 @@ import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
@@ -116,6 +124,39 @@ public class GeofencePlugin extends Plugin {
         }
 
         call.resolve(new JSObject().put("granted", true));
+    }
+
+    /** Android cannot switch GPS on silently; send the user to the system location screen. */
+    @PluginMethod
+    public void openLocationSettings(PluginCall call) {
+        if (isLocationEnabled()) {
+            call.resolve(new JSObject().put("enabled", true));
+            return;
+        }
+        startActivityForResult(call, new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), "locationSettingsResult");
+    }
+
+    @ActivityCallback
+    private void locationSettingsResult(PluginCall call, ActivityResult result) {
+        call.resolve(new JSObject().put("enabled", isLocationEnabled()));
+    }
+
+    /** For a permission the user denied with "don't ask again". */
+    @PluginMethod
+    public void openAppSettings(PluginCall call) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", getContext().getPackageName(), null));
+        startActivityForResult(call, intent, "appSettingsResult");
+    }
+
+    @ActivityCallback
+    private void appSettingsResult(PluginCall call, ActivityResult result) {
+        call.resolve();
+    }
+
+    private boolean isLocationEnabled() {
+        LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        return lm != null && LocationManagerCompat.isLocationEnabled(lm);
     }
 
     @PermissionCallback

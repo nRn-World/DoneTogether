@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Geolocation, type Position } from '@capacitor/geolocation';
+import GeofencePlugin from '../lib/geofence';
 
 function toWebPosition(position: GeolocationPosition): Position {
     return {
@@ -121,13 +122,21 @@ export function useLocation(userId: string | undefined) {
             try {
                 let permission = await Geolocation.checkPermissions();
                 if (permission.location !== 'granted') {
+                    const wasBlocked = permission.location === 'denied';
                     permission = await Geolocation.requestPermissions();
+                    // Android shows no dialog once denied for good: send the user to app settings
+                    if (permission.location !== 'granted' && wasBlocked) {
+                        await GeofencePlugin.openAppSettings().catch(() => undefined);
+                        permission = await Geolocation.checkPermissions();
+                    }
                 }
                 setPermissionStatus(permission.location);
                 if (permission.location !== 'granted') {
                     setIsTracking(false);
                     return false;
                 }
+                // GPS switched off in the phone: open the system location screen
+                await GeofencePlugin.openLocationSettings().catch(() => undefined);
                 setIsTracking(true);
                 const coordinates = await Geolocation.getCurrentPosition({
                     enableHighAccuracy: true,

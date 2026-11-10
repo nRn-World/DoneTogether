@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +28,7 @@ import { ShareModal } from './components/ShareModal';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminDashboard } from './components/AdminDashboard';
+import { useAdminInbox } from './hooks/useAdminChat';
 import { ContactAdminModal } from './components/ContactAdminModal';
 import { APP_VERSION } from './config/appVersion';
 import { deleteAccount } from './lib/deleteAccount';
@@ -140,6 +142,7 @@ function App() {
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showContactAdmin, setShowContactAdmin] = useState(false);
   const isAdmin = isAdminEmail(user?.email || userProfile?.email);
+  const { unreadCount: adminUnreadCount } = useAdminInbox(user?.email || userProfile?.email, isAdmin);
   const { hasUnread: hasAdminReply, preview: adminReplyPreview } = useMyAdminChatAlert(
     user?.uid,
     !!user && !isAdmin
@@ -457,6 +460,20 @@ function App() {
                 <MessageSquare className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950">
                   1
+                </span>
+              </button>
+            )}
+
+            {isAdmin && adminUnreadCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAdminDashboard(true)}
+                className="relative p-2 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                aria-label={`Nya meddelanden ${adminUnreadCount}`}
+              >
+                <MessageSquare className="w-5 h-5" />
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-emerald-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950">
+                  {adminUnreadCount}
                 </span>
               </button>
             )}
@@ -835,7 +852,7 @@ function App() {
                           value={addInput}
                           onChange={(e) => setAddInput(e.target.value)}
                           placeholder={t('plans.what_else')}
-                          className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl py-5 pl-14 pr-32 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic shadow-sm"
+                          className={`w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl py-5 ${itemFile ? 'pl-28' : 'pl-14'} pr-32 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic shadow-sm`}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                           <button
@@ -1470,6 +1487,9 @@ function App() {
                             <p className="text-sm font-bold tracking-tight">Meddelanden</p>
                             <p className="text-[11px] text-zinc-400 mt-0.5">Feedback från användare</p>
                           </div>
+                          {adminUnreadCount > 0 && (
+                            <span className="min-w-5 h-5 px-1.5 bg-emerald-500 text-black text-[11px] font-black rounded-full flex items-center justify-center">{adminUnreadCount}</span>
+                          )}
                           <span className="text-emerald-400/80 text-xs font-semibold group-hover:translate-x-0.5 transition-transform">Öppna →</span>
                         </div>
                       </button>
@@ -1836,7 +1856,7 @@ function App() {
                       type="text"
                       defaultValue={editingItem.item.text}
                       id="edit-item-input"
-                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-5 pl-14 pr-32 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic text-lg text-zinc-900 dark:text-white shadow-inner"
+                      className={`w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl py-5 ${itemFile || editingItem.item.imageUrl ? 'pl-28' : 'pl-14'} pr-32 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all font-bold italic text-lg text-zinc-900 dark:text-white shadow-inner`}
                       autoFocus
                     />
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -2189,7 +2209,7 @@ function App() {
               </div>
               <p className="text-sm text-zinc-400 leading-relaxed">
                 {permissionStatus === 'denied'
-                  ? t('plans.gps_denied_toast')
+                  ? t(Capacitor.isNativePlatform() ? 'plans.gps_denied_native' : 'plans.gps_denied_toast')
                   : t('plans.gps_permission_body')}
               </p>
               <div className="flex flex-col gap-2">

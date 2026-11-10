@@ -22,7 +22,7 @@ i18n
       escapeValue: true,
     },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'], // English by default; other languages are chosen in the app
       caches: ['localStorage'],
     },
   });

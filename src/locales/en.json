@@ -132,6 +132,7 @@
         "join_error_text": "Could not join the plan. Try again.",
         "gps_required_toast": "GPS required for your reminders!",
         "gps_denied_toast": "Location blocked. Click the lock icon in the address bar → Location → Allow, then reload.",
+        "gps_denied_native": "Location is blocked. Tap Allow to open the app settings → Permissions → Location → Allow.",
         "gps_unavailable_toast": "Could not get your location right now. Try again in a moment.",
         "gps_background_disclosure": "We use your location in the background, even when the app is closed, only to remind you when you arrive at or leave places you saved on your list items. Your location is not stored or shared. On the next screen, choose \"Allow all the time\".",
         "gps_background_failed": "Location reminders can't run in the background. Open Settings → Apps → DoneTogether → Location and choose \"Allow all the time\".",

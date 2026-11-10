@@ -129,6 +129,7 @@
         "join_error_text": "Plana katılamadı. Tekrar deneyin.",
         "gps_required_toast": "Hatırlatmalarınız için GPS gerekli!",
         "gps_denied_toast": "Konum engellendi. Adres çubuğundaki kilit simgesine tıklayın → Konum → İzin ver, sonra sayfayı yenileyin.",
+        "gps_denied_native": "Konum engellendi. İzin ver'e dokunup uygulama ayarları → İzinler → Konum → İzin ver yolunu izleyin.",
         "gps_unavailable_toast": "Konumunuz şu an alınamadı. Biraz sonra tekrar deneyin.",
         "gps_background_disclosure": "Konumunuzu, uygulama kapalıyken bile arka planda yalnızca listenize kaydettiğiniz yerlere vardığınızda veya ayrıldığınızda size hatırlatmak için kullanırız. Konumunuz saklanmaz veya paylaşılmaz. Sonraki ekranda \"Her zaman izin ver\"i seçin.",
         "gps_background_failed": "Konum hatırlatıcıları arka planda çalışamıyor. Ayarlar → Uygulamalar → DoneTogether → Konum'u açın ve \"Her zaman izin ver\"i seçin.",

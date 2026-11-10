@@ -17,6 +17,10 @@ export interface GeofencePluginInterface {
   addGeofences(options: { geofences: GeofenceData[] }): Promise<{ success: boolean; count?: number }>;
   removeGeofences(): Promise<{ success: boolean }>;
   requestPermission(): Promise<{ granted: boolean }>;
+  /** Opens the system location screen if GPS is off; resolves with the state after the user returns. */
+  openLocationSettings(): Promise<{ enabled: boolean }>;
+  /** Opens this app's system settings (permission denied with "don't ask again"). */
+  openAppSettings(): Promise<void>;
 }
 
 const GeofencePlugin = registerPlugin<GeofencePluginInterface>('GeofencePlugin');

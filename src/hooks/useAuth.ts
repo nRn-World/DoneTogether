@@ -172,6 +172,8 @@ export function useAuth() {
             console.log('[useAuth] Native platform:', Capacitor.isNativePlatform());
 
             if (Capacitor.isNativePlatform()) {
+                // Clear the cached Google account so the account chooser is shown again.
+                await GoogleAuth.signOut().catch(() => {});
                 console.log('[useAuth] Calling GoogleAuth.signIn()');
                 const googleUser = await GoogleAuth.signIn();
                 console.log('[useAuth] GoogleAuth.signIn() success, user:', googleUser.email);
@@ -231,6 +233,7 @@ export function useAuth() {
                 return;
             }
             await firebaseSignOut(auth);
+            if (Capacitor.isNativePlatform()) await GoogleAuth.signOut().catch(() => {});
         } catch (err: any) {
             console.error('Sign out error:', err);
             setError('Utloggning misslyckades');
