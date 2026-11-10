@@ -209,9 +209,9 @@
         "map_unavailable": "Kartan kunde inte laddas. Du kan fortfarande använda sök och favoriter.",
         "resolving_address": "Hämtar adress...",
         "wall_of_fame": {
-            "title": "☕ THE WALL OF FAME",
-            "description": "Stöd utvecklingen av DoneTogether genom att bjuda mig på en kaffe. Ditt bidrag hjälper till att hålla appen gratis och ständigt förbättrad!",
-            "button": "Klicka här för att bjuda mig på en kaffe"
+            "title": "Stöd DoneTogether",
+            "description": "Gillar du appen? Bjud mig på en kaffe så hjälper du mig att hålla den gratis och fortsätta utveckla den.",
+            "button": "Bjud på en kaffe"
         }
     },
     "contact": {

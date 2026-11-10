@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Plus, Share2, Trash2, Pencil, Check, Users, User, ArrowLeft, Home, Camera, History, X, Smile, Sun, Moon, MapPin, Copy, Shield, Bell, BellOff, MessageSquare } from 'lucide-react';
+import { Plus, Share2, Trash2, Pencil, Check, Users, User, ArrowLeft, Home, Camera, History, X, Smile, Sun, Moon, MapPin, Copy, Shield, Bell, BellOff, MessageSquare, Coffee } from 'lucide-react';
 import { compressAndToBase64 } from './lib/utils';
 import { useAuth } from './hooks/useAuth';
 import {
@@ -1493,22 +1493,20 @@ function App() {
                     </div>
                   )}
 
-                  {/* Wall of Fame */}
-                  <div className="w-full mb-4 flex gap-4 items-start p-4 rounded-2xl border border-blue-500/55 bg-gradient-to-br from-slate-900 to-[#1c2742] shadow-lg shadow-black/25">
-                    <img src="kofi-coffee.png" alt="" width={72} height={72} className="shrink-0 w-[72px] h-[72px] rounded-full object-cover shadow-lg shadow-amber-500/35" />
-                    <div className="flex-1 min-w-0 flex flex-col gap-2">
-                      <h2 className="text-sm font-extrabold tracking-wide text-sky-400">{t('profile.wall_of_fame.title')}</h2>
-                      <p className="text-xs leading-relaxed text-slate-300">{t('profile.wall_of_fame.description')}</p>
-                      <a
-                        href="https://ko-fi.com/nrnworld"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 text-white text-xs font-bold shadow-md shadow-sky-500/35 hover:opacity-90 transition"
-                      >
-                        <img src="kofi-coffee.png" alt="" width={18} height={18} className="w-[18px] h-[18px] rounded-full object-cover" />
-                        {t('profile.wall_of_fame.button')}
-                      </a>
-                    </div>
+                  {/* Support / Ko-fi */}
+                  <div className="w-full mb-4 flex flex-col items-center text-center gap-3 p-6 rounded-3xl border border-sky-500/30 bg-gradient-to-br from-slate-900 to-[#1c2742] shadow-lg shadow-black/25">
+                    <img src="kofi-coffee.png" alt="" width={56} height={56} className="w-14 h-14 rounded-full object-cover shadow-lg shadow-amber-500/30" />
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-400">{t('profile.wall_of_fame.title')}</h2>
+                    <p className="text-sm leading-relaxed text-slate-300 max-w-xs">{t('profile.wall_of_fame.description')}</p>
+                    <a
+                      href="https://ko-fi.com/nrnworld"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 text-white text-sm font-bold shadow-md shadow-sky-500/30 hover:opacity-90 active:scale-[0.98] transition"
+                    >
+                      <Coffee className="w-4 h-4" />
+                      {t('profile.wall_of_fame.button')}
+                    </a>
                   </div>
 
                   <button

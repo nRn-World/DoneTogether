@@ -206,9 +206,9 @@
         "map_unavailable": "Harita yüklenemedi. Arama ve favorileri hâlâ kullanabilirsiniz.",
         "resolving_address": "Adres alınıyor...",
         "wall_of_fame": {
-            "title": "☕ THE WALL OF FAME",
-            "description": "DoneTogether geliştirmesini desteklemek için bana bir kahve ısmarlayın. Katkınız bu uygulamanın ücretsiz kalmasına ve sürekli gelişmesine yardımcı olur!",
-            "button": "Bana kahve ısmarlamak için tıklayın"
+            "title": "DoneTogether'a destek ol",
+            "description": "Uygulamayı beğendin mi? Bana bir kahve ısmarlayarak ücretsiz kalmasına ve gelişmeye devam etmesine yardımcı olabilirsin.",
+            "button": "Bir kahve ısmarla"
         }
     },
     "contact": {
