@@ -8,6 +8,7 @@
         "delete": "Sil",
         "edit": "Düzenle",
         "unknown": "Bilinmiyor",
+        "by": "tarafından",
         "or": "VEYA",
         "home": "EVİM",
         "friends": "ARKADAŞLAR",
@@ -142,7 +143,7 @@
         "gps_sim_button": "GPS test et (simüle)",
         "gps_sim_start": "GPS simüle ediliyor… bildirimi bekleyin",
         "cover_image_label": "Kapak görseli (Güzel!)",
-        "cover_image_placeholder": "Görsel seçmek için tıklayın",
+        "cover_image_placeholder": "Resim seçilmedi",
         "plan_name_label": "Planın adı ne olsun?",
         "plan_name_placeholder": "Örn. Yazlık 2024",
         "create_plan_btn": "Oluştur",
@@ -170,6 +171,8 @@
         "add_reaction": "Tepki ekle",
         "react_with": "{{emoji}} ile tepki ver",
         "remove_image": "Resmi kaldır",
+        "take_photo": "Fotoğraf çek",
+        "choose_photo": "Galeri",
         "delete_plan": "Planı sil"
     },
     "profile": {

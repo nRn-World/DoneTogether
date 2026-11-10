@@ -8,6 +8,7 @@
         "delete": "Delete",
         "edit": "Edit",
         "unknown": "Unknown",
+        "by": "by",
         "or": "OR",
         "home": "HOME",
         "friends": "FRIENDS",
@@ -145,7 +146,7 @@
         "gps_sim_button": "Test GPS (simulate)",
         "gps_sim_start": "Simulating GPS… wait for notification",
         "cover_image_label": "Cover image (Nice!)",
-        "cover_image_placeholder": "Click to choose image",
+        "cover_image_placeholder": "No image selected",
         "plan_name_label": "What should the plan be called?",
         "plan_name_placeholder": "E.g. Summer house 2024",
         "create_plan_btn": "Create",
@@ -173,6 +174,8 @@
         "add_reaction": "Add reaction",
         "react_with": "React with {{emoji}}",
         "remove_image": "Remove image",
+        "take_photo": "Take photo",
+        "choose_photo": "Gallery",
         "delete_plan": "Delete plan"
     },
     "profile": {

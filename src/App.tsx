@@ -28,6 +28,7 @@ import { ShareModal } from './components/ShareModal';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AdminDashboard } from './components/AdminDashboard';
+import { PhotoPicker, PhotoButtons } from './components/PhotoPicker';
 import { useAdminInbox } from './hooks/useAdminChat';
 import { ContactAdminModal } from './components/ContactAdminModal';
 import { APP_VERSION } from './config/appVersion';
@@ -739,7 +740,7 @@ function App() {
                           <h1 className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-1 text-zinc-900 dark:text-white">{currentPlan.name}</h1>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-lg">
-                              {t('common.by') || 'BY'} {currentPlan.members?.[currentPlan.ownerId]?.displayName || t('common.unknown')}
+                              {t('common.by')} {currentPlan.members?.[currentPlan.ownerId]?.displayName || t('common.unknown')}
                             </span>
                           </div>
                         </div>
@@ -831,13 +832,9 @@ function App() {
                     >
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                          <label className="cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                            <Camera className="w-5 h-5" />
-                            <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) setItemFile(file);
-                            }} />
-                          </label>
+                          <PhotoPicker onFile={setItemFile} ariaLabel={t('plans.take_photo')} className="cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
+<Camera className="w-5 h-5" />
+</PhotoPicker>
                           {itemFile && (
                              <div className="relative ml-1">
                                <img src={itemFilePreview!} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />
@@ -1736,8 +1733,8 @@ function App() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="create-plan-cover-image" className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t('plans.cover_image_label')}</label>
-                  <div className="relative group overflow-hidden rounded-[24px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/40 transition-all aspect-video flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 cursor-pointer">
+                  <label className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t('plans.cover_image_label')}</label>
+                  <div className="relative group overflow-hidden rounded-[24px] border-2 border-dashed border-zinc-200 dark:border-zinc-800 transition-all aspect-video flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
                     {imagePreview ? (
                       <>
                         <img src={imagePreview} className="w-full h-full object-cover" alt="" />
@@ -1751,16 +1748,13 @@ function App() {
                         <span className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors tracking-widest uppercase">{t('plans.cover_image_placeholder')}</span>
                       </div>
                     )}
-                    <input id="create-plan-cover-image" type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setSelectedFile(file);
-                        const reader = new FileReader();
-                        reader.onloadend = () => setImagePreview(reader.result as string);
-                        reader.readAsDataURL(file);
-                      }
-                    }} />
                   </div>
+                  <PhotoButtons onFile={(file) => {
+                    setSelectedFile(file);
+                    const reader = new FileReader();
+                    reader.onloadend = () => setImagePreview(reader.result as string);
+                    reader.readAsDataURL(file);
+                  }} />
                 </div>
 
                 <div className="pt-6 flex gap-3">
@@ -1823,13 +1817,9 @@ function App() {
                   <label id="edit-item-title" htmlFor="edit-item-input" className="text-[10px] font-black text-zinc-600 dark:text-zinc-400 uppercase tracking-widest ml-1">{t('common.edit')}</label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                      <label className="cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                        <Camera className="w-5 h-5" />
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) setItemFile(file);
-                        }} />
-                      </label>
+                      <PhotoPicker onFile={setItemFile} ariaLabel={t('plans.take_photo')} className="cursor-pointer text-zinc-500 dark:text-zinc-400 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
+<Camera className="w-5 h-5" />
+</PhotoPicker>
                       {itemFile ? (
                          <div className="relative ml-1">
                            <img src={itemFilePreview!} className="w-8 h-8 rounded-lg border border-emerald-500 object-cover" alt="" />

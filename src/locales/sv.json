@@ -8,6 +8,7 @@
         "delete": "Radera",
         "edit": "Redigera",
         "unknown": "Okänd",
+        "by": "av",
         "or": "ELLER",
         "home": "HEM",
         "friends": "VÄNNER",
@@ -145,7 +146,7 @@
         "gps_sim_button": "Testa GPS (simulera)",
         "gps_sim_start": "Simulerar GPS… vänta på notis",
         "cover_image_label": "Omslagsbild (Snyggt!)",
-        "cover_image_placeholder": "Klicka för att välja bild",
+        "cover_image_placeholder": "Ingen bild vald",
         "plan_name_label": "Vad ska planen heta?",
         "plan_name_placeholder": "T.ex. Sommarstugan 2024",
         "create_plan_btn": "Skapa",
@@ -173,6 +174,8 @@
         "add_reaction": "Lägg till reaktion",
         "react_with": "Reagera med {{emoji}}",
         "remove_image": "Ta bort bild",
+        "take_photo": "Ta bild",
+        "choose_photo": "Galleri",
         "delete_plan": "Radera plan"
     },
     "profile": {
