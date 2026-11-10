@@ -48,7 +48,7 @@ import { useMyAdminChatAlert } from './hooks/useAdminChat';
 const EMOJIS = ['❤️', '🔥', '💪', '🙏', '😂', '💯']; // Reactions supported by the app
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
   });
@@ -1540,7 +1540,7 @@ function App() {
                       {t('update.version_label', { version: APP_VERSION })}
                     </p>
                     <a
-                      href="https://nrnworld.one/DoneTogether/privacy.html"
+                      href={`https://nrnworld.one/DoneTogether/privacy.html?lang=${i18n.language.slice(0, 2)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] text-zinc-600 dark:text-zinc-400 font-medium underline mt-1 inline-block"
