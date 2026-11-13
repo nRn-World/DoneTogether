@@ -2,6 +2,7 @@ import {
     Timestamp,
     addDoc,
     collection,
+    deleteDoc,
     doc,
     getDoc,
     onSnapshot,
@@ -112,6 +113,11 @@ export async function sendAdminChatMessage(params: {
     } catch (err) {
         console.warn('[adminChat] notify skipped', err);
     }
+}
+
+export async function deleteAdminChatMessage(threadUserId: string, messageId: string): Promise<void> {
+    if (isDemoMode()) return;
+    await deleteDoc(doc(db, THREADS, threadUserId, 'messages', messageId));
 }
 
 export function useAdminThreadMessages(threadUserId: string | undefined, enabled: boolean) {

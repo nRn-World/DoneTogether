@@ -233,6 +233,7 @@
         "daily_limit": "Du har redan skrivit idag",
         "daily_limit_hint": "Du kan skicka ett nytt meddelande imorgon, eller svara när admin har svarat dig.",
         "send_error": "Kunde inte skicka. Försök igen.",
+        "delete_confirm": "Radera meddelandet?",
         "send_error_rules": "Firebase blockerar. Publicera firestore.rules i Firebase Console först.",
         "alert_title": "Svar från admin",
         "alert_body": "Du har fått ett nytt meddelande",

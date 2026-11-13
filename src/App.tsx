@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -220,11 +220,19 @@ function App() {
   }, [itemFile]);
 
   // Trigger confetti when plan is completed
+  // Only on the open -> completed transition of the plan being viewed (not when opening an already finished plan).
+  const prevCompletedRef = useRef<{ id: string | null; completed: boolean }>({ id: null, completed: false });
   useEffect(() => {
-    if (currentPlan?.completed) {
-      triggerConfetti();
+    const id = currentPlan?.id ?? null;
+    const completed = !!currentPlan?.completed;
+    const prev = prevCompletedRef.current;
+    prevCompletedRef.current = { id, completed };
+    if (completed && prev.id === id && !prev.completed) {
+      // Delay so the list re-sorts first; the full-screen canvas flashed white in the Android WebView otherwise.
+      const timer = setTimeout(triggerConfetti, 400);
+      return () => clearTimeout(timer);
     }
-  }, [currentPlan?.completed]);
+  }, [currentPlan?.id, currentPlan?.completed]);
 
   // Auto-cleanup for plans completed more than 30 days ago
   useEffect(() => {
@@ -274,8 +282,8 @@ function App() {
   };
 
   const triggerConfetti = () => {
-    const count = 200;
-    const defaults = { origin: { y: 0.7 } };
+    const count = 90; // fewer particles: 200 stalled the WebView compositor
+    const defaults = { origin: { y: 0.7 }, disableForReducedMotion: true };
 
     function fire(particleRatio: number, opts: any) {
       confetti({
@@ -1164,7 +1172,7 @@ function App() {
                             )}
 
                             {/* Reactions Section */}
-                            <div className="mt-4 flex flex-wrap gap-2 items-center">
+                            <div className="relative mt-4 flex flex-wrap gap-2 items-center">
                               {item.reactions && item.reactions.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5">
                                   {Object.entries(
@@ -1185,7 +1193,7 @@ function App() {
                                 </div>
                               )}
 
-                              <div className="relative">
+                              <div>
                                 <button
                                   aria-label={t('plans.add_reaction')} aria-expanded={activeReactionPicker === item.id} onClick={() => setActiveReactionPicker(activeReactionPicker === item.id ? null : item.id)}
                                   className={`p-2 rounded-xl border transition-all ${activeReactionPicker === item.id ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-zinc-50 dark:bg-zinc-800/40 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors'}`}
@@ -1199,7 +1207,7 @@ function App() {
                                       initial={{ opacity: 0, y: 10, scale: 0.9 }}
                                       animate={{ opacity: 1, y: 0, scale: 1 }}
                                       exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                                      className="absolute bottom-full mb-3 left-0 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-2 rounded-2xl shadow-xl dark:shadow-2xl flex gap-1 z-20"
+                                      className="absolute bottom-full mb-3 left-0 max-w-full flex-wrap bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-2 rounded-2xl shadow-xl dark:shadow-2xl flex gap-1 z-20"
                                     >
                                       {EMOJIS.map(emoji => (
                                         <button

@@ -11,3 +11,8 @@
         display: none;
     }
 }
+
+/* Match the app background so the WebView never shows white between renders/overscroll. */
+html { background-color: #09090b; }
+html:not(.dark) { background-color: #fafafa; }
+body { background-color: inherit; overscroll-behavior: none; }
