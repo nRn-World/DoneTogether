@@ -14,6 +14,7 @@ exports.sendPush = onDocumentCreated('notifications/{id}', async (event) => {
   const userRef = getFirestore().doc(`users/${n.to}`);
   const tokens = ((await userRef.get()).data() || {}).fcmTokens || [];
   if (!tokens.length) {
+    console.log(`no fcmTokens for user ${n.to} (${n.type})`);
     await snap.ref.update({ status: 'failed' });
     return;
   }
@@ -24,6 +25,11 @@ exports.sendPush = onDocumentCreated('notifications/{id}', async (event) => {
     data: { type: String(n.type || ''), relatedId: String(n.relatedId || '') },
     android: { priority: 'high' },
   });
+
+  console.log(
+    `push to ${n.to} (${n.type}): ${res.successCount}/${tokens.length} ok`,
+    res.responses.filter((r) => r.error).map((r) => r.error.code)
+  );
 
   // Drop tokens that are no longer valid (app uninstalled / token rotated).
   const dead = tokens.filter((_, i) =>
