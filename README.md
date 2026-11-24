@@ -2,7 +2,11 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Version](https://img.shields.io/badge/version-1.0.0-green.svg) ![Status](https://img.shields.io/badge/status-Active-success.svg)
 
+[![Google Play](https://img.shields.io/badge/Google%20Play-Download-414141?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=nrn.DoneTogether.com)
+
 **DoneTogether** is a modern and intelligent task manager designed to make planning and collaboration easy, fast, and fun. Whether it's the family grocery list, your team's project plan, or your personal to-do list, DoneTogether helps you get things done – together.
+
+**📲 Android:** [Download DoneTogether on Google Play](https://play.google.com/store/apps/details?id=nrn.DoneTogether.com)
 
 ---
 
