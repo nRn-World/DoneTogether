@@ -31,3 +31,4 @@ dist-ssr
 
 # Upload bundles (never in the repo)
 *.aab
+*.apk
