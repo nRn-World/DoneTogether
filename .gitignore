@@ -57,3 +57,4 @@ video/video/
 
 # Upload bundles (never in the repo)
 *.aab
+*.apk
