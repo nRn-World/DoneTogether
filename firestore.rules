@@ -163,7 +163,8 @@ service cloud.firestore {
             (isOwner(userId) && request.resource.data.from == 'user')
             || (isAdmin() && request.resource.data.from == 'admin')
           );
-        allow update, delete: if false;
+        allow update: if false;
+        allow delete: if isAdmin();
       }
     }
   }

@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/badge/license-Non--Commercial-orange.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.2.2-green.svg)](https://github.com/nRn-World/DoneTogether/releases)
 [![Status](https://img.shields.io/badge/status-Live-success.svg)](https://nrnworld.one/DoneTogether/)
+[![Google Play](https://img.shields.io/badge/Google%20Play-Download-414141?logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=nrn.DoneTogether.com)
 
 DoneTogether is a free collaborative planning app for families and friends.
 Create a shared plan, invite others with a link, and check items off together
@@ -13,6 +14,7 @@ so people get notified when they need them most.
 
 **Live app:** [https://nrnworld.one/DoneTogether/](https://nrnworld.one/DoneTogether/)  
 **Info & Android download:** [https://nrnworld.one/p/donetogether](https://nrnworld.one/p/donetogether)  
+**Google Play:** [Download DoneTogether on Google Play](https://play.google.com/store/apps/details?id=nrn.DoneTogether.com)  
 **Repository:** [https://github.com/nRn-World/DoneTogether](https://github.com/nRn-World/DoneTogether)
 
 ---

@@ -54,3 +54,7 @@ video/frames/
 video/scenes/
 video/out/
 video/video/
+
+# Upload bundles (never in the repo)
+*.aab
+*.apk

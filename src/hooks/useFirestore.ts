@@ -94,6 +94,9 @@ export function usePlans(userId: string | undefined) {
     return { plans, loading, error };
 }
 
+// Latest snapshot of each open plan, so item edits can be written optimistically.
+const planCache = new Map<string, Plan>();
+
 export function usePlan(planId: string | null) {
     const [plan, setPlan] = useState<Plan | null>(null);
     const [loading, setLoading] = useState(true);
@@ -123,13 +126,16 @@ export function usePlan(planId: string | null) {
             (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.data();
-                    setPlan({
+                    const next = {
                         id: snapshot.id,
                         ...data,
                         items: data.items || [],
                         members: data.members || {},
-                    } as Plan);
+                    } as Plan;
+                    planCache.set(snapshot.id, next);
+                    setPlan(next);
                 } else {
+                    planCache.delete(snapshot.id);
                     setPlan(null);
                 }
                 setLoading(false);
@@ -263,6 +269,25 @@ async function mutatePlanItems(
     updateCompletion = true
 ): Promise<{ plan: Plan; items: Item[]; allChecked: boolean } | null> {
     const planRef = doc(db, 'plans', planId);
+
+    // Fast path: write from the live snapshot with updateDoc. The snapshot listener fires
+    // instantly (latency compensation), so ticking/reacting feels immediate instead of
+    // waiting on a server round-trip like a transaction does.
+    // shortcut: last write wins if two members edit items in the same instant; use the transaction below if that matters.
+    const cached = planCache.get(planId);
+    if (cached) {
+        const items = compute(cached);
+        if (!items) return null;
+        const allChecked = items.length > 0 && items.every((i) => i.checked);
+        const update: Record<string, unknown> = { items, lastModified: Timestamp.now() };
+        if (updateCompletion) {
+            update.completed = allChecked;
+            update.completedAt = allChecked ? Timestamp.now() : null;
+        }
+        await updateDoc(planRef, update);
+        return { plan: cached, items, allChecked };
+    }
+
     return runTransaction(db, async (tx) => {
         const snap = await tx.get(planRef);
         if (!snap.exists()) return null;
@@ -298,7 +323,7 @@ export async function updateItem(planId: string, itemId: string, updates: Partia
     if (!result) return;
     const { plan, allChecked } = result;
 
-    if (allChecked && plan.notificationsEnabled === true) {
+    if (allChecked) {
         Object.keys(plan.members).forEach(uid => {
             sendAppNotification(uid, 'Plan slutförd! 🎉', `Planen "${plan.name}" är nu helt klar!`, 'plan_complete', planId);
         });
@@ -321,7 +346,7 @@ export async function deleteItem(planId: string, itemId: string): Promise<void> 
     if (!result) return;
     const { plan, allChecked } = result;
 
-    if (allChecked && plan.notificationsEnabled === true) {
+    if (allChecked) {
         Object.keys(plan.members).forEach(uid => {
             sendAppNotification(uid, 'Plan slutförd! 🎉', `Planen "${plan.name}" är nu helt klar!`, 'plan_complete', planId);
         });
@@ -376,17 +401,15 @@ export async function toggleItemChecked(
     const isNowChecked = !item.checked;
     const itemText = item.text;
 
-    if (plan.notificationsEnabled === true) {
-        Object.keys(plan.members).forEach(uid => {
-            if (uid !== userId) { // Don't notify the person who did it
-                if (allChecked && isNowChecked) {
-                    sendAppNotification(uid, 'Plan slutförd! 🎉', `Planen "${plan.name}" är nu helt klar!`, 'plan_complete', planId);
-                } else if (isNowChecked) {
-                    sendAppNotification(uid, 'Punkt avklarad! ✅', `${displayName} fixade "${itemText}" i ${plan.name}`, 'plan_update', planId);
-                }
-            }
-        });
-    }
+    Object.keys(plan.members).forEach(uid => {
+        if (uid === userId) return; // Don't notify the person who did it
+        // Plan completion is always announced; per-item updates respect the plan's notification toggle.
+        if (allChecked && isNowChecked) {
+            sendAppNotification(uid, 'Plan slutförd! 🎉', `${displayName} bockade av sista punkten – "${plan.name}" är nu helt klar!`, 'plan_complete', planId);
+        } else if (isNowChecked && plan.notificationsEnabled === true) {
+            sendAppNotification(uid, 'Punkt avklarad! ✅', `${displayName} fixade "${itemText}" i ${plan.name}`, 'plan_update', planId);
+        }
+    });
 }
 
 export async function addMemberToPlan(

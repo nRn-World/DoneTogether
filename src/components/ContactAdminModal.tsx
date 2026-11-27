@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, MessageSquare, Send, X, Shield } from 'lucide-react';
+import { Loader2, MessageSquare, Send, Trash2, X, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
+    deleteAdminChatMessage,
     getUserSendBlockReason,
     markThreadRead,
     sendAdminChatMessage,
@@ -106,6 +107,16 @@ export function ContactAdminModal({
         }
     };
 
+    const onDelete = async (id: string) => {
+        if (!window.confirm(t('contact.delete_confirm'))) return;
+        try {
+            await deleteAdminChatMessage(threadUserId, id);
+        } catch (err) {
+            console.error(err);
+            setSendError(t('contact.send_error'));
+        }
+    };
+
     const placeholder = isAdminMode
         ? t('contact.admin_placeholder')
         : blockReason === 'awaiting_reply'
@@ -138,7 +149,7 @@ export function ContactAdminModal({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 24 }}
                         transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                        className="relative z-10 flex max-h-[88vh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl sm:rounded-[28px]"
+                        className="relative z-10 flex max-h-[88dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-2xl sm:rounded-[28px]"
                     >
                         <div className="flex items-start justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 px-5 py-4">
                             <div className="flex items-center gap-3 min-w-0">
@@ -212,11 +223,23 @@ export function ContactAdminModal({
                                             <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                                                 {m.text}
                                             </p>
-                                            <p
-                                                className={`text-[10px] mt-1.5 ${mine ? 'text-black/50' : 'text-zinc-600 dark:text-zinc-400'}`}
-                                            >
-                                                {formatTime(m.createdAt)}
-                                            </p>
+                                            <div className="flex items-center justify-between gap-3 mt-1.5">
+                                                <p
+                                                    className={`text-[10px] ${mine ? 'text-black/50' : 'text-zinc-600 dark:text-zinc-400'}`}
+                                                >
+                                                    {formatTime(m.createdAt)}
+                                                </p>
+                                                {isAdminMode && (
+                                                    <button
+                                                        type="button"
+                                                        aria-label={t('common.delete')}
+                                                        onClick={() => void onDelete(m.id)}
+                                                        className="p-1 -m-1 opacity-60 hover:opacity-100 hover:text-red-600"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 );

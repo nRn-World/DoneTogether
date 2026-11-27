@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete Account &amp; Data – DoneTogether: Shared To-Do (nRnWorld)</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:740px;margin:0 auto;padding:24px 16px;line-height:1.65;color:#18181b;background:#fff}
+@media (prefers-color-scheme:dark){body{color:#e4e4e7;background:#09090b}a{color:#34d399}.card{background:#18181b;border-color:#27272a}table,th,td{border-color:#27272a}}
+h1{font-size:1.6rem;margin-bottom:.35rem}h2{font-size:1.18rem;margin-top:1.8rem}
+.meta{color:#71717a;font-size:.92rem;margin-top:0}
+.card{background:#f4f4f5;border:1px solid #e4e4e7;border-radius:12px;padding:16px 18px;margin:16px 0}
+.btn{display:inline-block;margin-top:8px;padding:10px 16px;border-radius:8px;background:#10b981;color:#052e16;font-weight:700;text-decoration:none}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.95rem}
+th,td{border:1px solid #e4e4e7;padding:10px 12px;text-align:left;vertical-align:top}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<p id="nav"><a href="?lang=en">English</a> · <a href="?lang=sv">Svenska</a> · <a href="?lang=tr">Türkçe</a> · <a href="privacy.html">Privacy Policy</a></p>
+
+<div id="en">
+<h1>Account &amp; Data Deletion – DoneTogether: Shared To-Do</h1>
+<p class="meta">App: <b>DoneTogether: Shared To-Do</b> (<code>nrn.DoneTogether.com</code>) · Developer: <b>nRnWorld</b> (nRn World) · Updated: 2026-11-27</p>
+
+<p>This page explains how users of <b>DoneTogether: Shared To-Do</b> by <b>nRnWorld</b> can permanently delete their account and associated data, or request deletion of specific data without deleting their account.</p>
+
+<h2>1. Delete your account (full account &amp; data deletion)</h2>
+
+<div class="card">
+<strong>Option A — Delete directly in the app (immediate)</strong>
+<ol>
+<li>Open <b>DoneTogether: Shared To-Do</b> on your device and sign in with your Google account.</li>
+<li>Go to the <b>Profile</b> tab.</li>
+<li>Tap <b>Delete account</b> and confirm the prompt.</li>
+<li>Complete the Google re-authentication prompt. Your account and personal data are permanently deleted immediately.</li>
+</ol>
+</div>
+
+<div class="card">
+<strong>Option B — Request account deletion online / by email (if you uninstalled the app)</strong>
+<ol>
+<li>Send an email to <a href="mailto:bynrnworld@gmail.com?subject=Delete%20Account%20-%20DoneTogether">bynrnworld@gmail.com</a> from (or clearly stating) the Google email address linked to your DoneTogether account.</li>
+<li>Use the subject line <b>Delete Account – DoneTogether</b>.</li>
+<li>We will verify ownership and permanently delete your account and associated data within <b>30 days</b> (usually within 7 days), and send you a confirmation email.</li>
+</ol>
+<a class="btn" href="mailto:bynrnworld@gmail.com?subject=Delete%20Account%20-%20DoneTogether&amp;body=Please%20permanently%20delete%20my%20DoneTogether%20account%20and%20associated%20data.%0A%0AGoogle%20account%20email%3A%20">Request Account Deletion via Email</a>
+</div>
+
+<h2>2. Delete specific data without deleting your account</h2>
+<p>You can remove individual items or categories of data while keeping your DoneTogether account active:</p>
+<ul>
+<li><b>In the app (immediate):</b> Delete any plan you own (trash icon on the plan card), delete individual to-do items, remove uploaded item photos, remove saved location reminders, or remove friends from your friend list.</li>
+<li><b>By email (within 30 days):</b> Email <a href="mailto:bynrnworld@gmail.com?subject=Delete%20Data%20-%20DoneTogether">bynrnworld@gmail.com</a> with subject <b>Delete Data – DoneTogether</b>, stating your Google account email and which data you want deleted (for example: friend requests, invite codes, feedback/support messages, or specific plan content).</li>
+</ul>
+<p><a class="btn" href="mailto:bynrnworld@gmail.com?subject=Delete%20Data%20-%20DoneTogether&amp;body=Please%20delete%20the%20following%20data%20without%20deleting%20my%20DoneTogether%20account.%0A%0AGoogle%20account%20email%3A%20%0AData%20to%20delete%3A%20">Request Partial Data Deletion via Email</a></p>
+
+<h2>3. Data deleted, retained, and retention periods</h2>
+<table>
+<thead>
+<tr><th>Data type</th><th>What happens on deletion</th><th>Retention period</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Account &amp; profile</b> (Google UID, name, email, profile photo, FCM notification tokens)</td>
+<td>Permanently deleted from Firebase Authentication and Firestore.</td>
+<td>0 days (immediate in-app) / up to 30 days via email request.</td>
+</tr>
+<tr>
+<td><b>Solo plans, items, saved locations, photos &amp; reactions</b></td>
+<td>Permanently deleted when you are the only member of the plan.</td>
+<td>0 days (immediate in-app) / up to 30 days via email request. Completed plans auto-delete after 30 days.</td>
+</tr>
+<tr>
+<td><b>Shared plans</b> (plans with other active members)</td>
+<td>Your account is removed from the plan's members list (ownership transfers to another member if you were the owner). The shared plan remains available to the other members without your membership.</td>
+<td>Membership removed immediately; shared plan content persists only while other members keep it.</td>
+</tr>
+<tr>
+<td><b>Friendships &amp; local geofences</b></td>
+<td>Permanently deleted from Firestore and removed from your device.</td>
+<td>0 days (immediate in-app) / up to 30 days via email request.</td>
+</tr>
+<tr>
+<td><b>Friend requests, invite codes &amp; feedback messages</b></td>
+<td>Cannot be deleted directly by the mobile client due to Firestore security rules. Permanently deleted by the developer upon email request.</td>
+<td>Retained until requested via email, then permanently deleted within 30 days.</td>
+</tr>
+<tr>
+<td><b>Real-time device GPS location</b></td>
+<td>Processed only on-device for geofence reminders; never stored on our servers.</td>
+<td>Not stored (0 days).</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Contact</h2>
+<p>Developer: <b>nRnWorld</b> (nRn World) · Email: <a href="mailto:bynrnworld@gmail.com">bynrnworld@gmail.com</a> · <a href="privacy.html?lang=en">Privacy Policy</a></p>
+</div>
+
+<div id="sv" hidden>
+<h1>Radera konto &amp; data – DoneTogether: Shared To-Do</h1>
+<p class="meta">App: <b>DoneTogether: Shared To-Do</b> (<code>nrn.DoneTogether.com</code>) · Utvecklare: <b>nRnWorld</b> (nRn World) · Uppdaterad: 2026-11-27</p>
+
+<p>Den här sidan beskriver hur användare av <b>DoneTogether: Shared To-Do</b> från <b>nRnWorld</b> permanent kan radera sitt konto och tillhörande data, eller begära radering av viss data utan att radera kontot.</p>
+
+<h2>1. Radera ditt konto (fullständig radering)</h2>
+
+<div class="card">
+<strong>Alternativ A — Radera direkt i appen (omedelbart)</strong>
+<ol>
+<li>Öppna <b>DoneTogether: Shared To-Do</b> på din enhet och logga in med ditt Google-konto.</li>
+<li>Gå till fliken <b>Profil</b>.</li>
+<li>Tryck på <b>Radera konto</b> och bekräfta.</li>
+<li>Bekräfta med ny Google-inloggning när du uppmanas. Ditt konto och dina personuppgifter raderas permanent direkt.</li>
+</ol>
+</div>
+
+<div class="card">
+<strong>Alternativ B — Begär kontoradering via e-post (om du avinstallerat appen)</strong>
+<ol>
+<li>Skicka ett mejl till <a href="mailto:bynrnworld@gmail.com?subject=Radera%20konto%20-%20DoneTogether">bynrnworld@gmail.com</a> från (eller med tydlig uppgift om) den Google-e-postadress som är kopplad till ditt DoneTogether-konto.</li>
+<li>Ange ämnesraden <b>Radera konto – DoneTogether</b>.</li>
+<li>Vi verifierar begäran och raderar ditt konto och tillhörande data permanent inom <b>30 dagar</b> (normalt inom 7 dagar) samt skickar bekräftelse via e-post.</li>
+</ol>
+<a class="btn" href="mailto:bynrnworld@gmail.com?subject=Radera%20konto%20-%20DoneTogether&amp;body=V%C3%A4nligen%20radera%20mitt%20DoneTogether-konto%20och%20tillh%C3%B6rande%20data%20permanent.%0A%0AGoogle-konto%20(e-post)%3A%20">Begär kontoradering via e-post</a>
+</div>
+
+<h2>2. Radera viss data utan att radera kontot</h2>
+<p>Du kan ta bort enskilda uppgifter och ändå behålla ditt DoneTogether-konto:</p>
+<ul>
+<li><b>I appen (omedelbart):</b> Ta bort egna planer (papperskorgsikonen), radera enskilda punkter, ta bort uppladdade bilder, ta bort sparade platspåminnelser eller ta bort vänner från vänlistan.</li>
+<li><b>Via e-post (inom 30 dagar):</b> Mejla <a href="mailto:bynrnworld@gmail.com?subject=Radera%20data%20-%20DoneTogether">bynrnworld@gmail.com</a> med ämnesraden <b>Radera data – DoneTogether</b>, ange din Google-e-post och vilken data du vill ta bort (t.ex. vänförfrågningar, inbjudningskoder, feedbackmeddelanden eller visst innehåll).</li>
+</ul>
+<p><a class="btn" href="mailto:bynrnworld@gmail.com?subject=Radera%20data%20-%20DoneTogether&amp;body=V%C3%A4nligen%20radera%20f%C3%B6ljande%20data%20utan%20att%20radera%20mitt%20DoneTogether-konto.%0A%0AGoogle-konto%20(e-post)%3A%20%0AData%20att%20radera%3A%20">Begär radering av viss data via e-post</a></p>
+
+<h2>3. Vilken data som raderas, behålls och lagringstider</h2>
+<table>
+<thead>
+<tr><th>Datatyp</th><th>Vad som händer vid radering</th><th>Lagringstid</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Konto &amp; profil</b> (Google-UID, namn, e-post, profilbild, aviseringstoken)</td>
+<td>Raderas permanent från Firebase Authentication och Firestore.</td>
+<td>0 dagar (omedelbart i appen) / upp till 30 dagar via e-post.</td>
+</tr>
+<tr>
+<td><b>Egna planer, punkter, platser, bilder &amp; reaktioner</b></td>
+<td>Raderas permanent när du är ensam medlem i planen.</td>
+<td>0 dagar (omedelbart i appen) / upp till 30 dagar via e-post. Klarade planer raderas automatiskt efter 30 dagar.</td>
+</tr>
+<tr>
+<td><b>Delade planer</b> (med andra medlemmar)</td>
+<td>Ditt konto tas bort ur planens medlemslista (ägarskapet går över till en annan medlem om du var ägare). Planen finns kvar för övriga medlemmar utan dig.</td>
+<td>Medlemskap tas bort direkt; delat innehåll finns kvar så länge övriga medlemmar behåller planen.</td>
+</tr>
+<tr>
+<td><b>Vänskaper &amp; lokala geofences</b></td>
+<td>Raderas permanent från Firestore och tas bort från din enhet.</td>
+<td>0 dagar (omedelbart i appen) / upp till 30 dagar via e-post.</td>
+</tr>
+<tr>
+<td><b>Vänförfrågningar, inbjudningskoder &amp; feedbackmeddelanden</b></td>
+<td>Kan inte raderas direkt från mobilappen p.g.a. säkerhetsregler i Firestore. Raderas permanent av utvecklaren efter mejlbegäran.</td>
+<td>Sparas tills du begär radering via e-post och tas då bort permanent inom 30 dagar.</td>
+</tr>
+<tr>
+<td><b>Enhetens GPS-position i realtid</b></td>
+<td>Bearbetas endast lokalt på enheten för platspåminnelser; lagras aldrig på våra servrar.</td>
+<td>Lagras inte (0 dagar).</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Kontakt</h2>
+<p>Utvecklare: <b>nRnWorld</b> (nRn World) · E-post: <a href="mailto:bynrnworld@gmail.com">bynrnworld@gmail.com</a> · <a href="privacy.html?lang=sv">Integritetspolicy</a></p>
+</div>
+
+<div id="tr" hidden>
+<h1>Hesap ve Veri Silme – DoneTogether: Shared To-Do</h1>
+<p class="meta">Uygulama: <b>DoneTogether: Shared To-Do</b> (<code>nrn.DoneTogether.com</code>) · Geliştirici: <b>nRnWorld</b> (nRn World) · Güncelleme: 2026-11-27</p>
+
+<p>Bu sayfa, <b>nRnWorld</b> tarafından geliştirilen <b>DoneTogether: Shared To-Do</b> kullanıcılarının hesaplarını ve ilgili verilerini kalıcı olarak nasıl silebileceğini veya hesaplarını silmeden belirli verilerin silinmesini nasıl talep edebileceğini açıklar.</p>
+
+<h2>1. Hesabınızı silme (tam hesap ve veri silme)</h2>
+<div class="card">
+<strong>Seçenek A — Uygulama içinden silme (anında)</strong>
+<ol>
+<li><b>DoneTogether: Shared To-Do</b> uygulamasını açın ve Google hesabınızla giriş yapın.</li>
+<li><b>Profil</b> sekmesine gidin.</li>
+<li><b>Hesabı sil</b> seçeneğine dokunun ve onaylayın.</li>
+<li>İstendiğinde Google hesabınızla yeniden doğrulama yapın. Hesabınız ve kişisel verileriniz derhal kalıcı olarak silinir.</li>
+</ol>
+</div>
+<div class="card">
+<strong>Seçenek B — E-posta ile hesap silme talebi (uygulamayı kaldırdıysanız)</strong>
+<ol>
+<li>DoneTogether hesabınıza bağlı Google e-posta adresinden (veya bu adresi belirterek) <a href="mailto:bynrnworld@gmail.com?subject=Delete%20Account%20-%20DoneTogether">bynrnworld@gmail.com</a> adresine e-posta gönderin.</li>
+<li>Konu satırına <b>Delete Account – DoneTogether</b> yazın.</li>
+<li>Talebiniz doğrulandıktan sonra hesabınız ve ilgili veriler <b>30 gün</b> içinde (genellikle 7 gün içinde) kalıcı olarak silinir.</li>
+</ol>
+</div>
+
+<h2>2. Hesabınızı silmeden belirli verileri silme</h2>
+<ul>
+<li><b>Uygulama içinde (anında):</b> Sahip olduğunuz planları, maddeleri, yüklenen fotoğrafları, kayıtlı konum hatırlatıcılarını ve arkadaşlıkları dilediğiniz zaman silebilirsiniz.</li>
+<li><b>E-posta ile (30 gün içinde):</b> <a href="mailto:bynrnworld@gmail.com?subject=Delete%20Data%20-%20DoneTogether">bynrnworld@gmail.com</a> adresine <b>Delete Data – DoneTogether</b> konusuyla yazın ve silinmesini istediğiniz verileri (arkadaşlık istekleri, davet kodları, geri bildirim mesajları vb.) belirtin.</li>
+</ul>
+
+<h2>3. Silinen ve saklanan veriler ile saklama süreleri</h2>
+<ul>
+<li><b>Hesap, profil, bildirim belirteçleri, arkadaşlıklar ve tek üyesi olduğunuz planlar:</b> Uygulama içinden anında (0 gün), e-posta talebiyle en geç 30 gün içinde kalıcı olarak silinir.</li>
+<li><b>Paylaşılan planlar:</b> Üyeliğiniz derhal kaldırılır; plan diğer üyeler için sizsiz olarak kalır.</li>
+<li><b>Arkadaşlık istekleri, davet kodları ve geri bildirim mesajları:</b> E-posta talebi üzerine 30 gün içinde kalıcı olarak silinir.</li>
+<li><b>Gerçek zamanlı cihaz konumu:</b> Sunucularımızda hiç saklanmaz (0 gün).</li>
+</ul>
+
+<h2>İletişim</h2>
+<p>Geliştirici: <b>nRnWorld</b> (nRn World) · E-posta: <a href="mailto:bynrnworld@gmail.com">bynrnworld@gmail.com</a> · <a href="privacy.html?lang=tr">Gizlilik Politikası</a></p>
+</div>
+
+<script>
+// Default to English when no ?lang= query param is provided so Play reviewers & links open in English unless requested.
+(function(){
+var L=['en','sv','tr'],q=new URLSearchParams(location.search).get('lang');
+if(!q)return;
+var l=q.slice(0,2).toLowerCase();
+if(L.indexOf(l)<0)l='en';
+document.documentElement.lang=l;
+L.forEach(function(x){document.getElementById(x).hidden=x!==l;});
+})();
+</script>
+</body>
+</html>

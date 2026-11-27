@@ -19,10 +19,11 @@ public class MainActivity extends BridgeActivity {
         // Android 15+ draws edge-to-edge: keep the app above the system status/nav bars.
         View content = findViewById(android.R.id.content);
         content.setBackgroundColor(Color.parseColor("#09090b")); // matches the app's dark background
+        getBridge().getWebView().setBackgroundColor(Color.parseColor("#09090b")); // no white flash while the WebView repaints
         WindowCompat.getInsetsController(getWindow(), content).setAppearanceLightStatusBars(false);
         WindowCompat.getInsetsController(getWindow(), content).setAppearanceLightNavigationBars(false);
         ViewCompat.setOnApplyWindowInsetsListener(content, (v, windowInsets) -> {
-            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });

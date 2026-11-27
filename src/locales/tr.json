@@ -230,6 +230,7 @@
         "daily_limit": "Bugün zaten yazdınız",
         "daily_limit_hint": "Yarın yeni mesaj gönderebilirsiniz veya admin cevapladığında yanıt verebilirsiniz.",
         "send_error": "Gönderilemedi. Lütfen tekrar deneyin.",
+        "delete_confirm": "Mesaj silinsin mi?",
         "send_error_rules": "Firebase engelledi. Önce Firebase Console'da firestore.rules yayınlayın.",
         "alert_title": "Adminden cevap",
         "alert_body": "Yeni bir mesajınız var",

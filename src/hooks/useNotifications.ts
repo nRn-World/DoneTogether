@@ -16,6 +16,44 @@ const VAPID_KEY =
 export function useNotifications(userId: string | undefined) {
     const [token, setToken] = useState<string | null>(null);
 
+    // Native (Android APK/AAB): register for FCM push and save the device token.
+    // The `notifications` Cloud Function (functions/index.js) delivers the pushes to these tokens.
+    useEffect(() => {
+        if (!userId || !Capacitor.isNativePlatform()) return;
+        let cancelled = false;
+        const handles: { remove: () => Promise<void> }[] = [];
+
+        const setup = async () => {
+            try {
+                const { PushNotifications } = await import('@capacitor/push-notifications');
+                handles.push(
+                    await PushNotifications.addListener('registration', (t) => {
+                        if (cancelled) return;
+                        setToken(t.value);
+                        updateDoc(doc(db, 'users', userId), { fcmTokens: arrayUnion(t.value) }).catch((e) =>
+                            console.error('[push] saving token failed', e)
+                        );
+                    }),
+                    await PushNotifications.addListener('registrationError', (e) =>
+                        console.error('[push] registration error', e)
+                    )
+                );
+                let perm = await PushNotifications.checkPermissions();
+                if (perm.receive === 'prompt') perm = await PushNotifications.requestPermissions();
+                if (perm.receive !== 'granted' || cancelled) return;
+                await PushNotifications.register();
+            } catch (e) {
+                console.error('[push] setup failed', e);
+            }
+        };
+        void setup();
+
+        return () => {
+            cancelled = true;
+            handles.forEach((h) => void h.remove());
+        };
+    }, [userId]);
+
     useEffect(() => {
         if (!userId || Capacitor.isNativePlatform() || !messaging) return;
 

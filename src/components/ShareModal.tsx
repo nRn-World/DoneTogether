@@ -112,11 +112,11 @@ export function ShareModal({ plan, currentUserId, currentUserName, onClose }: Sh
                                         type="text"
                                         value={inviteLink}
                                         readOnly
-                                        className="flex-1 h-14 px-5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-sm font-bold text-zinc-600 dark:text-zinc-400 focus:outline-none"
+                                        className="flex-1 min-w-0 h-14 px-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-sm font-bold text-zinc-600 dark:text-zinc-400 focus:outline-none"
                                     />
                                     <button
                                         onClick={handleCopy}
-                                        className="px-6 h-14 rounded-2xl bg-emerald-500 text-black font-black italic uppercase tracking-widest hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                                        className="shrink-0 px-4 h-14 rounded-2xl bg-emerald-500 text-black font-black italic uppercase tracking-wider hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
                                     >
                                         {copied ? <Check className="w-5 h-5 stroke-[3px]" /> : <Copy className="w-5 h-5 stroke-[2.5px]" />}
                                         {copied ? t('plans.copied') : t('plans.copy')}
