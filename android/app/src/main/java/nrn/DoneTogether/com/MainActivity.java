@@ -15,6 +15,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(GeofencePlugin.class);
         registerPlugin(GoogleAuth.class);
+        registerPlugin(AppReviewPlugin.class);
         super.onCreate(savedInstanceState);
         // Android 15+ draws edge-to-edge: keep the app above the system status/nav bars.
         View content = findViewById(android.R.id.content);

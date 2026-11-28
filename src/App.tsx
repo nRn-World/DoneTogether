@@ -33,6 +33,7 @@ import { useAdminInbox } from './hooks/useAdminChat';
 import { ContactAdminModal } from './components/ContactAdminModal';
 import { APP_VERSION } from './config/appVersion';
 import { deleteAccount } from './lib/deleteAccount';
+import { maybeRequestInAppReview } from './lib/appReview';
 import type { Plan, Item } from './types';
 
 import { useLocation } from './hooks/useLocation';
@@ -230,7 +231,13 @@ function App() {
     if (completed && prev.id === id && !prev.completed) {
       // Delay so the list re-sorts first; the full-screen canvas flashed white in the Android WebView otherwise.
       const timer = setTimeout(triggerConfetti, 400);
-      return () => clearTimeout(timer);
+      const reviewTimer = setTimeout(() => {
+        void maybeRequestInAppReview();
+      }, 2400);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(reviewTimer);
+      };
     }
   }, [currentPlan?.id, currentPlan?.completed]);
 
